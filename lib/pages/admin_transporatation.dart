@@ -42,7 +42,7 @@ class _AdminTransportState extends State<AdminTransport> {
                   indicator: UnderlineTabIndicator(
                       borderRadius: BorderRadius.circular(5),
                       borderSide: BorderSide(width: 4, color: Colors.white)),
-                  padding: EdgeInsets.only(left: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 12),
                   // indicatorWeight: 25,
                   tabs: [
                     Tab(

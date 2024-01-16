@@ -3,8 +3,10 @@ import 'dart:js_interop';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:school_management/widgets/textfield_widget.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 import '../ip_address.dart';
 
@@ -31,6 +33,7 @@ class _OwnerPageState extends State<OwnerPage> {
       return;
     } else {
       var data = jsonDecode(res.body);
+      print(data);
       return data;
     }
   }
@@ -72,7 +75,7 @@ class _OwnerPageState extends State<OwnerPage> {
               ),
             ),
             SizedBox(
-              width: 650,
+              width: double.infinity,
               child: FutureBuilder(
                 future: _schools,
                 builder: (context, snapshot) {
@@ -83,7 +86,7 @@ class _OwnerPageState extends State<OwnerPage> {
                     }
                     return Column(
                       children: [
-                        const Row(
+                        Row(
                           children: [
                             SizedBox(
                                 width: 150,
@@ -104,11 +107,12 @@ class _OwnerPageState extends State<OwnerPage> {
                               width: 10,
                             ),
                             SizedBox(
-                                width: 200,
-                                child: Text(
-                                  'Password',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                )),
+                              width: 200,
+                              child: Text(
+                                'Password',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(
@@ -135,8 +139,17 @@ class _OwnerPageState extends State<OwnerPage> {
                                     ),
                                     SizedBox(
                                         width: 200,
-                                        child:
-                                            Text(data[index]['schoolPassword']))
+                                        child: Text(
+                                            data[index]['schoolPassword'])),
+                                    OutlinedButton(
+                                        onPressed: () {
+                                          // launchUrl(Uri.parse(
+                                          //     '/onlineApplication/${data[index]['onlineCode']}'));
+
+                                          context.go(
+                                              '/onlineApplication/${data[index]['onlineCode']}');
+                                        },
+                                        child: Text('data'))
                                   ],
                                 ),
                             separatorBuilder: (context, index) =>

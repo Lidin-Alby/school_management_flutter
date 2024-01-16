@@ -55,12 +55,29 @@ class _ParentInfoState extends State<ParentInfo> {
   bool _motherOpacity = false;
   bool _gaurdianOpacity = false;
   late bool isEdit;
+  bool getAll = false;
+  Map form = {};
 
   @override
   void initState() {
     isEdit = widget.isEdit;
     getStudentParentInfo();
     super.initState();
+  }
+
+  getFormAccessStudent() async {
+    var client = BrowserClient()..withCredentials = true;
+    var url = Uri.http(ipv4, '/getFormAccessStudent');
+    var res = await client.get(url);
+
+    Map data = jsonDecode(res.body);
+    // Map form = data['studentForm'];
+    print(data);
+    form = data['studentForm'];
+
+    setState(() {
+      getAll = true;
+    });
   }
 
   getAllProfilePics() async {
@@ -120,6 +137,7 @@ class _ParentInfoState extends State<ParentInfo> {
     gaurdianMobNo.text = data['gaurdianOccupation'] ?? '';
     gaurdianWhatsApp.text = data['gaurdianWhatsApp'] ?? '';
     gaurdianAadhaar.text = data['gaurdianAadhaar'] ?? '';
+    getFormAccessStudent();
   }
 
   saveStudentParentInfo() async {
@@ -297,91 +315,98 @@ class _ParentInfoState extends State<ParentInfo> {
       child: Wrap(
         runSpacing: 15,
         children: [
-          Center(
-            child: InkWell(
-              hoverColor: Colors.transparent,
-              borderRadius: BorderRadius.circular(50),
-              onHover: (value) {
-                setState(() {
-                  _gaurdianOpacity = value;
-                });
-              },
-              onTap: !isEdit
-                  ? () {}
-                  : () async {
-                      FilePickerResult? result = await FilePicker.platform
-                          .pickFiles(type: FileType.image);
-                      _gaurdianImage = result!.files.first;
-                      setState(() {
-                        _gaurdianImagebytes = _gaurdianImage!.bytes;
-                      });
-                    },
-              child: Stack(
-                children: [
-                  _gaurdianImagebytes == null
-                      ? Icon(
-                          color: Colors.grey,
-                          Icons.account_circle_rounded,
-                          size: 100,
-                        )
-                      : CircleAvatar(
-                          radius: 50,
-                          backgroundImage: MemoryImage(
-                            _gaurdianImagebytes!,
-                            //  fit: BoxFit.contain,
+          if (form['gaurdianPic'] == 'true')
+            Center(
+              child: InkWell(
+                hoverColor: Colors.transparent,
+                borderRadius: BorderRadius.circular(50),
+                onHover: (value) {
+                  setState(() {
+                    _gaurdianOpacity = value;
+                  });
+                },
+                onTap: !isEdit
+                    ? () {}
+                    : () async {
+                        FilePickerResult? result = await FilePicker.platform
+                            .pickFiles(type: FileType.image);
+                        _gaurdianImage = result!.files.first;
+                        setState(() {
+                          _gaurdianImagebytes = _gaurdianImage!.bytes;
+                        });
+                      },
+                child: Stack(
+                  children: [
+                    _gaurdianImagebytes == null
+                        ? Icon(
+                            color: Colors.grey,
+                            Icons.account_circle_rounded,
+                            size: 100,
+                          )
+                        : CircleAvatar(
+                            radius: 50,
+                            backgroundImage: MemoryImage(
+                              _gaurdianImagebytes!,
+                              //  fit: BoxFit.contain,
+                            ),
                           ),
+                    if (_gaurdianOpacity)
+                      CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.black.withOpacity(.60)),
+                    if (_gaurdianOpacity)
+                      Positioned(
+                        top: 35,
+                        left: 35,
+                        child: Icon(
+                          color: Colors.white,
+                          Icons.edit_outlined,
+                          size: 30,
                         ),
-                  if (_gaurdianOpacity)
-                    CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.black.withOpacity(.60)),
-                  if (_gaurdianOpacity)
-                    Positioned(
-                      top: 35,
-                      left: 35,
-                      child: Icon(
-                        color: Colors.white,
-                        Icons.edit_outlined,
-                        size: 30,
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
           SizedBox(
             height: 10,
           ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Relation with Student',
-            controller: gaurdianRelation,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Gaurdian\'s Name',
-            controller: gaurdianName,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Occupation',
-            controller: gaurdianOccupation,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Gaurdian\'s Mobile No.',
-            controller: gaurdianMobNo,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Gaurdian \'s Whatsapp No.',
-            controller: gaurdianWhatsApp,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Aadhaar No.',
-            controller: gaurdianAadhaar,
-          )
+          if (form['gaurdianRelation'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Relation with Student',
+              controller: gaurdianRelation,
+            ),
+          if (form['gaurdianName'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Gaurdian\'s Name',
+              controller: gaurdianName,
+            ),
+          if (form['gaurdianOccupation'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Occupation',
+              controller: gaurdianOccupation,
+            ),
+          if (form['gaurdianMobNo'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Gaurdian\'s Mobile No.',
+              controller: gaurdianMobNo,
+            ),
+          if (form['gaurdianWhatsApp'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Gaurdian \'s Whatsapp No.',
+              controller: gaurdianWhatsApp,
+            ),
+          if (form['gaurdianAadhaar'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Aadhaar No.',
+              controller: gaurdianAadhaar,
+            )
         ],
       ),
     );
@@ -393,86 +418,92 @@ class _ParentInfoState extends State<ParentInfo> {
       child: Wrap(
         runSpacing: 15,
         children: [
-          Center(
-            child: InkWell(
-              hoverColor: Colors.transparent,
-              borderRadius: BorderRadius.circular(50),
-              onHover: (value) {
-                setState(() {
-                  _motherOpacity = value;
-                });
-              },
-              onTap: !isEdit
-                  ? () {}
-                  : () async {
-                      FilePickerResult? result = await FilePicker.platform
-                          .pickFiles(type: FileType.image);
-                      _motherImage = result!.files.first;
-                      setState(() {
-                        _motherImagebytes = _motherImage!.bytes;
-                      });
-                    },
-              child: Stack(
-                children: [
-                  _motherImagebytes == null
-                      ? Icon(
-                          color: Colors.grey,
-                          Icons.account_circle_rounded,
-                          size: 100,
-                        )
-                      : CircleAvatar(
-                          radius: 50,
-                          backgroundImage: MemoryImage(
-                            _motherImagebytes!,
-                            //  fit: BoxFit.contain,
+          if (form['motherPic'] == 'true')
+            Center(
+              child: InkWell(
+                hoverColor: Colors.transparent,
+                borderRadius: BorderRadius.circular(50),
+                onHover: (value) {
+                  setState(() {
+                    _motherOpacity = value;
+                  });
+                },
+                onTap: !isEdit
+                    ? () {}
+                    : () async {
+                        FilePickerResult? result = await FilePicker.platform
+                            .pickFiles(type: FileType.image);
+                        _motherImage = result!.files.first;
+                        setState(() {
+                          _motherImagebytes = _motherImage!.bytes;
+                        });
+                      },
+                child: Stack(
+                  children: [
+                    _motherImagebytes == null
+                        ? Icon(
+                            color: Colors.grey,
+                            Icons.account_circle_rounded,
+                            size: 100,
+                          )
+                        : CircleAvatar(
+                            radius: 50,
+                            backgroundImage: MemoryImage(
+                              _motherImagebytes!,
+                              //  fit: BoxFit.contain,
+                            ),
                           ),
+                    if (_motherOpacity)
+                      CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.black.withOpacity(.60)),
+                    if (_motherOpacity)
+                      Positioned(
+                        top: 35,
+                        left: 35,
+                        child: Icon(
+                          color: Colors.white,
+                          Icons.edit_outlined,
+                          size: 30,
                         ),
-                  if (_motherOpacity)
-                    CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.black.withOpacity(.60)),
-                  if (_motherOpacity)
-                    Positioned(
-                      top: 35,
-                      left: 35,
-                      child: Icon(
-                        color: Colors.white,
-                        Icons.edit_outlined,
-                        size: 30,
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
           SizedBox(
             height: 10,
           ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Mother\'s Name',
-            controller: motherName,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Occupation',
-            controller: motherOccupation,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Mother\'s Mobile No.',
-            controller: motherMobNo,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Mother\'s Whatsapp No.',
-            controller: motherWhatsApp,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Aadhaar No.',
-            controller: motherAadhaar,
-          )
+          if (form['motherName'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Mother\'s Name',
+              controller: motherName,
+            ),
+          if (form['motherOccupation'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Occupation',
+              controller: motherOccupation,
+            ),
+          if (form['motherMobNo'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Mother\'s Mobile No.',
+              controller: motherMobNo,
+            ),
+          if (form['motherWhatsapp'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Mother\'s Whatsapp No.',
+              controller: motherWhatsApp,
+            ),
+          if (form['motherAadhaar'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Aadhaar No.',
+              controller: motherAadhaar,
+            )
         ],
       ),
     );
@@ -484,86 +515,92 @@ class _ParentInfoState extends State<ParentInfo> {
       child: Wrap(
         runSpacing: 15,
         children: [
-          Center(
-            child: InkWell(
-              hoverColor: Colors.transparent,
-              borderRadius: BorderRadius.circular(50),
-              onHover: (value) {
-                setState(() {
-                  _fatherOpacity = value;
-                });
-              },
-              onTap: !isEdit
-                  ? () {}
-                  : () async {
-                      FilePickerResult? result = await FilePicker.platform
-                          .pickFiles(type: FileType.image);
-                      _fatherImage = result!.files.first;
-                      setState(() {
-                        _fatherImagebytes = _fatherImage!.bytes;
-                      });
-                    },
-              child: Stack(
-                children: [
-                  _fatherImagebytes == null
-                      ? Icon(
-                          color: Colors.grey,
-                          Icons.account_circle_rounded,
-                          size: 100,
-                        )
-                      : CircleAvatar(
-                          radius: 50,
-                          backgroundImage: MemoryImage(
-                            _fatherImagebytes!,
-                            //  fit: BoxFit.contain,
+          if (form['fatherPic'] == 'true')
+            Center(
+              child: InkWell(
+                hoverColor: Colors.transparent,
+                borderRadius: BorderRadius.circular(50),
+                onHover: (value) {
+                  setState(() {
+                    _fatherOpacity = value;
+                  });
+                },
+                onTap: !isEdit
+                    ? () {}
+                    : () async {
+                        FilePickerResult? result = await FilePicker.platform
+                            .pickFiles(type: FileType.image);
+                        _fatherImage = result!.files.first;
+                        setState(() {
+                          _fatherImagebytes = _fatherImage!.bytes;
+                        });
+                      },
+                child: Stack(
+                  children: [
+                    _fatherImagebytes == null
+                        ? Icon(
+                            color: Colors.grey,
+                            Icons.account_circle_rounded,
+                            size: 100,
+                          )
+                        : CircleAvatar(
+                            radius: 50,
+                            backgroundImage: MemoryImage(
+                              _fatherImagebytes!,
+                              //  fit: BoxFit.contain,
+                            ),
                           ),
+                    if (_fatherOpacity)
+                      CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.black.withOpacity(.60)),
+                    if (_fatherOpacity)
+                      Positioned(
+                        top: 35,
+                        left: 35,
+                        child: Icon(
+                          color: Colors.white,
+                          Icons.edit_outlined,
+                          size: 30,
                         ),
-                  if (_fatherOpacity)
-                    CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.black.withOpacity(.60)),
-                  if (_fatherOpacity)
-                    Positioned(
-                      top: 35,
-                      left: 35,
-                      child: Icon(
-                        color: Colors.white,
-                        Icons.edit_outlined,
-                        size: 30,
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
           SizedBox(
             height: 10,
           ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Father\'s Name',
-            controller: fatherName,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Occupation',
-            controller: fatherOccupation,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Father\'s Mobile No.',
-            controller: fatherMobNo,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Father\'s Whatsapp No.',
-            controller: fatherWhatsApp,
-          ),
-          TextFieldWidget(
-            isEdit: isEdit,
-            label: 'Aadhaar No.',
-            controller: fatherAadhaar,
-          )
+          if (form['fatherName'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Father\'s Name',
+              controller: fatherName,
+            ),
+          if (form['fatherOccupation'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Occupation',
+              controller: fatherOccupation,
+            ),
+          if (form['fatherMobNo'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Father\'s Mobile No.',
+              controller: fatherMobNo,
+            ),
+          if (form['fatherWhatsapp'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Father\'s Whatsapp No.',
+              controller: fatherWhatsApp,
+            ),
+          if (form['fatherAadhaar'] == 'true')
+            TextFieldWidget(
+              isEdit: isEdit,
+              label: 'Aadhaar No.',
+              controller: fatherAadhaar,
+            )
         ],
       ),
     );

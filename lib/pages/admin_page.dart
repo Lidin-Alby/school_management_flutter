@@ -168,7 +168,11 @@ class _AdminPageState extends State<AdminPage> {
                         ),
                       ),
                     ),
-                    Expanded(child: widget.child),
+                    Expanded(
+                        child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: widget.child,
+                    )),
                   ],
                 ),
         ),
@@ -215,7 +219,7 @@ class CustomNavigationRail extends StatelessWidget {
             icon: Icon(Icons.calendar_month),
             label: Text(
               'Class\nAttendance',
-              textAlign: TextAlign.center,
+              // textAlign: TextAlign.center,
             ));
       case 'id-cards':
         return NavigationRailDestination(
@@ -228,6 +232,12 @@ class CustomNavigationRail extends StatelessWidget {
           selectedIcon: Icon(Icons.account_circle),
           icon: Icon(Icons.account_circle_outlined),
           label: Text('Profile'),
+        );
+      case 'school-settings':
+        return const NavigationRailDestination(
+          selectedIcon: Icon(Icons.settings),
+          icon: Icon(Icons.settings_outlined),
+          label: Text('School Settings'),
         );
       case 'attendance':
         return NavigationRailDestination(
@@ -312,7 +322,7 @@ class CustomNavigationRail extends StatelessWidget {
     int? selectedIndex = accesses.indexWhere(
         (element) => GoRouter.of(context).location.startsWith('/$element'));
     return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+      padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
         child: NavigationRail(
@@ -353,6 +363,7 @@ class CustomNavigationRail extends StatelessWidget {
                 case 'time-table':
                   context.go('/time-table');
                   break;
+
                 case 'homework':
                   context.go('/homework');
                   break;
@@ -382,6 +393,9 @@ class CustomNavigationRail extends StatelessWidget {
                   break;
                 case 'accessControl':
                   context.go('/accessControl', extra: false);
+                  break;
+                case 'school-settings':
+                  context.go('/school-settings');
                   break;
               }
             },

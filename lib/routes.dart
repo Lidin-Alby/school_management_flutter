@@ -13,7 +13,9 @@ import 'package:school_management/pages/admin_page.dart';
 import 'package:school_management/pages/admin_transporatation.dart';
 import 'package:school_management/pages/each_staff_page.dart';
 import 'package:school_management/pages/login_page.dart';
+import 'package:school_management/pages/online_application.dart';
 import 'package:school_management/pages/owner_page.dart';
+import 'package:school_management/pages/school_settings.dart';
 
 import 'attendance_nav.dart';
 import 'chapter_content.dart';
@@ -61,6 +63,12 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => LoginPage(),
+    ),
+    GoRoute(
+      path: '/onlineApplication/:code',
+      builder: (context, state) => OnlineApplication(
+        code: state.params['code'].toString(),
+      ),
     ),
     GoRoute(
       path: '/myApp',
@@ -150,6 +158,8 @@ final GoRouter router = GoRouter(
         //   path: '/login',
         //   builder: (context, state) => LoginPage(),
         // ),
+        // GoRoute(path: '/studentsMenu'),
+
         GoRoute(
           path: '/students',
           builder: (context, state) => AdminStudents(),
@@ -178,6 +188,11 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/transportation',
           builder: (context, state) => AdminTransport(),
+          redirect: (context, state) => authFun(),
+        ),
+        GoRoute(
+          path: '/school-settings',
+          builder: (context, state) => SchoolSettings(),
           redirect: (context, state) => authFun(),
         ),
         GoRoute(
