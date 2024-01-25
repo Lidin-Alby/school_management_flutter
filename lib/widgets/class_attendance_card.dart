@@ -77,7 +77,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
 
   getClass() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getClassDetails');
+    var url = Uri.parse('$ipv4/getClassDetails');
     var res = await client.get(url);
 
     print('done');
@@ -94,7 +94,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
 
   getAttendace() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getAttendance/$_selectedClass/$formattedDate');
+    var url = Uri.parse('$ipv4/getAttendance/$_selectedClass/$formattedDate');
 
     var res = await client.get(url);
     print(res.body);
@@ -609,7 +609,7 @@ class _MarkAttendanceState extends State<MarkAttendance> {
 
   getClass() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getClassDetails');
+    var url = Uri.parse('$ipv4/getClassDetails');
     var res = await client.get(url);
 
     print('done');
@@ -626,7 +626,7 @@ class _MarkAttendanceState extends State<MarkAttendance> {
 
   getAttendace() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getAttendance/$selectedClass/$formattedDate');
+    var url = Uri.parse('$ipv4/getAttendance/$selectedClass/$formattedDate');
 
     var res = await client.get(url);
     print(res.body);
@@ -642,7 +642,7 @@ class _MarkAttendanceState extends State<MarkAttendance> {
       isSaving = true;
     });
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/addAttendance');
+    var url = Uri.parse('$ipv4/addAttendance');
 
     var res = await client.post(
       url,
@@ -1191,7 +1191,7 @@ class _StudentAttendanceState extends State<StudentAttendance> {
 
   getProfilePic() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getProfilePic/${widget.admNo}');
+    var url = Uri.parse('$ipv4/getProfilePic/${widget.admNo}');
     var response = await client.get(url);
 
     if (response.body == 'false') {
@@ -1329,7 +1329,7 @@ class _StudentAttendanceState extends State<StudentAttendance> {
 
   getAttendace() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getSingleAttendance/${widget.admNo}');
+    var url = Uri.parse('$ipv4/getSingleAttendance/${widget.admNo}');
 
     var res = await client.get(url);
     print(res.body);

@@ -24,7 +24,7 @@ class _AdminStaffState extends State<AdminStaff> {
   List staffs = [];
   getStaffUsers() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffUsers');
+    var url = Uri.parse('$ipv4/getStaffUsers');
     var res = await client.get(url);
 
     List staffs = json.decode(res.body);
@@ -34,7 +34,7 @@ class _AdminStaffState extends State<AdminStaff> {
 
   deleteStudent() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/deleteStaff');
+    var url = Uri.parse('$ipv4/deleteStaff');
     var res =
         await client.delete(url, body: {'staffs': jsonEncode(selectedStaffs)});
 
@@ -48,7 +48,7 @@ class _AdminStaffState extends State<AdminStaff> {
 
   Future getStaffProfilePic(fileName) async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffPic/$fileName');
+    var url = Uri.parse('$ipv4/getStaffPic/$fileName');
     var response = await client.get(url);
 
     return response.bodyBytes;

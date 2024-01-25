@@ -19,6 +19,8 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController userId = TextEditingController();
   TextEditingController password = TextEditingController();
   String? selectedCode;
+  late String logSchoolCode;
+
   List schoolCodesList = [];
   bool logged = false;
 
@@ -28,12 +30,14 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       //context.go('/students');
       print(state);
+      logSchoolCode = selectedCode.toString();
       context.go('/$state');
     }
   }
 
   getSchoolCodes() async {
-    var url = Uri.http(ipv4, '/getSchoolCodes');
+    var url = Uri.parse('$ipv4/getSchoolCodes');
+    print(url);
     var res = await http.get(url);
     if (res.body.isEmpty) {
       return;
@@ -151,8 +155,8 @@ class _LoginPageState extends State<LoginPage> {
                               ..withCredentials = true;
 
                             http.Response response;
-                            var url = Uri.http(ipv4, '/login');
-
+                            var url = Uri.parse('$ipv4/login');
+                            print(url);
                             response = await client.post(
                               url,
                               body: {

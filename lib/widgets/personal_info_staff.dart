@@ -96,7 +96,7 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
   getStaffProfilePic() async {
     print('staff profile pic');
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffProfilePic/${mob.text}');
+    var url = Uri.parse('$ipv4/getStaffProfilePic/${mob.text}');
     var response = await client.get(url);
 
     if (response.body == 'false') {
@@ -111,7 +111,7 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
   getStaffPersonalInfo() async {
     getStaffProfilePic();
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffPersonalInfo/${mob.text}');
+    var url = Uri.parse('$ipv4/getStaffPersonalInfo/${mob.text}');
 
     var response = await client.get(url);
     print(response.body);
@@ -145,7 +145,7 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
 
   getStaffFormDetails() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffFormDetails');
+    var url = Uri.parse('$ipv4/getStaffFormDetails');
 
     var response = await client.get(url);
     print(response.body);
@@ -163,7 +163,7 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
 
   getStaffForms() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/staffForms');
+    var url = Uri.parse('$ipv4/staffForms');
     var response = await client.get(url);
     print(response.body);
     Map details = jsonDecode(response.body);
@@ -178,7 +178,7 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
       setState(() {
         isSaved = false;
       });
-      var url = Uri.http(ipv4,
+      var url = Uri.https(ipv4,
           widget.isEdit ? '/addPersonalInfoStaff' : 'updatePersonalInfoStaff');
       var req = http.MultipartRequest(
         'POST',
@@ -245,7 +245,7 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
       // });
 
       var client = BrowserClient()..withCredentials = true;
-      var url = Uri.http(ipv4, '/searchStudent/$value');
+      var url = Uri.parse('$ipv4/searchStudent/$value');
       var res = await client.get(url);
 
       setState(() {
@@ -955,7 +955,7 @@ class _AddDesignationState extends State<AddDesignation> {
                                 borderRadius: BorderRadius.circular(20))),
                         onPressed: () async {
                           var client = BrowserClient()..withCredentials = true;
-                          var url = Uri.http(ipv4, '/removeDesignation');
+                          var url = Uri.parse('$ipv4/removeDesignation');
                           var res = await client.delete(url, body: {
                             'schoolCode': widget.schoolCode.toString(),
                             'designation': e
@@ -1003,7 +1003,7 @@ class _AddDesignationState extends State<AddDesignation> {
         ElevatedButton(
           onPressed: () async {
             var client = BrowserClient()..withCredentials = true;
-            var url = Uri.http(ipv4, '/addDesignation');
+            var url = Uri.parse('$ipv4/addDesignation');
             var res = await client.post(url, body: {
               'schoolCode': widget.schoolCode.toString(),
               'designation': newDesignation.text.trim()
@@ -1077,7 +1077,7 @@ class _AddDepartmentState extends State<AddDepartment> {
                                 borderRadius: BorderRadius.circular(20))),
                         onPressed: () async {
                           var client = BrowserClient()..withCredentials = true;
-                          var url = Uri.http(ipv4, '/removeDepartment');
+                          var url = Uri.parse('$ipv4/removeDepartment');
                           var res = await client.delete(url, body: {
                             'schoolCode': widget.schoolCode.toString(),
                             'department': e
@@ -1125,7 +1125,7 @@ class _AddDepartmentState extends State<AddDepartment> {
         ElevatedButton(
           onPressed: () async {
             var client = BrowserClient()..withCredentials = true;
-            var url = Uri.http(ipv4, '/addDepartment');
+            var url = Uri.parse('$ipv4/addDepartment');
             var res = await client.post(url, body: {
               'schoolCode': widget.schoolCode.toString(),
               'department': newDepartment.text.trim()

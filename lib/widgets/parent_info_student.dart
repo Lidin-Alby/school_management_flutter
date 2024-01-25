@@ -67,7 +67,7 @@ class _ParentInfoState extends State<ParentInfo> {
 
   getFormAccessStudent() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getFormAccessStudent');
+    var url = Uri.parse('$ipv4/getFormAccessStudent');
     var res = await client.get(url);
 
     Map data = jsonDecode(res.body);
@@ -82,7 +82,7 @@ class _ParentInfoState extends State<ParentInfo> {
 
   getAllProfilePics() async {
     var client = BrowserClient()..withCredentials = true;
-    var url1 = Uri.http(ipv4, '/getFatherPic/${widget.admNo}');
+    var url1 = Uri.parse('$ipv4/getFatherPic/${widget.admNo}');
     var response1 = await client.get(url1);
 
     if (response1.body == 'false') {
@@ -90,7 +90,7 @@ class _ParentInfoState extends State<ParentInfo> {
     } else {
       _fatherImagebytes = response1.bodyBytes;
     }
-    var url2 = Uri.http(ipv4, '/getMotherPic/${widget.admNo}');
+    var url2 = Uri.parse('$ipv4/getMotherPic/${widget.admNo}');
     var response2 = await client.get(url2);
 
     if (response2.body == 'false') {
@@ -98,7 +98,7 @@ class _ParentInfoState extends State<ParentInfo> {
     } else {
       _motherImagebytes = response2.bodyBytes;
     }
-    var url3 = Uri.http(ipv4, '/getGaurdianPic/${widget.admNo}');
+    var url3 = Uri.parse('$ipv4/getGaurdianPic/${widget.admNo}');
     var response3 = await client.get(url3);
 
     if (response3.body == 'false') {
@@ -114,7 +114,7 @@ class _ParentInfoState extends State<ParentInfo> {
   getStudentParentInfo() async {
     getAllProfilePics();
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStudentParentInfo/${widget.admNo}');
+    var url = Uri.parse('$ipv4/getStudentParentInfo/${widget.admNo}');
 
     var response = await client.get(url);
     print(response.body);
@@ -144,7 +144,7 @@ class _ParentInfoState extends State<ParentInfo> {
     setState(() {
       isSaved = false;
     });
-    var url = Uri.http(ipv4, '/addStudentParentInfo');
+    var url = Uri.parse('$ipv4/addStudentParentInfo');
 
     var req = http.MultipartRequest(
       'POST',

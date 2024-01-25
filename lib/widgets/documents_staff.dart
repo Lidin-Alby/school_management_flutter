@@ -57,7 +57,7 @@ class _StaffDocumentState extends State<StaffDocument> {
 
   getStaffDocuments() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffContactInfo/${widget.mob}');
+    var url = Uri.parse('$ipv4/getStaffContactInfo/${widget.mob}');
 
     var response = await client.get(url);
 
@@ -113,7 +113,7 @@ class _StaffDocumentState extends State<StaffDocument> {
       // isSaved = false;
       _loading = true;
     });
-    var url = Uri.http(ipv4, '/uploadStaffDocument');
+    var url = Uri.parse('$ipv4/uploadStaffDocument');
 
     var req = http.MultipartRequest(
       'POST',
@@ -190,7 +190,7 @@ class _StaffDocumentState extends State<StaffDocument> {
 
   downloadFile(String loc, String name) async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/downloadDoc');
+    var url = Uri.parse('$ipv4/downloadDoc');
     var response = await client.post(url, body: {'loc': loc});
 
     final fileBytes = response.bodyBytes;
@@ -278,7 +278,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             splashRadius: 20,
                                             onPressed: () async {
                                               var url =
-                                                  Uri.http(ipv4, '/deleteDoc');
+                                                  Uri.parse('$ipv4/deleteDoc');
 
                                               await http.post(url, body: {
                                                 'schoolCode':
@@ -372,7 +372,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             splashRadius: 20,
                                             onPressed: () async {
                                               var url =
-                                                  Uri.http(ipv4, '/deleteDoc');
+                                                  Uri.parse('$ipv4/deleteDoc');
 
                                               await http.post(url, body: {
                                                 'schoolCode':
@@ -462,7 +462,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             splashRadius: 20,
                                             onPressed: () async {
                                               var url =
-                                                  Uri.http(ipv4, '/deleteDoc');
+                                                  Uri.parse('$ipv4/deleteDoc');
 
                                               await http.post(url, body: {
                                                 'schoolCode':
@@ -554,7 +554,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             splashRadius: 20,
                                             onPressed: () async {
                                               var url =
-                                                  Uri.http(ipv4, '/deleteDoc');
+                                                  Uri.parse('$ipv4/deleteDoc');
 
                                               await http.post(url, body: {
                                                 'schoolCode':
@@ -648,7 +648,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             splashRadius: 20,
                                             onPressed: () async {
                                               var url =
-                                                  Uri.http(ipv4, '/deleteDoc');
+                                                  Uri.parse('$ipv4/deleteDoc');
 
                                               await http.post(url, body: {
                                                 'schoolCode':
@@ -760,7 +760,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             IconButton(
                                                 splashRadius: 20,
                                                 onPressed: () async {
-                                                  var url = Uri.http(
+                                                  var url = Uri.https(
                                                       ipv4, '/deleteDoc');
 
                                                   await http.post(url, body: {

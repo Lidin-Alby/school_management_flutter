@@ -111,7 +111,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
   getFormAccessStudent() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getFormAccessStudent');
+    var url = Uri.parse('$ipv4/getFormAccessStudent');
     var res = await client.get(url);
 
     Map data = jsonDecode(res.body);
@@ -131,7 +131,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
       // });
 
       var client = BrowserClient()..withCredentials = true;
-      var url = Uri.http(ipv4, '/searchStudent/$value');
+      var url = Uri.parse('$ipv4/searchStudent/$value');
       var res = await client.get(url);
 
       setState(() {
@@ -147,7 +147,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
 
   getProfilePic() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getProfilePic/${admNo.text}');
+    var url = Uri.parse('$ipv4/getProfilePic/${admNo.text}');
     var response = await client.get(url);
 
     if (response.body == 'false') {
@@ -163,7 +163,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     var client = BrowserClient()..withCredentials = true;
     getProfilePic();
     Map data = {};
-    var url = Uri.http(ipv4, '/getStudentUsers/${admNo.text}');
+    var url = Uri.parse('$ipv4/getStudentUsers/${admNo.text}');
 
     var response = await client.get(url);
 
@@ -207,14 +207,13 @@ class _PersonalInfoState extends State<PersonalInfo> {
             ? data['sibling']
             : jsonDecode(data['sibling']);
       }
-      getFormAccessStudent();
     }
     // return response.body;
   }
 
   Future getFormDetails() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getFormDetails');
+    var url = Uri.parse('$ipv4/getFormDetails');
     var res = await client.get(url);
 
     Map data = jsonDecode(res.body);
@@ -224,6 +223,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     schoolTransportList = data['route'];
     vehicleNoList = data['vehicle'];
     pickAndDropList = data['pickup'];
+    getFormAccessStudent();
     setState(() {});
   }
 
@@ -233,9 +233,9 @@ class _PersonalInfoState extends State<PersonalInfo> {
       setState(() {
         isSaved = false;
       });
-      //   var url = Uri.http(ipv4, '/addPersonalInfo');
+      //   var url = Uri.parse('$ipv4/addPersonalInfo');
 
-      var url = Uri.http(ipv4,
+      var url = Uri.https(ipv4,
           widget.isEdit ? '/addPersonalInfo' : '/updateStudentPersonalInfo');
 
       var req = http.MultipartRequest(
@@ -428,7 +428,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
               ],
             ),
           )
-        : CircularProgressIndicator();
+        : Center(child: CircularProgressIndicator());
   }
 
   Wrap firstColumn() {

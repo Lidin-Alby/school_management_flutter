@@ -21,7 +21,7 @@ class _TimeTableNavState extends State<TimeTableNav> {
   String classTeacher = '';
   getTimeTable() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getTimeTable/common');
+    var url = Uri.parse('$ipv4/getTimeTable/common');
     var res = await client.get(url);
 
     Map details = jsonDecode(res.body);

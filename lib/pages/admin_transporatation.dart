@@ -98,7 +98,7 @@ class _DriverTabState extends State<DriverTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/getDrivers');
+    var url = Uri.parse('$ipv4/getDrivers');
 
     var response = await client.get(url);
     var data = jsonDecode(response.body);
@@ -107,7 +107,7 @@ class _DriverTabState extends State<DriverTab> {
 
   Future getStaffProfilePic(fileName) async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffPic/$fileName');
+    var url = Uri.parse('$ipv4/getStaffPic/$fileName');
     var response = await client.get(url);
 
     return response.bodyBytes;
@@ -239,7 +239,7 @@ class _AssignTabState extends State<AssignTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/getAllstudentTransport');
+    var url = Uri.parse('$ipv4/getAllstudentTransport');
 
     var response = await client.get(url);
     var data = jsonDecode(response.body);
@@ -259,7 +259,7 @@ class _AssignTabState extends State<AssignTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/getAllTransport');
+    var url = Uri.parse('$ipv4/getAllTransport');
 
     var response = await client.get(url);
     // print(response.body);
@@ -629,7 +629,7 @@ class _AssignStudentsSheetState extends State<AssignStudentsSheet> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/addTransport');
+    var url = Uri.parse('$ipv4/addTransport');
 
     var response = await client.post(url, body: {
       'schoolTransportRoute': selectedRoute,
@@ -667,7 +667,7 @@ class _AssignStudentsSheetState extends State<AssignStudentsSheet> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/removeStudentTransport');
+    var url = Uri.parse('$ipv4/removeStudentTransport');
 
     var response = await client.delete(url, body: {
       'schoolTransportRoute': "",
@@ -705,7 +705,7 @@ class _AssignStudentsSheetState extends State<AssignStudentsSheet> {
   searchFunction(value) async {
     if (value != '') {
       var client = BrowserClient()..withCredentials = true;
-      var url = Uri.http(ipv4, '/searchStudent/$value');
+      var url = Uri.parse('$ipv4/searchStudent/$value');
       var res = await client.get(url);
       setState(() {
         // searching = false;
@@ -896,7 +896,7 @@ class _PickupTabState extends State<PickupTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/getPickupPoints');
+    var url = Uri.parse('$ipv4/getPickupPoints');
 
     var response = await client.get(url);
     // print(response.body);
@@ -930,7 +930,7 @@ class _PickupTabState extends State<PickupTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/updatePickupPoint');
+    var url = Uri.parse('$ipv4/updatePickupPoint');
 
     var response = await client.post(url, body: {
       'index': index.toString(),
@@ -1128,7 +1128,7 @@ class _PickupTabState extends State<PickupTab> {
                                           var client = BrowserClient()
                                             ..withCredentials = true;
 
-                                          var url = Uri.http(
+                                          var url = Uri.https(
                                               ipv4, '/deletePickpoint');
 
                                           var response = await client.delete(
@@ -1249,7 +1249,7 @@ class _RouteTabState extends State<RouteTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/getRoutes');
+    var url = Uri.parse('$ipv4/getRoutes');
 
     var response = await client.get(url);
     // print(response.body);
@@ -1281,7 +1281,7 @@ class _RouteTabState extends State<RouteTab> {
     var vehicle = selectedVehicle[index].split(" ~ ");
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/updateRoute');
+    var url = Uri.parse('$ipv4/updateRoute');
 
     var response = await client.post(url, body: {
       'index': index.toString(),
@@ -1467,7 +1467,7 @@ class _RouteTabState extends State<RouteTab> {
 
                                             // Map data = {};
                                             var url =
-                                                Uri.http(ipv4, '/deleteRoute');
+                                                Uri.parse('$ipv4/deleteRoute');
 
                                             var response = await client.delete(
                                                 url,
@@ -1601,7 +1601,7 @@ class _VehicleTabState extends State<VehicleTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/getVehicles');
+    var url = Uri.parse('$ipv4/getVehicles');
 
     var response = await client.get(url);
     // print(response.body);
@@ -1621,7 +1621,7 @@ class _VehicleTabState extends State<VehicleTab> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/updateVehicle');
+    var url = Uri.parse('$ipv4/updateVehicle');
 
     var response = await client.post(url, body: {
       // 'schoolCode': widget.schoolCode,
@@ -1861,7 +1861,7 @@ class _VehicleTabState extends State<VehicleTab> {
                                                   ..withCredentials = true;
 
                                                 // Map data = {};
-                                                var url = Uri.http(
+                                                var url = Uri.https(
                                                     ipv4, '/deleteVehicle');
 
                                                 var response = await client
@@ -2017,7 +2017,7 @@ class _AddPickupPointState extends State<AddPickupPoint> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/addPickupPoint');
+    var url = Uri.parse('$ipv4/addPickupPoint');
 
     var response = await client.post(url, body: {
       'schoolCode': widget.schoolCode.toString(),
@@ -2120,7 +2120,7 @@ class _AddRouteState extends State<AddRoute> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/addRoute');
+    var url = Uri.parse('$ipv4/addRoute');
 
     var response = await client.post(url, body: {
       'schoolCode': widget.schoolCode.toString(),
@@ -2267,7 +2267,7 @@ class _AddVehicleState extends State<AddVehicle> {
     var client = BrowserClient()..withCredentials = true;
 
     // Map data = {};
-    var url = Uri.http(ipv4, '/addVehicle');
+    var url = Uri.parse('$ipv4/addVehicle');
 
     var response = await client.post(url, body: {
       'schoolCode': widget.schoolCode,

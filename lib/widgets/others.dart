@@ -30,9 +30,9 @@ class _AddResultState extends State<AddResult> {
 
   getClasses() async {
     var client = BrowserClient()..withCredentials = true;
-    var url1 = Uri.http(ipv4, '/getTeacherClasses');
+    var url1 = Uri.parse('$ipv4/getTeacherClasses');
     var res1 = await client.get(url1);
-    var url2 = Uri.http(ipv4, '/getSubjects');
+    var url2 = Uri.parse('$ipv4/getSubjects');
     var res2 = await client.get(url2);
     subjects = jsonDecode(res2.body)['subjects'];
     print(res1.body);
@@ -197,7 +197,7 @@ class _RemarksState extends State<Remarks> {
   getRemarks() async {
     var client = BrowserClient()..withCredentials = true;
     var url =
-        Uri.http(ipv4, '/getRemarks/${widget.classTitle}/${widget.subject}');
+        Uri.parse('$ipv4/getRemarks/${widget.classTitle}/${widget.subject}');
 
     var res = await client.get(url);
 
@@ -299,7 +299,7 @@ class _AddRemarkState extends State<AddRemark> {
 
   getClassStudents() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getClassStudents/${widget.classTitle}');
+    var url = Uri.parse('$ipv4/getClassStudents/${widget.classTitle}');
 
     var res = await client.get(url);
 
@@ -312,7 +312,7 @@ class _AddRemarkState extends State<AddRemark> {
 
   addRemarks() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/addRemark');
+    var url = Uri.parse('$ipv4/addRemark');
 
     var res = await client.post(url, body: {
       'schoolCode': widget.schoolCode,
@@ -417,7 +417,7 @@ class _StudyMaterialsState extends State<StudyMaterials> {
 
   getStudyMaterials() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(
+    var url = Uri.https(
         ipv4, '/getstudyMaterials/${widget.classTitle}/${widget.subject}');
 
     var res = await client.get(url);
@@ -431,7 +431,7 @@ class _StudyMaterialsState extends State<StudyMaterials> {
 
   downloadFile(String loc, String name) async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/downloadDoc');
+    var url = Uri.parse('$ipv4/downloadDoc');
     var response = await client.post(url, body: {'loc': loc});
 
     final fileBytes = response.bodyBytes;
@@ -445,7 +445,7 @@ class _StudyMaterialsState extends State<StudyMaterials> {
   }
 
   uploadFile() async {
-    var url = Uri.http(ipv4, '/addStudyMaterial');
+    var url = Uri.parse('$ipv4/addStudyMaterial');
 
     var req = http.MultipartRequest(
       'POST',
@@ -615,7 +615,7 @@ class _HomeworksState extends State<Homeworks> {
   getHomeworks() async {
     var client = BrowserClient()..withCredentials = true;
     var url =
-        Uri.http(ipv4, '/getHomeworks/${widget.classTitle}/${widget.subject}');
+        Uri.parse('$ipv4/getHomeworks/${widget.classTitle}/${widget.subject}');
 
     var res = await client.get(url);
     print(res.body);
@@ -628,7 +628,7 @@ class _HomeworksState extends State<Homeworks> {
 
   getstudentsHomework(String hid) async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getstudentsHomework/${widget.classTitle}/$hid');
+    var url = Uri.parse('$ipv4/getstudentsHomework/${widget.classTitle}/$hid');
 
     var res = await client.get(url);
     print(res.body);
@@ -785,7 +785,7 @@ class _AddHomeworkState extends State<AddHomework> {
 
   addHomework() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/addHomework');
+    var url = Uri.parse('$ipv4/addHomework');
 
     var res = await client.post(url, body: {
       'subject': 'English',

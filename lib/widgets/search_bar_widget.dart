@@ -95,7 +95,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   searchFunction(value) async {
     if (value != '') {
       var client = BrowserClient()..withCredentials = true;
-      var url = Uri.http(ipv4, '/searchStaff/$value');
+      var url = Uri.parse('$ipv4/searchStaff/$value');
       var res = await client.get(url);
 
       searchList = jsonDecode(res.body);

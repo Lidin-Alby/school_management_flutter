@@ -40,7 +40,7 @@ class _ProfileNavState extends State<ProfileNav> {
 
   getMyProfile() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getMyProfile');
+    var url = Uri.parse('$ipv4/getMyProfile');
     var res = await client.get(url);
     // print(res.body);
     var data = jsonDecode(res.body);

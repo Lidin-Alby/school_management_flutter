@@ -59,7 +59,7 @@ class _AddClassDialogState extends State<AddClassDialog> {
                       : validate = false;
                 });
                 if (!validate) {
-                  var url = Uri.http(ipv4, '/addClassOrBranch');
+                  var url = Uri.parse('$ipv4/addClassOrBranch');
                   var res = await http.post(url, body: {
                     'schoolCode': widget.schoolCode.toString(),
                     'title': '${className.text.trim()}-${section.text.trim()}',

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,32 +19,62 @@ class _AdminPageState extends State<AdminPage> {
   bool loading = true;
   List accesses = [];
   List searchList = [];
+  List academic = ['students', 'academic', 'online-admission'];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool expanded = false;
+  int headIndex = 0;
+  int? selectedHead;
+  bool hide = true;
+  late Future _getLogo;
+  late Future _schoolName;
 
   @override
   void initState() {
     loadAccess().then((value) {
       accesses = value;
+      academic.retainWhere(
+        (element) => accesses.contains(element),
+      );
       setState(() {
         loading = false;
       });
     });
+    _getLogo = getLogo();
+    _schoolName = getSchooldata();
     super.initState();
+  }
+
+  getSchooldata() async {
+    var client = BrowserClient()..withCredentials = true;
+    var url = Uri.parse('$ipv4/getMyschoolData');
+    var res = await client.get(url);
+    // print(res.body);
+    Map data = jsonDecode(res.body);
+
+    return data['schoolName'];
   }
 
   Future loadAccess() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getAccesses');
+    var url = Uri.parse('$ipv4/getAccesses');
     http.Response res;
     res = await client.get(url);
     print(res.body);
     return jsonDecode(res.body);
   }
 
+  getLogo() async {
+    var url2 = Uri.parse('$ipv4/getAdminLogo');
+    var client = BrowserClient()..withCredentials = true;
+    var response2 = await client.get(url2);
+
+    return (response2.bodyBytes);
+  }
+
   searchFunction(value) async {
     if (value != '') {
       var client = BrowserClient()..withCredentials = true;
-      var url = Uri.http(ipv4, '/searchStudent/$value');
+      var url = Uri.parse('$ipv4/searchStudent/$value');
       var res = await client.get(url);
 
       setState(() {
@@ -64,118 +95,193 @@ class _AdminPageState extends State<AdminPage> {
     return Stack(
       children: [
         Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            backgroundColor: Colors.indigo[900],
-            actions: [
-              Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 10),
-                child: SizedBox(
-                  width: 400,
-                  child: TextField(
-                    // onTapOutside: (event) => setState(() {
-                    //   searchList = [];
-                    // }),
-                    decoration: InputDecoration(
-                        contentPadding: EdgeInsets.only(top: 15),
-                        filled: true,
-                        fillColor: Colors.orange[50],
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular(20)),
-                        hintText: 'Search Student',
-                        isDense: true,
-                        prefixIcon: Icon(Icons.search)),
-                    onChanged: (value) => searchFunction(value),
+            key: _scaffoldKey,
+            appBar: AppBar(
+              backgroundColor: Colors.indigo[900],
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
+                  child: SizedBox(
+                    width: 400,
+                    child: TextField(
+                      // onTapOutside: (event) => setState(() {
+                      //   searchList = [];
+                      // }),
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(top: 15),
+                          filled: true,
+                          fillColor: Colors.orange[50],
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.circular(20)),
+                          hintText: 'Search Student',
+                          isDense: true,
+                          prefixIcon: Icon(Icons.search)),
+                      onChanged: (value) => searchFunction(value),
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: 20,
-              ),
-              IconButton(
-                  iconSize: 35,
-                  onPressed: () {
-                    var client = BrowserClient()..withCredentials = true;
-                    var url = Uri.http(ipv4, '/logout');
-                    // http.Response res;
-                    client.get(url);
+                SizedBox(
+                  width: 20,
+                ),
+                IconButton(
+                    iconSize: 35,
+                    onPressed: () {
+                      var client = BrowserClient()..withCredentials = true;
+                      var url = Uri.parse('$ipv4/logout');
+                      // http.Response res;
+                      client.get(url);
 
-                    context.go('/login');
-                  },
-                  icon: Icon(
-                    Icons.account_circle_rounded,
-                  )),
-              SizedBox(
-                width: 10,
-              )
-            ],
-            title: Text('School Management'),
-          ),
-          drawerScrimColor: Colors.transparent,
-          drawer: width > 800
-              ? Drawer(
-                  width: 300,
-                  // elevation: 1,
-                  child: SizedBox(
-                    height: 500,
-                    child: Column(
-                      children: [
-                        AppBar(
-                          title: Text('School Management'),
-                          leading: IconButton(
-                              icon: Icon(Icons.menu),
-                              onPressed: () {
-                                _scaffoldKey.currentState!.closeDrawer();
-                              }),
-                        ),
-                        ConstrainedBox(
-                          constraints: BoxConstraints(
-                              minHeight:
-                                  MediaQuery.of(context).size.height - 56),
-                          child: IntrinsicHeight(
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 8),
-                              child: CustomNavigationRail(
-                                accesses: accesses,
+                      context.go('/login');
+                    },
+                    icon: Icon(
+                      Icons.account_circle_rounded,
+                    )),
+                SizedBox(
+                  width: 10,
+                )
+              ],
+              title: Row(
+                children: [
+                  FutureBuilder(
+                    future: _getLogo,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return CircleAvatar(
+                          // radius: 50,
+                          backgroundImage:
+                              MemoryImage(snapshot.data as Uint8List),
+                        );
+                      } else {
+                        return Icon(Icons.error_outline_rounded);
+                      }
+                    },
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  FutureBuilder(
+                    future: _schoolName,
+                    builder: (context, snapshot) => Text(
+                      snapshot.data.toString(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            drawerScrimColor: Colors.transparent,
+            drawer: width > 800
+                ? Drawer(
+                    width: 300,
+                    // elevation: 1,
+                    child: SizedBox(
+                      height: 500,
+                      child: Column(
+                        children: [
+                          AppBar(
+                            title: Text('School Management'),
+                            leading: IconButton(
+                                icon: Icon(Icons.menu),
+                                onPressed: () {
+                                  _scaffoldKey.currentState!.closeDrawer();
+                                }),
+                          ),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                                minHeight:
+                                    MediaQuery.of(context).size.height - 56),
+                            child: IntrinsicHeight(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: CustomNavigationRail(
+                                  accesses: accesses,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : null,
+            backgroundColor: Colors.white,
+            body: loading
+                ? const Center(child: CircularProgressIndicator())
+                : Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
+                        child: Material(
+                          color: Colors.indigo[900],
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: InkWell(
+                            onHover: (value) {
+                              setState(() {
+                                hide = !value;
+                              });
+                            },
+                            onTap: () {},
+                            child: SingleChildScrollView(
+                              child: SizedBox(
+                                // height: double.,
+                                width: hide ? 63 : 220,
+                                child: Column(
+                                  children: [
+                                    // for (int i = 0; i < heads.length; i++)
+                                    MyExpandingNavTile(
+                                        headIcon: Icons.school_rounded,
+                                        headTitle: 'Academic',
+                                        head: 0,
+                                        subDivsions: academic,
+                                        hide: hide),
+                                    MyNavTile(
+                                      headIcon: Icons.person_rounded,
+                                      headTitle: 'Staff',
+                                      link: 'staff',
+                                      hide: hide,
+                                    ),
+                                    MyNavTile(
+                                      headIcon: Icons.calendar_month,
+                                      headTitle: 'Attendance',
+                                      link: 'class-attendance',
+                                      hide: hide,
+                                    ),
+                                    MyNavTile(
+                                      headIcon: Icons.directions_bus,
+                                      headTitle: 'Transportation',
+                                      link: 'transportation',
+                                      hide: hide,
+                                    ),
+                                    MyNavTile(
+                                      headIcon: Icons.shield,
+                                      headTitle: 'Access Control',
+                                      link: 'accessControl',
+                                      hide: hide,
+                                    ),
+                                    MyNavTile(
+                                      headIcon: Icons.settings,
+                                      headTitle: 'School Settings',
+                                      link: 'school-settings',
+                                      hide: hide,
+                                    ),
+                                    SizedBox(
+                                      height: 8,
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                )
-              : null,
-          backgroundColor: Colors.white,
-          body: loading
-              ? const Center(child: CircularProgressIndicator())
-              : Row(
-                  children: [
-                    SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                            minHeight: MediaQuery.of(context).size.height - 56),
-                        child: IntrinsicHeight(
-                          child: width > 800
-                              ? SizedBox(
-                                  width: 220,
-                                  child: CustomNavigationRail(
-                                    accesses: accesses,
-                                  ),
-                                )
-                              : null,
-                        ),
                       ),
-                    ),
-                    Expanded(
-                        child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: widget.child,
-                    )),
-                  ],
-                ),
-        ),
+                      Expanded(
+                          child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: widget.child,
+                      )),
+                    ],
+                  )),
         Positioned(
             top: 50,
             right: 90,
@@ -203,6 +309,270 @@ class _AdminPageState extends State<AdminPage> {
                 ),
               ),
             ))
+      ],
+    );
+  }
+}
+
+class MyNavTile extends StatelessWidget {
+  const MyNavTile(
+      {super.key,
+      required this.headIcon,
+      required this.headTitle,
+      required this.link,
+      required this.hide});
+  final IconData headIcon;
+  final String headTitle;
+  final String link;
+  final bool hide;
+
+  @override
+  Widget build(BuildContext context) {
+    bool selected = GoRouter.of(context).location.contains('/$link');
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(10),
+        onTap: () => context.go('/$link'),
+        child: Ink(
+          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 12),
+          decoration: BoxDecoration(
+            color: selected ? Colors.white : null,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 5, right: 5),
+                child: Icon(
+                  headIcon,
+                  size: 25,
+                  color: selected ? Colors.indigo[900] : Colors.white,
+                ),
+              ),
+              if (!hide)
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    headTitle,
+                    style: TextStyle(
+                      color: selected ? Colors.indigo[900] : Colors.white,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class MyExpandingNavTile extends StatefulWidget {
+  const MyExpandingNavTile(
+      {super.key,
+      required this.headIcon,
+      required this.headTitle,
+      required this.subDivsions,
+      required this.head,
+      required this.hide});
+  final IconData headIcon;
+  final String headTitle;
+  // final bool selected;
+  final int head;
+
+  final List subDivsions;
+  final bool hide;
+
+  @override
+  State<MyExpandingNavTile> createState() => _MyExpandingNavTileState();
+}
+
+class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
+  bool expanded = false;
+  int selected = 0;
+  List accesses = [];
+  late List subDivsions;
+  int? selectedHead;
+
+  Future loadAccess() async {
+    var client = BrowserClient()..withCredentials = true;
+    var url = Uri.parse('$ipv4/getAccesses');
+    http.Response res;
+    res = await client.get(url);
+    print(res.body);
+    setState(() {
+      accesses = jsonDecode(res.body);
+    });
+  }
+
+  String getTitle(String title) {
+    switch (title) {
+      case 'students':
+        return 'Students';
+      // case 'staff':
+      //   return 'Staff';
+      case 'academic':
+        return 'Academic';
+      case 'online-admission':
+        return 'Online Admission';
+    }
+    return '';
+  }
+
+  @override
+  void initState() {
+    subDivsions = widget.subDivsions;
+
+    loadAccess();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    expanded = !widget.hide;
+    int? selectedIndex = subDivsions.indexWhere(
+        (element) => GoRouter.of(context).location.startsWith('/$element'));
+    String currentRoute = GoRouter.of(context).location;
+    switch (currentRoute) {
+      case '/students' || '/academic' || '/online-admission':
+        selectedHead = 0;
+        selected = selectedIndex;
+        break;
+
+      case '/staff':
+        selectedHead = 1;
+        selected = selectedIndex;
+        break;
+      case '/transportation':
+        selectedHead = 1;
+        selected = selectedIndex;
+        break;
+      case '/class-attendance':
+        selectedHead = 1;
+        selected = selectedIndex;
+        break;
+      case '/accessControl':
+        selectedHead = 1;
+        selected = selectedIndex;
+        break;
+      case '/school-settings':
+        selectedHead = 1;
+        selected = selectedIndex;
+        break;
+    }
+
+    // int?selectedHead=
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            child: Ink(
+              padding: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+              decoration: BoxDecoration(
+                color: widget.head == selectedHead
+                    ? Colors.white
+                    : widget.head != selectedHead && expanded
+                        ? Colors.indigo
+                        : null,
+                borderRadius: expanded
+                    ? BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10))
+                    : BorderRadius.circular(10),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5, right: 5),
+                        child: Icon(
+                          widget.headIcon,
+                          size: 25,
+                          color: widget.head == selectedHead
+                              ? Colors.indigo[900]
+                              : Colors.white,
+                        ),
+                      ),
+                      if (!widget.hide)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 5),
+                          child: Text(
+                            widget.headTitle,
+                            style: TextStyle(
+                              color: widget.head == selectedHead
+                                  ? Colors.indigo[900]
+                                  : Colors.white,
+                            ),
+                          ),
+                        ),
+                      Spacer(),
+                      if (!widget.hide)
+                        AnimatedRotation(
+                          duration: Duration(milliseconds: 200),
+                          turns: expanded ? 0.5 : 0.0,
+                          child: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: widget.head == selectedHead
+                                ? Colors.indigo[900]
+                                : Colors.white,
+                          ),
+                        )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Ink(
+          width: 205,
+          decoration: BoxDecoration(
+              color: Colors.indigo,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10))),
+          child: AnimatedSize(
+            curve: Curves.easeInOut,
+            duration: Duration(milliseconds: 200),
+            child: expanded
+                ? Column(children: [
+                    for (int i = 0; i < subDivsions.length; i++)
+                      InkWell(
+                        onTap: () {
+                          context.go('/${subDivsions[i]}');
+                        },
+                        borderRadius: BorderRadius.circular(10),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 35,
+                              ),
+                              Text(
+                                getTitle(subDivsions[i]),
+                                style: TextStyle(
+                                  fontSize: selected == i ? 15 : null,
+                                  letterSpacing: .5,
+                                  fontWeight:
+                                      selected == i ? FontWeight.bold : null,
+                                  color: selected == i
+                                      ? Colors.white
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ])
+                : Container(),
+          ),
+        )
       ],
     );
   }

@@ -29,7 +29,7 @@ class _ControlListState extends State<ControlList> {
   }
 
   Future getAccessDetails() async {
-    var url = Uri.http(ipv4, '/getSingleAccesses/${widget.userType}');
+    var url = Uri.parse('$ipv4/getSingleAccesses/${widget.userType}');
     var res = await http.get(url);
 
     print('done');
@@ -60,7 +60,7 @@ class _ControlListState extends State<ControlList> {
       setState(() {
         _loading = true;
       });
-      var url = Uri.http(ipv4, '/editAccesses/${widget.userType}');
+      var url = Uri.parse('$ipv4/editAccesses/${widget.userType}');
       var res = await http.post(url, body: {field: value.toString()});
       print(res.body);
       if (res.body == 'true') {

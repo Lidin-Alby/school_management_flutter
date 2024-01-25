@@ -30,7 +30,7 @@ class _AccessControlState extends State<AccessControl>
 
   getUserTypes() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getUserType');
+    var url = Uri.parse('$ipv4/getUserType');
 
     var response = await client.get(url);
     print(response.body);
@@ -42,7 +42,7 @@ class _AccessControlState extends State<AccessControl>
     if (newUserType.text.trim().isEmpty) {
       return;
     }
-    var url = Uri.http(ipv4, '/addUserType');
+    var url = Uri.parse('$ipv4/addUserType');
 
     var response = await client.post(
       url,

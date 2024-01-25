@@ -27,7 +27,7 @@ class _OwnerPageState extends State<OwnerPage> {
   }
 
   getSchools() async {
-    var url = Uri.http(ipv4, '/getSchools');
+    var url = Uri.parse('$ipv4/getSchools');
     var res = await http.get(url);
     if (res.body.isEmpty) {
       return;
@@ -189,9 +189,9 @@ class _BulkUplaodDialogState extends State<BulkUplaodDialog> {
       setState(() {
         isSaved = false;
       });
-      //   var url = Uri.http(ipv4, '/addPersonalInfo');
+      //   var url = Uri.parse('$ipv4/addPersonalInfo');
 
-      var url = Uri.http(ipv4, '/bulkUpload');
+      var url = Uri.parse('$ipv4/bulkUpload');
 
       var req = http.MultipartRequest(
         'POST',
@@ -387,7 +387,7 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
       setState(() {
         isSaved = false;
       });
-      var url = Uri.http(ipv4, '/addNewSchool');
+      var url = Uri.parse('$ipv4/addNewSchool');
       var res = await http.post(url, body: {
         'schoolCode': schoolCode.text.trim(),
         'schoolName': schoolName.text.trim(),

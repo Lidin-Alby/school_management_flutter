@@ -13,6 +13,7 @@ import 'package:school_management/pages/admin_page.dart';
 import 'package:school_management/pages/admin_transporatation.dart';
 import 'package:school_management/pages/each_staff_page.dart';
 import 'package:school_management/pages/login_page.dart';
+import 'package:school_management/pages/online_admission.dart';
 import 'package:school_management/pages/online_application.dart';
 import 'package:school_management/pages/owner_page.dart';
 import 'package:school_management/pages/school_settings.dart';
@@ -46,7 +47,7 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 FutureOr<String?> authFun() async {
   var client = BrowserClient()..withCredentials = true;
-  var url = Uri.http(ipv4, '/getCookie');
+  var url = Uri.parse('$ipv4/getCookie');
   http.Response response;
   response = await client.get(url);
   if (response.body == 'false') {
@@ -188,6 +189,11 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/transportation',
           builder: (context, state) => AdminTransport(),
+          redirect: (context, state) => authFun(),
+        ),
+        GoRoute(
+          path: '/online-admission',
+          builder: (context, state) => OnlineAdmission(),
           redirect: (context, state) => authFun(),
         ),
         GoRoute(

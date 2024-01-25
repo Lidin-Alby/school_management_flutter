@@ -20,7 +20,7 @@ class _AdminNoticeState extends State<AdminNotice> {
   }
 
   getNotice() async {
-    var url = Uri.http(ipv4, '/getNotice');
+    var url = Uri.parse('$ipv4/getNotice');
     var res = await http.post(url, body: {'mob': '789'});
     if (res.statusCode == 200) {
       print(res.body);
@@ -108,7 +108,7 @@ class _AddNoticeState extends State<AddNotice> {
   TextEditingController description = TextEditingController();
 
   addNotice() async {
-    var url = Uri.http(ipv4, '/addNotice');
+    var url = Uri.parse('$ipv4/addNotice');
     var res = await http.post(url, body: {
       'sendTo': sendTo,
       'title': title.text.trim(),

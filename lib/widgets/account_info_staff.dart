@@ -51,7 +51,7 @@ class _AccountInfoStaffState extends State<AccountInfoStaff> {
 
   getAccountInfoStaff() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffAccountInfo/${widget.mob}');
+    var url = Uri.parse('$ipv4/getStaffAccountInfo/${widget.mob}');
 
     var response = await client.get(url);
 
@@ -78,7 +78,7 @@ class _AccountInfoStaffState extends State<AccountInfoStaff> {
 
   getStaffForms() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/staffForms');
+    var url = Uri.parse('$ipv4/staffForms');
     var response = await client.get(url);
     print(response.body);
     Map details = jsonDecode(response.body);
@@ -91,7 +91,7 @@ class _AccountInfoStaffState extends State<AccountInfoStaff> {
     setState(() {
       isSaved = false;
     });
-    var url = Uri.http(ipv4, '/addStaffAccountInfo');
+    var url = Uri.parse('$ipv4/addStaffAccountInfo');
     print('mobile');
     print(widget.mob);
     var response = await http.post(url, body: {
@@ -465,7 +465,7 @@ class _AddSalaryTypeState extends State<AddSalaryType> {
                                 borderRadius: BorderRadius.circular(20))),
                         onPressed: () async {
                           var client = BrowserClient()..withCredentials = true;
-                          var url = Uri.http(ipv4, '/removeSalaryType');
+                          var url = Uri.parse('$ipv4/removeSalaryType');
                           var res = await client.delete(url, body: {
                             'schoolCode': widget.schoolCode.toString(),
                             'salaryType': e
@@ -513,7 +513,7 @@ class _AddSalaryTypeState extends State<AddSalaryType> {
         ElevatedButton(
           onPressed: () async {
             var client = BrowserClient()..withCredentials = true;
-            var url = Uri.http(ipv4, '/addSalaryType');
+            var url = Uri.parse('$ipv4/addSalaryType');
             var res = await client.post(url, body: {
               'schoolCode': widget.schoolCode.toString(),
               'salaryType': newSalaryType.text.trim()
@@ -586,7 +586,7 @@ class _AddContractTypeState extends State<AddContractType> {
                                 borderRadius: BorderRadius.circular(20))),
                         onPressed: () async {
                           var client = BrowserClient()..withCredentials = true;
-                          var url = Uri.http(ipv4, '/removeContractType');
+                          var url = Uri.parse('$ipv4/removeContractType');
                           var res = await client.delete(url, body: {
                             'schoolCode': widget.schoolCode.toString(),
                             'contractType': e
@@ -634,7 +634,7 @@ class _AddContractTypeState extends State<AddContractType> {
         ElevatedButton(
           onPressed: () async {
             var client = BrowserClient()..withCredentials = true;
-            var url = Uri.http(ipv4, '/addContractType');
+            var url = Uri.parse('$ipv4/addContractType');
             var res = await client.post(url, body: {
               'schoolCode': widget.schoolCode.toString(),
               'contractType': newContractType.text.trim()

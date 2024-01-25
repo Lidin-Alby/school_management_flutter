@@ -46,7 +46,7 @@ class _ContactInfoStaffState extends State<ContactInfoStaff> {
 
   getContactInfoStaff() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStaffAccountInfo/${widget.mob}');
+    var url = Uri.parse('$ipv4/getStaffAccountInfo/${widget.mob}');
 
     var response = await client.get(url);
     print(response.body);
@@ -66,7 +66,7 @@ class _ContactInfoStaffState extends State<ContactInfoStaff> {
     setState(() {
       isSaved = false;
     });
-    var url = Uri.http(ipv4, '/addStaffContactInfo');
+    var url = Uri.parse('$ipv4/addStaffContactInfo');
     var response = await http.post(url, body: {
       'schoolCode': schoolCode.toString(),
       'mob': widget.mob,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/browser_client.dart';
 
 import '../ip_address.dart';
+import 'logo_settings.dart';
 
 class SchoolSettings extends StatefulWidget {
   const SchoolSettings({super.key});
@@ -16,6 +17,7 @@ class SchoolSettings extends StatefulWidget {
 
 class _SchoolSettingsState extends State<SchoolSettings> {
   int _selectedIndex = 0;
+  late String schoolCode;
 
   @override
   Widget build(BuildContext context) {
@@ -172,8 +174,13 @@ class _SchoolSettingsState extends State<SchoolSettings> {
                 ],
               ),
             ),
-            if (_selectedIndex == 0) GeneralSettings(),
-            if (_selectedIndex == 1) LogoSettings(),
+            if (_selectedIndex == 0)
+              GeneralSettings(
+                setCode: (p0) {
+                  schoolCode = p0;
+                },
+              ),
+            if (_selectedIndex == 1) LogoSettings(schoolCode: schoolCode),
             if (_selectedIndex == 3) ThemeSettings(),
             if (_selectedIndex == 5) StudentPanelSettings(),
             if (_selectedIndex == 6) FeesSettings(),
@@ -265,7 +272,7 @@ class _FormSettingsOnlineState extends State<FormSettingsOnline> {
 
   getFormAccessStudent() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getFormAccessOnline');
+    var url = Uri.parse('$ipv4/getFormAccessOnline');
     var res = await client.get(url);
 
     print('done');
@@ -362,7 +369,7 @@ class _FormSettingsOnlineState extends State<FormSettingsOnline> {
 
   addFormAccessStudent() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/addFormAccessOnline');
+    var url = Uri.parse('$ipv4/addFormAccessOnline');
     var res = await client.post(url, body: {
       // 'admDate': admDate.toString(),
       'gender': gender.toString(),
@@ -932,7 +939,7 @@ class _FormSettingsState extends State<FormSettings> {
 
   getFormAccessStaff() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getFormAccessStaff');
+    var url = Uri.parse('$ipv4/getFormAccessStaff');
     var res = await client.get(url);
 
     print('done');
@@ -996,7 +1003,7 @@ class _FormSettingsState extends State<FormSettings> {
 
   addFormAccessStaff() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/addFormAccessStaff');
+    var url = Uri.parse('$ipv4/addFormAccessStaff');
     var res = await client.post(url, body: {
       'joiningDate': joiningDate.toString(),
       'reportsTo': reportsTo.toString(),
@@ -1623,7 +1630,7 @@ class _FormSettingsCardStudentState extends State<FormSettingsCardStudent> {
 
   getFormAccessStudent() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getFormAccessStudent');
+    var url = Uri.parse('$ipv4/getFormAccessStudent');
     var res = await client.get(url);
 
     print('done');
@@ -1718,7 +1725,7 @@ class _FormSettingsCardStudentState extends State<FormSettingsCardStudent> {
 
   addFormAccessStudent() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/addFormAccessStudent');
+    var url = Uri.parse('$ipv4/addFormAccessStudent');
     var res = await client.post(url, body: {
       'admDate': admDate.toString(),
       'gender': gender.toString(),
@@ -2939,217 +2946,6 @@ class _ThemeSettingsState extends State<ThemeSettings> {
   }
 }
 
-class LogoSettings extends StatelessWidget {
-  const LogoSettings({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        child: Card(
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Logo Settings',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Divider(),
-            SizedBox(
-              height: 10,
-            ),
-            Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: [
-                Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                      // color: Colors.red,
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        'Print Logo',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Divider(
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                            width: 200,
-                            height: 160,
-                            // color: Colors.red,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.file_upload_outlined,
-                                  size: 50,
-                                  color: Colors.indigo,
-                                ),
-                                Text('170px x 184px'),
-                              ],
-                            )),
-                      )
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                      // color: Colors.red,
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        'Admin Logo',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Divider(height: 1),
-                      InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 160,
-                          width: 200,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.file_upload_outlined,
-                                size: 50,
-                                color: Colors.indigo,
-                              ),
-                              Text('290px x 51px')
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                      // color: Colors.red,
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        'Admin Small Logo',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Divider(height: 1),
-                      InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 160,
-                          width: 200,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.file_upload_outlined,
-                                size: 50,
-                                color: Colors.indigo,
-                              ),
-                              Text('32px x 32px')
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                      // color: Colors.red,
-                      border: Border.all(),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        'App Logo',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Divider(
-                        height: 1,
-                      ),
-                      InkWell(
-                        onTap: () {},
-                        child: SizedBox(
-                          height: 160,
-                          width: 200,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.file_upload_outlined,
-                                size: 50,
-                                color: Colors.indigo,
-                              ),
-                              Text('290px x 51px')
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
-    ));
-  }
-}
-
 class FeesSettings extends StatefulWidget {
   const FeesSettings({super.key});
 
@@ -3361,7 +3157,8 @@ class _FeesSettingsState extends State<FeesSettings> {
 }
 
 class GeneralSettings extends StatefulWidget {
-  const GeneralSettings({super.key});
+  const GeneralSettings({super.key, required this.setCode});
+  final Function(String) setCode;
 
   @override
   State<GeneralSettings> createState() => _GeneralSettingsState();
@@ -3395,7 +3192,7 @@ class _GeneralSettingsState extends State<GeneralSettings> {
 
   getGeneralSettings() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getGeneralSettings');
+    var url = Uri.parse('$ipv4/getGeneralSettings');
     var res = await client.get(url);
 
     Map data = jsonDecode(res.body);
@@ -3407,12 +3204,13 @@ class _GeneralSettingsState extends State<GeneralSettings> {
     schoolAddress.text = data['schoolAddress'];
     schoolPhone.text = data['schoolPhone'];
     schoolMail.text = data['schoolMail'];
+    widget.setCode(data['schoolCode'].toString());
     setState(() {});
   }
 
   saveGeneralSettings() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/saveGeneralSettings');
+    var url = Uri.parse('$ipv4/saveGeneralSettings');
     var res = await client.post(url, body: {
       'selectedSession': selectedSession,
       'selectedMonth': selectedMonth,

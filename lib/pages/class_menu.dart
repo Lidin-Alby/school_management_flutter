@@ -59,7 +59,7 @@ class _ClassMenuState extends State<ClassMenu> {
 
   Future getTimeTable() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getTimeTable/${widget.title}');
+    var url = Uri.parse('$ipv4/getTimeTable/${widget.title}');
     var res = await client.get(url);
 
     print(res.body);
@@ -86,7 +86,7 @@ class _ClassMenuState extends State<ClassMenu> {
 
   Future getAllSubjects() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getSubjects');
+    var url = Uri.parse('$ipv4/getSubjects');
     var response = await client.get(url);
     var data = jsonDecode(response.body);
 
@@ -98,7 +98,7 @@ class _ClassMenuState extends State<ClassMenu> {
 
   Future getTeacherNames() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getTeachers/${widget.title}');
+    var url = Uri.parse('$ipv4/getTeachers/${widget.title}');
     var response = await client.get(url);
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
@@ -122,7 +122,7 @@ class _ClassMenuState extends State<ClassMenu> {
 
   addTimeTable() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/addTimeTable/${widget.title}');
+    var url = Uri.parse('$ipv4/addTimeTable/${widget.title}');
     List times = timeControllers.map((e) => e.text).toList();
 
     timeTable.addAll({'0': times});
@@ -138,7 +138,7 @@ class _ClassMenuState extends State<ClassMenu> {
   searchFunction(value) async {
     var client = BrowserClient()..withCredentials = true;
     if (value.trim() != '') {
-      var url = Uri.http(ipv4, '/searchStaff/$value');
+      var url = Uri.parse('$ipv4/searchStaff/$value');
       var response = await client.get(url);
 
       setState(() {
@@ -184,7 +184,7 @@ class _ClassMenuState extends State<ClassMenu> {
         'classTeacherMob': classTeacherMob
       });
 
-      var url = Uri.http(ipv4, '/addTeachers/${widget.title}');
+      var url = Uri.parse('$ipv4/addTeachers/${widget.title}');
       var response = await client.post(url, body: teachers);
       if (response.body == 'true') {}
     }
@@ -761,7 +761,7 @@ class _ClassMenuState extends State<ClassMenu> {
 //   }
 
 //   Future getAllSubjects() async {
-//     var url = Uri.http('localhost:3000', '/getSubjects');
+//     var url = Uri.https('localhost:3000', '/getSubjects');
 //     var response = await http.get(url);
 //     var allSubjects = jsonDecode(response.body);
 

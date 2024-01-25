@@ -46,7 +46,7 @@ class _ContactInfoState extends State<ContactInfo> {
 
   getStudentContactInfo() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getStudentContactInfo/${widget.admNo}');
+    var url = Uri.parse('$ipv4/getStudentContactInfo/${widget.admNo}');
 
     var response = await client.get(url);
 
@@ -68,7 +68,7 @@ class _ContactInfoState extends State<ContactInfo> {
     setState(() {
       isSaved = false;
     });
-    var url = Uri.http(ipv4, '/addStudentContactInfo');
+    var url = Uri.parse('$ipv4/addStudentContactInfo');
 
     var response = await http.post(url, body: {
       'schoolCode': schoolCode.toString(),

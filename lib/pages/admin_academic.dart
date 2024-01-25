@@ -23,7 +23,7 @@ class _AdminAcademicState extends State<AdminAcademic> {
 
   getClass() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.http(ipv4, '/getClassDetails');
+    var url = Uri.parse('$ipv4/getClassDetails');
     var res = await client.get(url);
 
     print('done');
@@ -236,7 +236,7 @@ class _InstituteSubjectsState extends State<InstituteSubjects> {
   }
 
   getInstitueSubjects() async {
-    var url = Uri.http(ipv4, '/getSubjects');
+    var url = Uri.parse('$ipv4/getSubjects');
     var res = await http.get(url);
 
     print('hello');
@@ -292,7 +292,7 @@ class _InstituteSubjectsState extends State<InstituteSubjects> {
                           onPressed: () async {
                             var client = BrowserClient()
                               ..withCredentials = true;
-                            var url = Uri.http(ipv4, '/addSubjects');
+                            var url = Uri.parse('$ipv4/addSubjects');
                             var res = await client
                                 .post(url, body: {'subject': newSubject.text});
                             if (res.body == 'true') {
@@ -369,7 +369,7 @@ class _StudentsPromotionState extends State<StudentsPromotion> {
   }
 
   getClassForPromotion() async {
-    var url = Uri.http(ipv4, '/classForPromotion');
+    var url = Uri.parse('$ipv4/classForPromotion');
     var res = await http.get(url);
     print(res.body);
     return (jsonDecode(res.body));
@@ -441,7 +441,7 @@ class _PromoteClassState extends State<PromoteClass> {
   }
 
   getClassStudents() async {
-    var url = Uri.http(ipv4, '/promoteClass/${widget.className}');
+    var url = Uri.parse('$ipv4/promoteClass/${widget.className}');
     var res = await http.get(url);
     print(res.body);
     var data = jsonDecode(res.body);
@@ -454,7 +454,7 @@ class _PromoteClassState extends State<PromoteClass> {
   }
 
   getClasses() async {
-    var url = Uri.http(ipv4, '/getClassDetails');
+    var url = Uri.parse('$ipv4/getClassDetails');
     var res = await http.get(url);
     print(res.body);
     // setState(() {
