@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:http/browser_client.dart';
 
 import '../ip_address.dart';
+import 'attendance_settings.dart';
 import 'logo_settings.dart';
 
 class SchoolSettings extends StatefulWidget {
-  const SchoolSettings({super.key});
+  const SchoolSettings({super.key, this.index = 0});
+  final int index;
 
   @override
   State<SchoolSettings> createState() => _SchoolSettingsState();
@@ -18,6 +20,11 @@ class SchoolSettings extends StatefulWidget {
 class _SchoolSettingsState extends State<SchoolSettings> {
   int _selectedIndex = 0;
   late String schoolCode;
+  @override
+  void initState() {
+    _selectedIndex = widget.index;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,6 +185,7 @@ class _SchoolSettingsState extends State<SchoolSettings> {
               GeneralSettings(
                 setCode: (p0) {
                   schoolCode = p0;
+                  print(p0);
                 },
               ),
             if (_selectedIndex == 1) LogoSettings(schoolCode: schoolCode),
@@ -2492,20 +2500,6 @@ class _FormSettingsCardStudentState extends State<FormSettingsCardStudent> {
   }
 }
 
-class AttendanceSettings extends StatelessWidget {
-  const AttendanceSettings({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        child: Card(
-      child: Text('fh'),
-    ));
-  }
-}
-
 class IDGenerationSettings extends StatefulWidget {
   const IDGenerationSettings({
     super.key,
@@ -3197,13 +3191,15 @@ class _GeneralSettingsState extends State<GeneralSettings> {
 
     Map data = jsonDecode(res.body);
     print(data);
-    selectedSession = data['selectedSession'];
-    selectedMonth = data['selectedMonth'];
+    selectedSession =
+        data['selectedSession'] == '' ? null : data['selectedSession'];
+    selectedMonth = data['selectedMonth'] == '' ? null : data['selectedMonth'];
     schoolName.text = data['schoolName'];
     code.text = data['schoolCode'].toString();
     schoolAddress.text = data['schoolAddress'];
     schoolPhone.text = data['schoolPhone'];
     schoolMail.text = data['schoolMail'];
+    print(data['schoolCode']);
     widget.setCode(data['schoolCode'].toString());
     setState(() {});
   }
@@ -3212,8 +3208,8 @@ class _GeneralSettingsState extends State<GeneralSettings> {
     var client = BrowserClient()..withCredentials = true;
     var url = Uri.parse('$ipv4/saveGeneralSettings');
     var res = await client.post(url, body: {
-      'selectedSession': selectedSession,
-      'selectedMonth': selectedMonth,
+      'selectedSession': selectedSession ?? '',
+      'selectedMonth': selectedMonth ?? '',
       'schoolName': schoolName.text.trim(),
       'schoolAddress': schoolAddress.text.trim(),
       'schoolPhone': schoolPhone.text.trim(),

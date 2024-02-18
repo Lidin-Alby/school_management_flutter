@@ -44,6 +44,8 @@ dependencies:
   http_parser: ^4.0.2
   file_saver: ^0.2.8
   url_launcher: ^6.1.14
+  screenshot: ^2.1.0
+  pdf: ^3.10.7
 
 dev_dependencies:
   flutter_test:

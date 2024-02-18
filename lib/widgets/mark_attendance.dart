@@ -3,136 +3,70 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/browser_client.dart';
 import 'package:intl/intl.dart';
-import 'package:school_management/pages/student_attendance_period.dart';
-import 'package:school_management/widgets/mark_attendance_period.dart';
 
 import '../ip_address.dart';
 import '../pages/student_attendance.dart';
-import 'mark_attendance.dart';
 
-class ClassAttendanceCard extends StatefulWidget {
-  const ClassAttendanceCard({super.key});
+class MarkAttendance extends StatefulWidget {
+  const MarkAttendance({
+    super.key,
+    //  required this.date, required this.refresh
+  });
 
   @override
-  State<ClassAttendanceCard> createState() => _ClassAttendanceCardState();
+  State<MarkAttendance> createState() => _MarkAttendanceState();
 }
 
-class _ClassAttendanceCardState extends State<ClassAttendanceCard> {
-  String? attendanceType;
-  late Future _getSettings;
-
-  getAttendanceSettings() async {
-    var client = BrowserClient()..withCredentials = true;
-    var url = Uri.parse('$ipv4/getAttendanceSettings');
-    var res = await client.get(url);
-
-    Map data = jsonDecode(res.body);
-
-    if (data['attendanceSettings'].containsKey('type')) {
-      attendanceType = data['attendanceSettings']['type'];
-    }
-    return attendanceType;
-  }
-
-  @override
-  void initState() {
-    _getSettings = getAttendanceSettings();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _getSettings,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return DefaultTabController(
-              length: 2,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(5, 8, 5, 8),
-                child: Scaffold(
-                  backgroundColor: Colors.white,
-                  appBar: PreferredSize(
-                    preferredSize: Size.fromHeight(90),
-                    child: AppBar(
-                      bottom: TabBar(
-                          indicatorColor: Colors.white,
-                          indicator: UnderlineTabIndicator(
-                              borderRadius: BorderRadius.circular(5),
-                              borderSide:
-                                  BorderSide(width: 4, color: Colors.white)),
-                          padding: EdgeInsets.only(left: 12),
-                          tabs: [
-                            Tab(child: Text('View Attendance')),
-                            Tab(child: Text('Mark Attendance'))
-                          ]),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      // elevation: 0,
-                      backgroundColor: Colors.indigo[900],
-                      title: Text('Class Attendance'),
-                    ),
-                  ),
-                  body: TabBarView(
-                    children: [
-                      ViewAttendance(
-                        type: snapshot.data,
-                      ),
-                      snapshot.data == 'no'
-                          ? AttendancePeriod()
-                          : MarkAttendance()
-                    ],
-                  ),
-                ),
-              ),
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        });
-  }
-}
-
-class ViewAttendance extends StatefulWidget {
-  const ViewAttendance({super.key, required this.type});
-  final String type;
-
-  @override
-  State<ViewAttendance> createState() => _ViewAttendanceState();
-}
-
-class _ViewAttendanceState extends State<ViewAttendance> {
+class _MarkAttendanceState extends State<MarkAttendance> {
+  // bool enableEdit = false;
   String formattedDate = DateFormat('dd - MM - yyyy').format(DateTime.now());
   late Future _attendanceData;
   late List students;
-  int totalStudents = 0;
   List classes = [];
-  String searchText = '';
-
-  String? _selectedClass;
+  bool isSaving = false;
+  String? selectedClass;
   bool isHoliday = false;
+  String searchText = '';
+  List allSubjects = [];
+  String? selectedSubject;
+
+  String? status;
   bool loading = false;
+  String weekDay = DateFormat('EEE').format(DateTime.now());
   @override
   void initState() {
     getClass();
+
     super.initState();
   }
+
+  // getTimeTable() async {
+  //   allSubjects = [];
+  //   var client = BrowserClient()..withCredentials = true;
+  //   var url = Uri.parse('$ipv4/getTimeTable/$selectedClass');
+  //   var res = await client.get(url);
+  //   Map data = jsonDecode(res.body);
+
+  //   Map timeTable = data['timeTable'];
+
+  //   List subs = timeTable[weekDay].map((e) => e['subject']).toList();
+  //   for (int i = 0; i < subs.length; i++) {
+  //     allSubjects.add('${subs[i]}(${timeTable['Time'][i]})');
+  //   }
+  //   setState(() {});
+  //   print(allSubjects);
+  // }
 
   getClass() async {
     var client = BrowserClient()..withCredentials = true;
     var url = Uri.parse('$ipv4/getClassDetails');
     var res = await client.get(url);
 
-    print('done');
-    print(res.body);
     List cl = jsonDecode(res.body);
-    // schoolCode = cl.last['schoolCode'];
-    print(cl);
+
     cl.removeLast();
     classes = cl;
-    setState(() {
-      // classes.addAll(cl);
-    });
+    setState(() {});
   }
 
   getAttendace() async {
@@ -140,18 +74,48 @@ class _ViewAttendanceState extends State<ViewAttendance> {
       loading = true;
     });
     var client = BrowserClient()..withCredentials = true;
-    var url = widget.type == 'no'
-        ? Uri.parse('$ipv4/getAttendancePeriod/$_selectedClass/$formattedDate')
-        : Uri.parse('$ipv4/getAttendance/$_selectedClass/$formattedDate');
+    var url = Uri.parse('$ipv4/getAttendance/$selectedClass/$formattedDate');
 
     var res = await client.get(url);
+
     List students = jsonDecode(res.body);
+    for (int i = 0; i < students.length; i++) {
+      students[i]['attendance'] = {
+        formattedDate: {'status': 'present'}
+      };
+    }
     print(students);
     setState(() {
       loading = false;
     });
-
     return students;
+  }
+
+  addAttendance() async {
+    setState(() {
+      isSaving = true;
+    });
+    var client = BrowserClient()..withCredentials = true;
+    var url = Uri.parse('$ipv4/addAttendance');
+
+    print(students);
+
+    var res = await client.post(
+      url,
+      body: {
+        'data': jsonEncode(students),
+        'classTitle': selectedClass,
+        'date': formattedDate
+      },
+    );
+    print(res.body);
+    if (res.body == 'true') {
+      setState(() {
+        isSaving = false;
+        // enableEdit = false;
+      });
+      // widget.refresh();
+    }
   }
 
   @override
@@ -186,7 +150,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                         child: DropdownButton(
                           // borderRadius: BorderRadius.circular(10),
                           padding: EdgeInsets.all(4),
-                          value: _selectedClass,
+                          value: selectedClass,
                           isDense: true, isExpanded: true,
                           underline: Text(''),
                           hint: Text('Select Class'),
@@ -196,7 +160,8 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                               .toList(),
                           onChanged: (value) {
                             setState(() {
-                              _selectedClass = value.toString();
+                              selectedClass = value.toString();
+                              // getTimeTable();
 
                               _attendanceData = getAttendace();
                             });
@@ -230,10 +195,12 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                     .parse(formattedDate),
                                 firstDate: DateTime(2018),
                                 lastDate: DateTime.now());
+                            weekDay = DateFormat('EEE').format(date!);
+                            formattedDate =
+                                DateFormat('dd - MM - yyyy').format(date);
                             setState(() {
-                              formattedDate =
-                                  DateFormat('dd - MM - yyyy').format(date!);
                               _attendanceData = getAttendace();
+                              // getTimeTable();
                             });
                           },
                           child: Container(
@@ -257,9 +224,6 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  width: 30,
-                ),
               ],
             ),
             SizedBox(
@@ -269,7 +233,7 @@ class _ViewAttendanceState extends State<ViewAttendance> {
             SizedBox(
               height: 10,
             ),
-            _selectedClass == null
+            (selectedClass == null)
                 ? Center(child: Text('Select class to take attendance'))
                 : Center(
                     child: SingleChildScrollView(
@@ -281,40 +245,16 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   int i = 0;
-                                  int presentStudents = 0;
-
-                                  bool marked = false;
                                   students = snapshot.data;
-                                  print(students);
-                                  totalStudents = snapshot.data.length;
+
                                   if (students.isNotEmpty) {
-                                    if (students[0].containsKey('attendance')) {
-                                      // if (students[0]['attendance'][formattedDate]
-                                      //         ['status'] !=
-                                      //     '') {
-                                      marked = true;
-                                      // }
-                                      isHoliday = students[0]['attendance']
-                                              [formattedDate]['status'] ==
-                                          'holiday';
-                                      for (var i in students) {
-                                        if (i['attendance'][formattedDate]
+                                    if (students[0].containsKey('attendance') &&
+                                        students[0]['attendance'][formattedDate]
                                                 ['status'] ==
-                                            'present') {
-                                          presentStudents++;
-                                        }
-                                      }
+                                            'holiday') {
+                                      isHoliday = true;
                                     } else {
-                                      for (int i = 0;
-                                          i < students.length;
-                                          i++) {
-                                        if (!students[i]
-                                            .containsKey('attendance')) {
-                                          students[i]['attendance'] = {
-                                            formattedDate: {'status': ''}
-                                          };
-                                        }
-                                      }
+                                      isHoliday = false;
                                     }
                                   }
                                   if (searchText != '') {
@@ -324,12 +264,11 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                             .contains(searchText.toLowerCase()))
                                         .toList();
                                   }
+                                  //  List status = List.generate(students.length, (index) => null);
 
                                   return Column(
                                     // mainAxisSize: MainAxisSize.min,
                                     // crossAxisAlignment: CrossAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(
                                         width: 400,
@@ -353,32 +292,69 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                       SizedBox(
                                         height: 10,
                                       ),
-                                      SizedBox(
-                                        width: 900,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Text(
-                                              'Total Students: $totalStudents',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                      Row(
+                                        children: [
+                                          if (!isSaving)
+                                            Container(
+                                              // color: Colors.red,
+                                              constraints:
+                                                  BoxConstraints(maxWidth: 875),
+                                              child: Row(
+                                                // mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  SizedBox(
+                                                    width: 200,
+                                                    child: CheckboxListTile(
+                                                      title: const Text(
+                                                          'Mark as Holiday'),
+                                                      value: isHoliday,
+                                                      onChanged: (value) {
+                                                        if (value == true) {
+                                                          for (var student
+                                                              in students) {
+                                                            student['attendance']
+                                                                        [
+                                                                        formattedDate]
+                                                                    ['status'] =
+                                                                'holiday';
+                                                          }
+                                                        } else {
+                                                          setState(() {
+                                                            for (var student
+                                                                in students) {
+                                                              student['attendance']
+                                                                          [
+                                                                          formattedDate]
+                                                                      [
+                                                                      'status'] =
+                                                                  'present';
+                                                            }
+                                                          });
+                                                        }
+
+                                                        setState(() {
+                                                          isHoliday =
+                                                              !isHoliday;
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                  Spacer(),
+                                                  if (isSaving)
+                                                    CircularProgressIndicator(),
+                                                  // Spacer(),
+
+                                                  ElevatedButton(
+                                                    onPressed: addAttendance,
+                                                    child: Text('Save'),
+                                                  )
+                                                ],
+                                              ),
                                             ),
-                                            Text(
-                                              'Present Students:  ${marked ? presentStudents : 'Not Marked'}',
-                                              style: TextStyle(
-                                                  color: Colors.green),
-                                            ),
-                                            Text(
-                                              'Absent Students: ${marked ? totalStudents - presentStudents : 'Not Marked'}',
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            ),
-                                          ],
-                                        ),
+                                        ],
                                       ),
                                       SizedBox(
-                                        height: 10,
+                                        height: 5,
                                       ),
                                       Container(
                                         decoration: BoxDecoration(
@@ -445,93 +421,69 @@ class _ViewAttendanceState extends State<ViewAttendance> {
                                                             Navigator.push(
                                                                 context,
                                                                 MaterialPageRoute(
-                                                                  builder: (context) => widget
-                                                                              .type ==
-                                                                          'no'
-                                                                      ? StudentAttendancePeriod(
-                                                                          admNo:
-                                                                              e['admNo'],
-                                                                          studentName:
-                                                                              e['firstName'],
-                                                                        )
-                                                                      : StudentAttendance(
-                                                                          admNo:
-                                                                              e['admNo'],
-                                                                          studentName:
-                                                                              e['firstName'],
-                                                                        ),
+                                                                  builder:
+                                                                      (context) =>
+                                                                          StudentAttendance(
+                                                                    admNo: e[
+                                                                        'admNo'],
+                                                                    studentName:
+                                                                        e['firstName'],
+                                                                  ),
                                                                 )),
                                                         Text(e['firstName'])),
                                                     DataCell(
                                                         Text(e['fatherName'])),
-                                                    DataCell(
-                                                      widget.type == 'no'
-                                                          ? Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5),
-                                                              child: Column(
-                                                                children: [
-                                                                  if (e.containsKey(
-                                                                          'attendancePeriod') &&
-                                                                      e['attendancePeriod']
-                                                                          .containsKey(
-                                                                              formattedDate))
-                                                                    for (var i
-                                                                        in e['attendancePeriod'][formattedDate]
-                                                                            .keys)
-                                                                      Padding(
-                                                                        padding:
-                                                                            const EdgeInsets.all(3),
-                                                                        child: Text(
-                                                                            '$i - ${e['attendancePeriod'][formattedDate][i]}'),
-                                                                      )
-                                                                ],
-                                                              ),
-                                                            )
-                                                          : Row(
-                                                              children: [
-                                                                SizedBox(
-                                                                  width: 150,
-                                                                  child:
-                                                                      RadioListTile(
-                                                                    title: Text(
-                                                                        'Present'),
-                                                                    value:
-                                                                        'present',
-                                                                    // groupValue: '',
-                                                                    // onChanged: (value) {},
-                                                                    groupValue: e['attendance']
-                                                                            [
-                                                                            formattedDate]
-                                                                        [
-                                                                        'status'],
+                                                    DataCell(Row(
+                                                      children: [
+                                                        SizedBox(
+                                                          width: 150,
+                                                          child: RadioListTile(
+                                                            title:
+                                                                Text('Present'),
+                                                            value: 'present',
+                                                            // groupValue: '',
+                                                            // onChanged: (value) {},
+                                                            groupValue:
+                                                                e['attendance'][
+                                                                        formattedDate]
+                                                                    ['status'],
 
-                                                                    onChanged:
-                                                                        (value) {},
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  width: 150,
-                                                                  child:
-                                                                      RadioListTile(
-                                                                    title: Text(
-                                                                        'Absent'),
-                                                                    value:
-                                                                        'absent',
-                                                                    groupValue: e.containsKey(
-                                                                            'attendance')
-                                                                        ? e['attendance'][formattedDate]
-                                                                            [
-                                                                            'status']
-                                                                        : '',
-                                                                    onChanged:
-                                                                        (value) {},
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                    ),
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                e['attendance'][
+                                                                        formattedDate]
+                                                                    [
+                                                                    'status'] = value;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 150,
+                                                          child: RadioListTile(
+                                                            title:
+                                                                Text('Absent'),
+                                                            value: 'absent',
+                                                            groupValue: e
+                                                                    .containsKey(
+                                                                        'attendance')
+                                                                ? e['attendance']
+                                                                        [
+                                                                        formattedDate]
+                                                                    ['status']
+                                                                : '',
+                                                            onChanged: (value) {
+                                                              setState(() {
+                                                                e['attendance'][
+                                                                        formattedDate]
+                                                                    [
+                                                                    'status'] = value;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )),
                                                     DataCell(e['attendance']
                                                                 [formattedDate]
                                                             .containsKey(

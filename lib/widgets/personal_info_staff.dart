@@ -58,6 +58,7 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
   String? bloodGroup;
   String? religion;
   String? caste;
+  bool required = false;
 
   late String schoolCode;
 
@@ -174,12 +175,19 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
 
   savePersonalInfoStaff() async {
     // print(_staffImagebytes);
-    if (_formKey.currentState!.validate()) {
+    if (role == null) {
+      setState(() {
+        required = true;
+      });
+    }
+    if (_formKey.currentState!.validate() && role != null) {
       setState(() {
         isSaved = false;
       });
-      var url = Uri.https(ipv4,
-          widget.isEdit ? '/addPersonalInfoStaff' : 'updatePersonalInfoStaff');
+      var url = widget.isEdit
+          ? Uri.parse('$ipv4/addPersonalInfoStaff')
+          : Uri.parse('$ipv4/updatePersonalInfoStaff');
+
       var req = http.MultipartRequest(
         'POST',
         url,
@@ -426,47 +434,63 @@ class _PersonalInfoStaffState extends State<PersonalInfoStaff> {
                   children: [
                     IgnorePointer(
                       ignoring: !isEdit,
-                      child: Container(
-                        margin: EdgeInsets.only(top: 3),
-                        alignment: AlignmentDirectional.center,
-                        width: 250,
-                        height: 43,
-                        // margin: EdgeInsets.only(top: 10),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.circular(5)),
-                        child: DropdownButton(
-                          padding: EdgeInsets.fromLTRB(10, 4, 40, 4),
-                          disabledHint: role != null
-                              ? Text(
-                                  role.toString(),
-                                  style: TextStyle(color: Colors.black),
-                                )
-                              : Text(
-                                  'Role',
-                                  style: TextStyle(color: Colors.grey[600]),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(top: 3),
+                            alignment: AlignmentDirectional.center,
+                            width: 250,
+                            height: 43,
+                            // margin: EdgeInsets.only(top: 10),
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: required
+                                      ? Colors.red.shade800
+                                      : Colors.grey,
                                 ),
-                          value: role,
-                          isExpanded: true,
-                          underline: Text(''),
-                          hint: Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: Text('Role'),
+                                borderRadius: BorderRadius.circular(5)),
+                            child: DropdownButton(
+                              padding: EdgeInsets.fromLTRB(10, 4, 40, 4),
+                              disabledHint: role != null
+                                  ? Text(
+                                      role.toString(),
+                                      style: TextStyle(color: Colors.black),
+                                    )
+                                  : Text(
+                                      'Role',
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                              value: role,
+                              isExpanded: true,
+                              underline: Text(''),
+                              hint: Padding(
+                                padding: const EdgeInsets.only(left: 8),
+                                child: Text('Role'),
+                              ),
+                              items: roleDropdownList
+                                  .map((e) => DropdownMenuItem(
+                                        child: Text(e),
+                                        value: e,
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  role = value.toString();
+                                });
+                              },
+                            ),
                           ),
-                          items: roleDropdownList
-                              .map((e) => DropdownMenuItem(
-                                    child: Text(e),
-                                    value: e,
-                                  ))
-                              .toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              role = value.toString();
-                            });
-                          },
-                        ),
+                          if (required)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 3),
+                              child: Text(
+                                'This field is required',
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.red[800]),
+                              ),
+                            )
+                        ],
                       ),
                     ),
                     if (role != null)

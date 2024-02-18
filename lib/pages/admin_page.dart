@@ -19,7 +19,7 @@ class _AdminPageState extends State<AdminPage> {
   bool loading = true;
   List accesses = [];
   List searchList = [];
-  List academic = ['students', 'academic', 'online-admission'];
+  List academic = ['students', 'subject-management', 'online-admission'];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool expanded = false;
   int headIndex = 0;
@@ -222,53 +222,84 @@ class _AdminPageState extends State<AdminPage> {
                               });
                             },
                             onTap: () {},
-                            child: SingleChildScrollView(
-                              child: SizedBox(
-                                // height: double.,
-                                width: hide ? 63 : 220,
-                                child: Column(
-                                  children: [
-                                    // for (int i = 0; i < heads.length; i++)
-                                    MyExpandingNavTile(
-                                        headIcon: Icons.school_rounded,
-                                        headTitle: 'Academic',
-                                        head: 0,
-                                        subDivsions: academic,
-                                        hide: hide),
-                                    MyNavTile(
-                                      headIcon: Icons.person_rounded,
-                                      headTitle: 'Staff',
-                                      link: 'staff',
-                                      hide: hide,
-                                    ),
-                                    MyNavTile(
-                                      headIcon: Icons.calendar_month,
-                                      headTitle: 'Attendance',
-                                      link: 'class-attendance',
-                                      hide: hide,
-                                    ),
-                                    MyNavTile(
-                                      headIcon: Icons.directions_bus,
-                                      headTitle: 'Transportation',
-                                      link: 'transportation',
-                                      hide: hide,
-                                    ),
-                                    MyNavTile(
-                                      headIcon: Icons.shield,
-                                      headTitle: 'Access Control',
-                                      link: 'accessControl',
-                                      hide: hide,
-                                    ),
-                                    MyNavTile(
-                                      headIcon: Icons.settings,
-                                      headTitle: 'School Settings',
-                                      link: 'school-settings',
-                                      hide: hide,
-                                    ),
-                                    SizedBox(
-                                      height: 8,
-                                    )
-                                  ],
+                            child: Theme(
+                              data: ThemeData(
+                                  scrollbarTheme: ScrollbarThemeData(
+                                thumbVisibility:
+                                    MaterialStateProperty.all(true),
+                                thumbColor: MaterialStateColor.resolveWith(
+                                    (states) => Colors.orange.shade50),
+                              )),
+                              child: SingleChildScrollView(
+                                child: SizedBox(
+                                  // height: double.,
+                                  width: hide ? 63 : 220,
+                                  child: Column(
+                                    children: [
+                                      // for (int i = 0; i < heads.length; i++)
+                                      MyExpandingNavTile(
+                                          headIcon: Icons.school_rounded,
+                                          headTitle: 'Academic',
+                                          head: 0,
+                                          subDivsions: academic,
+                                          hide: hide),
+                                      MyExpandingNavTile(
+                                          headIcon: Icons.rectangle_rounded,
+                                          headTitle: 'Class Management',
+                                          head: 1,
+                                          subDivsions: [
+                                            'class-management',
+                                            'time-table-management',
+                                          ],
+                                          hide: hide),
+                                      MyNavTile(
+                                        headIcon: Icons.person_rounded,
+                                        headTitle: 'Staff',
+                                        link: 'staff',
+                                        hide: hide,
+                                      ),
+                                      MyNavTile(
+                                        headIcon: Icons.calendar_month,
+                                        headTitle: 'Attendance',
+                                        link: 'class-attendance',
+                                        hide: hide,
+                                      ),
+                                      MyNavTile(
+                                        headIcon: Icons.assignment_rounded,
+                                        headTitle: 'Class Curriculum',
+                                        link: 'class-curriculum',
+                                        hide: hide,
+                                      ),
+                                      MyNavTile(
+                                        headIcon: Icons.directions_bus,
+                                        headTitle: 'Transportation',
+                                        link: 'transportation',
+                                        hide: hide,
+                                      ),
+                                      MyNavTile(
+                                        headIcon: Icons.shield,
+                                        headTitle: 'Access Control',
+                                        link: 'accessControl',
+                                        hide: hide,
+                                      ),
+                                      MyNavTile(
+                                        headIcon: Icons.settings,
+                                        headTitle: 'School Settings',
+                                        link: 'school-settings',
+                                        hide: hide,
+                                      ),
+                                      MyNavTile(
+                                        headIcon:
+                                            Icons.playlist_add_check_circle,
+                                        headTitle: 'Exam Management',
+                                        link: 'exam-management',
+                                        hide: hide,
+                                      ),
+                                      SizedBox(
+                                        height: 8,
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -412,8 +443,14 @@ class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
         return 'Students';
       // case 'staff':
       //   return 'Staff';
-      case 'academic':
-        return 'Academic';
+
+      case 'subject-management':
+        return 'Subjects';
+
+      case 'class-management':
+        return 'Classes';
+      case 'time-table-management':
+        return 'Time Table';
       case 'online-admission':
         return 'Online Admission';
     }
@@ -435,29 +472,31 @@ class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
         (element) => GoRouter.of(context).location.startsWith('/$element'));
     String currentRoute = GoRouter.of(context).location;
     switch (currentRoute) {
-      case '/students' || '/academic' || '/online-admission':
+      case '/students' || '/subject-management' || '/online-admission':
         selectedHead = 0;
         selected = selectedIndex;
         break;
-
-      case '/staff':
+      case '/class-management' || '/time-table-management':
         selectedHead = 1;
+        selected = selectedIndex;
+      case '/staff':
+        selectedHead = 2;
         selected = selectedIndex;
         break;
       case '/transportation':
-        selectedHead = 1;
+        selectedHead = 2;
         selected = selectedIndex;
         break;
       case '/class-attendance':
-        selectedHead = 1;
+        selectedHead = 2;
         selected = selectedIndex;
         break;
       case '/accessControl':
-        selectedHead = 1;
+        selectedHead = 2;
         selected = selectedIndex;
         break;
       case '/school-settings':
-        selectedHead = 1;
+        selectedHead = 2;
         selected = selectedIndex;
         break;
     }

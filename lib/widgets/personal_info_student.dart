@@ -235,8 +235,9 @@ class _PersonalInfoState extends State<PersonalInfo> {
       });
       //   var url = Uri.parse('$ipv4/addPersonalInfo');
 
-      var url = Uri.https(ipv4,
-          widget.isEdit ? '/addPersonalInfo' : '/updateStudentPersonalInfo');
+      var url = widget.isEdit
+          ? Uri.parse('$ipv4/addPersonalInfo')
+          : Uri.parse('$ipv4/updateStudentPersonalInfo');
 
       var req = http.MultipartRequest(
         'POST',

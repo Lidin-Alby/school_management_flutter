@@ -11,12 +11,18 @@ import 'package:school_management/pages/admin_access_control.dart';
 
 import 'package:school_management/pages/admin_page.dart';
 import 'package:school_management/pages/admin_transporatation.dart';
+import 'package:school_management/pages/class_management.dart';
 import 'package:school_management/pages/each_staff_page.dart';
+import 'package:school_management/pages/exam_management.dart';
+import 'package:school_management/pages/form_submit_dialog.dart';
+import 'package:school_management/pages/full_application.dart';
 import 'package:school_management/pages/login_page.dart';
 import 'package:school_management/pages/online_admission.dart';
 import 'package:school_management/pages/online_application.dart';
 import 'package:school_management/pages/owner_page.dart';
 import 'package:school_management/pages/school_settings.dart';
+import 'package:school_management/pages/subject_management.dart';
+import 'package:school_management/pages/time_table_management.dart';
 
 import 'attendance_nav.dart';
 import 'chapter_content.dart';
@@ -38,7 +44,7 @@ import 'time_table_nav.dart';
 import 'widgets/add_marks.dart';
 import 'widgets/class_attendance_card.dart';
 import 'widgets/id_card.dart';
-import 'widgets/others.dart';
+import 'pages/class_curriculum.dart';
 import 'widgets/student_shell_widget.dart';
 import 'package:http/http.dart' as http;
 
@@ -67,9 +73,13 @@ final GoRouter router = GoRouter(
     ),
     GoRoute(
       path: '/onlineApplication/:code',
-      builder: (context, state) => OnlineApplication(
+      builder: (context, state) => OnlyForm(
         code: state.params['code'].toString(),
       ),
+    ),
+    GoRoute(
+      path: '/submitionComplete',
+      builder: (context, state) => SubmitDialog(),
     ),
     GoRoute(
       path: '/myApp',
@@ -106,6 +116,12 @@ final GoRouter router = GoRouter(
           path: '/result',
           pageBuilder: (context, state) => NoTransitionPage(child: ResultNav()),
         ),
+        GoRoute(
+          path: '/exam-management',
+          pageBuilder: (context, state) =>
+              NoTransitionPage(child: ExamManagement()),
+        ),
+
         GoRoute(
           path: '/fees',
           pageBuilder: (context, state) => NoTransitionPage(child: FeeNav()),
@@ -144,7 +160,8 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/others',
-          pageBuilder: (context, state) => NoTransitionPage(child: AddResult()),
+          pageBuilder: (context, state) =>
+              NoTransitionPage(child: ClassCurriculum()),
           routes: [
             GoRoute(
               name: 'addMarks',
@@ -175,6 +192,28 @@ final GoRouter router = GoRouter(
           ],
         ),
         GoRoute(
+          path: '/subject-management',
+          builder: (context, state) => SubjectManagement(),
+          redirect: (context, state) => authFun(),
+        ),
+        GoRoute(
+          path: '/class-management',
+          builder: (context, state) => ClassManagement(),
+          redirect: (context, state) => authFun(),
+        ),
+
+        GoRoute(
+          path: '/class-curriculum',
+          builder: (context, state) => ClassCurriculum(),
+          redirect: (context, state) => authFun(),
+        ),
+        GoRoute(
+          path: '/time-table-management',
+          builder: (context, state) => TimeTableManagement(),
+          redirect: (context, state) => authFun(),
+        ),
+
+        GoRoute(
             path: '/staff',
             builder: (context, state) => AdminStaff(),
             redirect: (context, state) => authFun(),
@@ -192,13 +231,21 @@ final GoRouter router = GoRouter(
           redirect: (context, state) => authFun(),
         ),
         GoRoute(
-          path: '/online-admission',
-          builder: (context, state) => OnlineAdmission(),
-          redirect: (context, state) => authFun(),
-        ),
+            path: '/online-admission',
+            builder: (context, state) => OnlineAdmission(),
+            redirect: (context, state) => authFun(),
+            routes: [
+              GoRoute(
+                  path: ':formNo',
+                  builder: (context, state) => FullApplication(
+                        formNo: state.params['formNo'].toString(),
+                      ),
+                  redirect: (context, state) => authFun())
+            ]),
         GoRoute(
           path: '/school-settings',
-          builder: (context, state) => SchoolSettings(),
+          builder: (context, state) => SchoolSettings(
+              index: state.extra.isNull ? 0 : state.extra as int),
           redirect: (context, state) => authFun(),
         ),
         GoRoute(

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/browser_client.dart';
+import 'package:intl/intl.dart';
 import 'package:school_management/pages/online_application.dart';
 
 import '../ip_address.dart';
@@ -16,6 +17,7 @@ class OnlineAdmission extends StatefulWidget {
 
 class _OnlineAdmissionState extends State<OnlineAdmission> {
   late Future _getschoolData;
+
   getSchooldata() async {
     var client = BrowserClient()..withCredentials = true;
     var url = Uri.parse('$ipv4/getMyschoolData');
@@ -77,10 +79,15 @@ class _OnlineAdmissionState extends State<OnlineAdmission> {
                         Align(
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
-                              onPressed: () => context.go('/school-settings'),
+                              onPressed: () =>
+                                  context.go('/school-settings', extra: 10),
                               icon: Icon(Icons.settings),
                               label: Text('Form Settings')),
                         ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Divider(),
                         OnlineApplication(code: snapshot.data['onlineCode']),
                       ],
                     ),
@@ -153,6 +160,9 @@ class _OnlineRequestsState extends State<OnlineRequests> {
                         label: Text('Name'),
                       ),
                       DataColumn(
+                        label: Text('Submitted On'),
+                      ),
+                      DataColumn(
                         label: Text(''),
                       ),
                     ],
@@ -166,9 +176,12 @@ class _OnlineRequestsState extends State<OnlineRequests> {
                                 ),
                               ),
                               DataCell(Text(e['fullName'])),
+                              DataCell(Text(DateFormat('dd-MM-yyyy')
+                                  .format(DateTime.parse(e['submittedOn'])))),
                               DataCell(IconButton(
                                 icon: Icon(Icons.arrow_forward),
-                                onPressed: () {},
+                                onPressed: () => context.go(
+                                    '/online-admission/${e['applicationNo']}'),
                               ))
                             ],
                           ),
