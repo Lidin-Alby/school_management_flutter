@@ -270,6 +270,19 @@ class _AdminPageState extends State<AdminPage> {
                                         link: 'class-curriculum',
                                         hide: hide,
                                       ),
+                                      MyExpandingNavTile(
+                                        headIcon:
+                                            Icons.playlist_add_check_circle,
+                                        head: 2,
+                                        headTitle: 'Exam Management',
+                                        subDivsions: [
+                                          'exam-management',
+                                          'marks-management',
+                                          'grade-management',
+                                          'grade-assignment'
+                                        ],
+                                        hide: hide,
+                                      ),
                                       MyNavTile(
                                         headIcon: Icons.directions_bus,
                                         headTitle: 'Transportation',
@@ -288,13 +301,7 @@ class _AdminPageState extends State<AdminPage> {
                                         link: 'school-settings',
                                         hide: hide,
                                       ),
-                                      MyNavTile(
-                                        headIcon:
-                                            Icons.playlist_add_check_circle,
-                                        headTitle: 'Exam Management',
-                                        link: 'exam-management',
-                                        hide: hide,
-                                      ),
+
                                       SizedBox(
                                         height: 8,
                                       )
@@ -453,6 +460,14 @@ class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
         return 'Time Table';
       case 'online-admission':
         return 'Online Admission';
+      case 'exam-management':
+        return 'Exam and Papers';
+      case 'marks-management':
+        return 'Marks Management';
+      case 'grade-management':
+        return 'Grade Management';
+      case 'grade-assignment':
+        return 'Grade Assignment';
     }
     return '';
   }
@@ -479,24 +494,30 @@ class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
       case '/class-management' || '/time-table-management':
         selectedHead = 1;
         selected = selectedIndex;
-      case '/staff':
+      case '/exam-management' ||
+            '/marks-management' ||
+            '/grade-management' ||
+            '/grade-assignment':
         selectedHead = 2;
+        selected = selectedIndex;
+      case '/staff':
+        selectedHead = 3;
         selected = selectedIndex;
         break;
       case '/transportation':
-        selectedHead = 2;
+        selectedHead = 3;
         selected = selectedIndex;
         break;
       case '/class-attendance':
-        selectedHead = 2;
+        selectedHead = 3;
         selected = selectedIndex;
         break;
       case '/accessControl':
-        selectedHead = 2;
+        selectedHead = 3;
         selected = selectedIndex;
         break;
       case '/school-settings':
-        selectedHead = 2;
+        selectedHead = 3;
         selected = selectedIndex;
         break;
     }

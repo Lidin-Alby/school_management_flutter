@@ -16,7 +16,10 @@ import 'package:school_management/pages/each_staff_page.dart';
 import 'package:school_management/pages/exam_management.dart';
 import 'package:school_management/pages/form_submit_dialog.dart';
 import 'package:school_management/pages/full_application.dart';
+import 'package:school_management/pages/grade_assignment.dart';
+import 'package:school_management/pages/grade_management.dart';
 import 'package:school_management/pages/login_page.dart';
+import 'package:school_management/pages/marks_management.dart';
 import 'package:school_management/pages/online_admission.dart';
 import 'package:school_management/pages/online_application.dart';
 import 'package:school_management/pages/owner_page.dart';
@@ -120,6 +123,21 @@ final GoRouter router = GoRouter(
           path: '/exam-management',
           pageBuilder: (context, state) =>
               NoTransitionPage(child: ExamManagement()),
+        ),
+        GoRoute(
+          path: '/marks-management',
+          pageBuilder: (context, state) =>
+              NoTransitionPage(child: MarksManagement()),
+        ),
+        GoRoute(
+          path: '/grade-management',
+          pageBuilder: (context, state) =>
+              NoTransitionPage(child: GradeManagement()),
+        ),
+        GoRoute(
+          path: '/grade-assignment',
+          pageBuilder: (context, state) =>
+              NoTransitionPage(child: GradeAssignment()),
         ),
 
         GoRoute(
