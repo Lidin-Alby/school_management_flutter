@@ -251,9 +251,7 @@ class _StudentAttendanceState extends State<StudentAttendance> {
 
               List unique = months.toSet().toList();
               print(unique);
-              // var a = attendance
-              //     .firstWhere((element) => element['date'] == today)?['status'];
-              // print(a);
+             
 
               return Column(
                 // crossAxisAlignment: CrossAxisAlignment.start,

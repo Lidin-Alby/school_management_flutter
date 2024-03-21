@@ -11,6 +11,7 @@ import 'package:school_management/pages/admin_access_control.dart';
 
 import 'package:school_management/pages/admin_page.dart';
 import 'package:school_management/pages/admin_transporatation.dart';
+import 'package:school_management/pages/admit_cards.dart';
 import 'package:school_management/pages/class_management.dart';
 import 'package:school_management/pages/each_staff_page.dart';
 import 'package:school_management/pages/exam_management.dart';
@@ -23,7 +24,9 @@ import 'package:school_management/pages/marks_management.dart';
 import 'package:school_management/pages/online_admission.dart';
 import 'package:school_management/pages/online_application.dart';
 import 'package:school_management/pages/owner_page.dart';
+import 'package:school_management/pages/report_card_download.dart';
 import 'package:school_management/pages/school_settings.dart';
+import 'package:school_management/pages/single_page_profile.dart';
 import 'package:school_management/pages/subject_management.dart';
 import 'package:school_management/pages/time_table_management.dart';
 
@@ -39,6 +42,7 @@ import 'pages/admin_satff_page.dart';
 import 'pages/admin_students_page.dart';
 import 'pages/class_menu.dart';
 import 'pages/each_student_page.dart';
+import 'pages/test.dart';
 import 'profile_nav.dart';
 import 'result_nav.dart';
 import 'study_material_nav.dart';
@@ -73,6 +77,13 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => LoginPage(),
+    ),
+    GoRoute(
+      path: '/shareProfile/:scCode/:admNo',
+      builder: (context, state) => SinglePageProfile(
+        schoolCode: state.params['scCode'].toString(),
+        admNo: state.params['admNo'].toString(),
+      ),
     ),
     GoRoute(
       path: '/onlineApplication/:code',
@@ -120,6 +131,10 @@ final GoRouter router = GoRouter(
           pageBuilder: (context, state) => NoTransitionPage(child: ResultNav()),
         ),
         GoRoute(
+          path: '/test',
+          pageBuilder: (context, state) => NoTransitionPage(child: Test()),
+        ),
+        GoRoute(
           path: '/exam-management',
           pageBuilder: (context, state) =>
               NoTransitionPage(child: ExamManagement()),
@@ -138,6 +153,16 @@ final GoRouter router = GoRouter(
           path: '/grade-assignment',
           pageBuilder: (context, state) =>
               NoTransitionPage(child: GradeAssignment()),
+        ),
+        GoRoute(
+          path: '/report-card-download',
+          pageBuilder: (context, state) =>
+              NoTransitionPage(child: ReportCardDownload()),
+        ),
+        GoRoute(
+          path: '/admit-card-download',
+          pageBuilder: (context, state) =>
+              NoTransitionPage(child: AdmitCardDownload()),
         ),
 
         GoRoute(

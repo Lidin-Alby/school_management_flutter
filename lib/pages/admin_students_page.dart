@@ -497,7 +497,7 @@ class _AdminStudentsState extends State<AdminStudents> {
                       if (searchText != '') {
                         students = searchList
                             .where((element) =>
-                                element['firstName']
+                                element['fullName']
                                     .toLowerCase()
                                     .contains(searchText.toLowerCase()) ||
                                 element['admNo'].contains(searchText))
@@ -560,11 +560,11 @@ class _AdminStudentsState extends State<AdminStudents> {
                                           }
                                         });
                                         if (ascending) {
-                                          students.sort((a, b) => a['firstName']
-                                              .compareTo(b['firstName']));
+                                          students.sort((a, b) => a['fullName']
+                                              .compareTo(b['fullName']));
                                         } else {
-                                          students.sort((a, b) => b['firstName']
-                                              .compareTo(a['firstName']));
+                                          students.sort((a, b) => b['fullName']
+                                              .compareTo(a['fullName']));
                                         }
                                       },
                                       label: Text('Name')),
@@ -615,7 +615,7 @@ class _AdminStudentsState extends State<AdminStudents> {
                                             cells: [
                                               DataCell(Text(student['admNo'])),
                                               DataCell(
-                                                  Text(student['firstName'])),
+                                                  Text(student['fullName'])),
                                               DataCell(
                                                   Text(student['classTitle'])),
                                               DataCell(Text(

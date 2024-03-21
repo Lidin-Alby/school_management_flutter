@@ -18,6 +18,9 @@ class ExamManagement extends StatefulWidget {
 class _ExamManagementState extends State<ExamManagement> {
   String? selectedClass;
   List<String?> selectedSubjects = [];
+  List sessions =
+      List.generate(20, (index) => '${2020 + index}-${20 + index + 1}');
+  String? selectedSession;
   List classes = [];
   List subjects = [];
   late String schoolCode;
@@ -26,6 +29,19 @@ class _ExamManagementState extends State<ExamManagement> {
   bool isEdit = false;
   int nos = 3;
   int? _selectedIndex;
+
+  getSession() async {
+    var client = BrowserClient()..withCredentials = true;
+
+    var url = Uri.parse('$ipv4/getCurrentSession');
+    var res = await client.get(url);
+
+    print(res.body);
+    var data = jsonDecode(res.body);
+    selectedSession =
+        data['selectedSession'] == '' ? null : data['selectedSession'];
+    _getExamTerms = getExamTerms();
+  }
 
   getClass() async {
     var client = BrowserClient()..withCredentials = true;
@@ -38,6 +54,7 @@ class _ExamManagementState extends State<ExamManagement> {
     data.removeLast();
 
     classes = data;
+    getSession();
     getInstitueSubjects();
 
     return data;
@@ -57,7 +74,7 @@ class _ExamManagementState extends State<ExamManagement> {
   getExamTerms() async {
     var client = BrowserClient()..withCredentials = true;
 
-    var url = Uri.parse('$ipv4/getExamTerms');
+    var url = Uri.parse('$ipv4/getExamTerms/$selectedSession');
     var res = await client.get(url);
     var data = jsonDecode(res.body);
     print(data);
@@ -67,7 +84,7 @@ class _ExamManagementState extends State<ExamManagement> {
   getPaper() async {
     var client = BrowserClient()..withCredentials = true;
 
-    var url = Uri.parse('$ipv4/getPaper/$selectedClass');
+    var url = Uri.parse('$ipv4/getPaper/$selectedSession/$selectedClass');
     var res = await client.get(url);
 
     print(res.body);
@@ -78,7 +95,7 @@ class _ExamManagementState extends State<ExamManagement> {
   @override
   void initState() {
     getClass();
-    _getExamTerms = getExamTerms();
+
     selectedSubjects = List.generate(3, (index) => null);
     super.initState();
   }
@@ -95,522 +112,612 @@ class _ExamManagementState extends State<ExamManagement> {
           Padding(
             padding: const EdgeInsets.all(15),
             child: ElevatedButton.icon(
-              onPressed: () => showModalBottomSheet(
-                  isScrollControlled: true,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20))),
-                  context: context,
-                  builder: (context) => AddTerm(
-                        schoolCode: schoolCode,
-                        refresh: () {
-                          setState(() {
-                            _getExamTerms = getExamTerms();
-                          });
-                        },
-                      )),
+              onPressed: () => selectedSession == null
+                  ? ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red[600],
+                        behavior: SnackBarBehavior.floating,
+                        content: const Row(
+                          children: [
+                            Text(
+                              'Select Session',
+                            ),
+                            Icon(
+                              Icons.error,
+                              color: Colors.white,
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  : showModalBottomSheet(
+                      isScrollControlled: true,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20))),
+                      context: context,
+                      builder: (context) => AddTerm(
+                            schoolCode: schoolCode,
+                            selectedSession: selectedSession!,
+                            refresh: () {
+                              setState(() {
+                                _getExamTerms = getExamTerms();
+                              });
+                            },
+                          )),
               icon: Icon(Icons.add_rounded),
               label: Text('New Term'),
             ),
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: _getExamTerms,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List examTerms = [];
-            if (snapshot.data.containsKey('examTerm')) {
-              examTerms = snapshot.data['examTerm'];
-            }
-            return examTerms.isEmpty
-                ? Center(child: Text('No Terms Added'))
-                : SingleChildScrollView(
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: ExpansionPanelList(
-                          animationDuration: Duration(milliseconds: 400),
-                          expandedHeaderPadding: EdgeInsets.zero,
-                          expansionCallback: (panelIndex, isExpanded) {
-                            selectedClass = null;
-                            if (_selectedIndex == panelIndex) {
-                              setState(() {
-                                _selectedIndex = null;
-                              });
-                            } else {
-                              setState(() {
-                                _selectedIndex = panelIndex;
-                              });
-                            }
-                          },
-                          children: [
-                            for (int i = 0; i < examTerms.length; i++)
-                              ExpansionPanel(
-                                canTapOnHeader: true,
-                                isExpanded: i == _selectedIndex,
-                                headerBuilder: (context, isExpanded) {
-                                  return ListTile(
-                                    contentPadding:
-                                        EdgeInsets.symmetric(vertical: 10),
-                                    tileColor: Colors.blue[50],
-                                    title: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Term Name',
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                            Text(examTerms[i]['termName']),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 30,
-                                          child: VerticalDivider(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Admit Card Name',
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                            Text(examTerms[i]['admitCardName']),
-                                          ],
-                                        ),
-                                        SizedBox(
-                                          height: 30,
-                                          child: VerticalDivider(
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Result Card Name',
-                                              style: TextStyle(fontSize: 12),
-                                            ),
-                                            Text(examTerms[i]['resultName']),
-                                          ],
-                                        ),
-                                        Row(
-                                          children: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  showModalBottomSheet(
-                                                isScrollControlled: true,
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(20),
-                                                    topRight:
-                                                        Radius.circular(20),
-                                                  ),
-                                                ),
-                                                context: context,
-                                                builder: (context) => EditTerm(
-                                                  schoolCode: schoolCode,
-                                                  termName: examTerms[i]
-                                                      ['termName'],
-                                                  admitCardName: examTerms[i]
-                                                      ['admitCardName'],
-                                                  resultName: examTerms[i]
-                                                      ['resultName'],
-                                                  index: i,
-                                                  refresh: () {
-                                                    setState(() {
-                                                      _getExamTerms =
-                                                          getExamTerms();
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                              child: Icon(
-                                                Icons.edit,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+          child: Column(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Session',
+                    style: TextStyle(fontSize: 15),
+                  ),
+                  SizedBox(
+                    height: 2,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(4)),
+                    child: DropdownButton(
+                      // borderRadius: BorderRadius.circular(10),
+                      padding: EdgeInsets.all(4),
+                      value: selectedSession,
+                      isDense: true,
+                      isExpanded: true,
+                      underline: Text(''),
+                      hint: Text('Select Session'),
+                      items: sessions
+                          .map(
+                              (e) => DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedSession = value.toString();
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              if (selectedSession != null)
+                FutureBuilder(
+                  future: _getExamTerms,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List examTerms = [];
+                      examTerms = snapshot.data;
+                      return examTerms.isEmpty
+                          ? Center(child: Text('No Terms Added'))
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: ExpansionPanelList(
+                                animationDuration: Duration(milliseconds: 400),
+                                expandedHeaderPadding: EdgeInsets.zero,
+                                expansionCallback: (panelIndex, isExpanded) {
+                                  selectedClass = null;
+                                  if (_selectedIndex == panelIndex) {
+                                    setState(() {
+                                      _selectedIndex = null;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _selectedIndex = panelIndex;
+                                    });
+                                  }
                                 },
-                                body: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(15),
-                                          child: SizedBox(
-                                            width: 500,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Class',
-                                                  style:
-                                                      TextStyle(fontSize: 15),
-                                                ),
-                                                SizedBox(
-                                                  height: 2,
-                                                ),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4)),
-                                                  child: DropdownButton(
-                                                    // borderRadius: BorderRadius.circular(10),
-                                                    padding: EdgeInsets.all(4),
-                                                    value: selectedClass,
-                                                    isDense: true,
-                                                    isExpanded: true,
-                                                    underline: Text(''),
-                                                    hint: Text('Select Class'),
-                                                    items: classes
-                                                        .map((e) =>
-                                                            DropdownMenuItem(
-                                                                value:
-                                                                    e['title'],
-                                                                child: Text(e[
-                                                                    'title'])))
-                                                        .toList(),
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        selectedClass =
-                                                            value.toString();
-                                                        _getPapers = getPaper();
-                                                      });
-                                                    },
+                                children: [
+                                  for (int i = 0; i < examTerms.length; i++)
+                                    ExpansionPanel(
+                                      canTapOnHeader: true,
+                                      isExpanded: i == _selectedIndex,
+                                      headerBuilder: (context, isExpanded) {
+                                        return ListTile(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          tileColor: Colors.blue[50],
+                                          title: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Term Name',
+                                                    style:
+                                                        TextStyle(fontSize: 12),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        if (selectedClass != null)
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 18),
-                                            child: ElevatedButton(
-                                              onPressed: () =>
-                                                  showModalBottomSheet(
-                                                isScrollControlled: true,
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(20),
-                                                    topRight:
-                                                        Radius.circular(20),
-                                                  ),
-                                                ),
-                                                context: context,
-                                                builder: (context) => AddPaper(
-                                                  subjects: subjects,
-                                                  schoolCode: schoolCode,
-                                                  selectedClass: selectedClass!,
-                                                  termName: examTerms[i]
-                                                      ['termName'],
-                                                  refresh: () {
-                                                    setState(() {
-                                                      _getPapers = getPaper();
-                                                    });
-                                                  },
+                                                  Text(
+                                                      examTerms[i]['termName']),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 30,
+                                                child: VerticalDivider(
+                                                  color: Colors.black,
                                                 ),
                                               ),
-                                              child: Icon(Icons.add),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                    selectedClass == null
-                                        ? const Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.all(8.0),
-                                                child: Text(
-                                                    'Select Class to see Exams'),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Admit Card Name',
+                                                    style:
+                                                        TextStyle(fontSize: 12),
+                                                  ),
+                                                  Text(examTerms[i]
+                                                      ['admitCardName']),
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 30,
+                                                child: VerticalDivider(
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Result Card Name',
+                                                    style:
+                                                        TextStyle(fontSize: 12),
+                                                  ),
+                                                  Text(examTerms[i]
+                                                      ['resultName']),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        showModalBottomSheet(
+                                                      isScrollControlled: true,
+                                                      shape:
+                                                          const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  20),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  20),
+                                                        ),
+                                                      ),
+                                                      context: context,
+                                                      builder: (context) =>
+                                                          EditTerm(
+                                                        schoolCode: schoolCode,
+                                                        termName: examTerms[i]
+                                                            ['termName'],
+                                                        selectedSession:
+                                                            selectedSession!,
+                                                        admitCardName: examTerms[
+                                                            i]['admitCardName'],
+                                                        resultName: examTerms[i]
+                                                            ['resultName'],
+                                                        index: i,
+                                                        refresh: () {
+                                                          setState(() {
+                                                            _getExamTerms =
+                                                                getExamTerms();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.edit,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
-                                          )
-                                        : FutureBuilder(
-                                            future: _getPapers,
-                                            builder: (context, snapshot) {
-                                              if (snapshot.hasData) {
-                                                Map paper = snapshot.data;
-                                                if (paper.isNotEmpty) {
-                                                  paper = paper['paper'];
-                                                }
-                                                List termPapers = [];
-                                                if (paper.containsKey(
-                                                    examTerms[i]['termName'])) {
-                                                  termPapers = paper[
-                                                      examTerms[i]['termName']];
-                                                }
-                                                return Container(
-                                                  margin: EdgeInsets.fromLTRB(
-                                                      15, 5, 15, 15),
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  child: Table(
-                                                    border: TableBorder(
-                                                      horizontalInside:
-                                                          BorderSide(),
-                                                      verticalInside:
-                                                          BorderSide(),
-                                                    ),
+                                          ),
+                                        );
+                                      },
+                                      body: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(15),
+                                                child: SizedBox(
+                                                  width: 500,
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
-                                                      TableRow(
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10),
-                                                              color: Colors
-                                                                  .orange
-                                                                  .shade50),
-                                                          children: const [
-                                                            TableCell(
-                                                                child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8.0),
-                                                              child: Text(
-                                                                'Paper Name',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                            )),
-                                                            TableCell(
-                                                                child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8.0),
-                                                              child: Text(
-                                                                'Maximum Marks',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style: TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                            )),
-                                                            TableCell(
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        8.0),
-                                                                child: Text(
-                                                                  'Subject Name',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            TableCell(
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        8.0),
-                                                                child: Text(
-                                                                  'Action',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style: TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
-                                                                ),
-                                                              ),
-                                                            )
-                                                          ]),
-                                                      for (int j = 0;
-                                                          j < termPapers.length;
-                                                          j++)
-                                                        TableRow(
+                                                      Text(
+                                                        'Class',
+                                                        style: TextStyle(
+                                                            fontSize: 15),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 2,
+                                                      ),
+                                                      Container(
+                                                        decoration: BoxDecoration(
+                                                            border:
+                                                                Border.all(),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        4)),
+                                                        child: DropdownButton(
+                                                          // borderRadius: BorderRadius.circular(10),
+                                                          padding:
+                                                              EdgeInsets.all(4),
+                                                          value: selectedClass,
+                                                          isDense: true,
+                                                          isExpanded: true,
+                                                          underline: Text(''),
+                                                          hint: Text(
+                                                              'Select Class'),
+                                                          items: classes
+                                                              .map((e) => DropdownMenuItem(
+                                                                  value: e[
+                                                                      'title'],
+                                                                  child: Text(e[
+                                                                      'title'])))
+                                                              .toList(),
+                                                          onChanged: (value) {
+                                                            setState(() {
+                                                              selectedClass =
+                                                                  value
+                                                                      .toString();
+                                                              _getPapers =
+                                                                  getPaper();
+                                                            });
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              if (selectedClass != null)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 18),
+                                                  child: ElevatedButton(
+                                                    onPressed: () =>
+                                                        showModalBottomSheet(
+                                                      isScrollControlled: true,
+                                                      shape:
+                                                          const RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  20),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  20),
+                                                        ),
+                                                      ),
+                                                      context: context,
+                                                      builder: (context) =>
+                                                          AddPaper(
+                                                        subjects: subjects,
+                                                        schoolCode: schoolCode,
+                                                        selectedSession:
+                                                            selectedSession!,
+                                                        selectedClass:
+                                                            selectedClass!,
+                                                        termName: examTerms[i]
+                                                            ['termName'],
+                                                        refresh: () {
+                                                          setState(() {
+                                                            _getPapers =
+                                                                getPaper();
+                                                          });
+                                                        },
+                                                      ),
+                                                    ),
+                                                    child: Icon(Icons.add),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          selectedClass == null
+                                              ? const Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsets.all(8.0),
+                                                      child: Text(
+                                                          'Select Class to see Exams'),
+                                                    ),
+                                                  ],
+                                                )
+                                              : FutureBuilder(
+                                                  future: _getPapers,
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      Map paper = snapshot.data;
+                                                      if (paper.containsKey(
+                                                          selectedSession)) {
+                                                        paper = paper[
+                                                            selectedSession];
+                                                      }
+                                                      List termPapers = [];
+                                                      if (paper.containsKey(
+                                                          examTerms[i]
+                                                              ['termName'])) {
+                                                        termPapers = paper[
+                                                            examTerms[i]
+                                                                ['termName']];
+                                                      }
+                                                      return Container(
+                                                        margin:
+                                                            EdgeInsets.fromLTRB(
+                                                                15, 5, 15, 15),
+                                                        decoration: BoxDecoration(
+                                                            border:
+                                                                Border.all(),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        child: Table(
+                                                          border: TableBorder(
+                                                            horizontalInside:
+                                                                BorderSide(),
+                                                            verticalInside:
+                                                                BorderSide(),
+                                                          ),
                                                           children: [
-                                                            TableCell(
-                                                              verticalAlignment:
-                                                                  TableCellVerticalAlignment
-                                                                      .middle,
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(10),
-                                                                child: Text(
-                                                                  termPapers[j][
-                                                                      'paperName'],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            TableCell(
-                                                              verticalAlignment:
-                                                                  TableCellVerticalAlignment
-                                                                      .middle,
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(10),
-                                                                child: Text(
-                                                                    termPapers[
-                                                                            j][
-                                                                        'maxMarks']),
-                                                              ),
-                                                            ),
-                                                            TableCell(
-                                                              verticalAlignment:
-                                                                  TableCellVerticalAlignment
-                                                                      .middle,
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(10),
-                                                                child: Center(
-                                                                  child: Text(
-                                                                    termPapers[
-                                                                            j][
-                                                                        'subject'],
+                                                            TableRow(
+                                                                decoration: BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    color: Colors
+                                                                        .orange
+                                                                        .shade50),
+                                                                children: const [
+                                                                  TableCell(
+                                                                      child:
+                                                                          Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            8.0),
+                                                                    child: Text(
+                                                                      'Paper Name',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                  )),
+                                                                  TableCell(
+                                                                      child:
+                                                                          Padding(
+                                                                    padding:
+                                                                        const EdgeInsets.all(
+                                                                            8.0),
+                                                                    child: Text(
+                                                                      'Maximum Marks',
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      style: TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold),
+                                                                    ),
+                                                                  )),
+                                                                  TableCell(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              8.0),
+                                                                      child:
+                                                                          Text(
+                                                                        'Subject Name',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            TableCell(
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(10),
-                                                                child: Center(
-                                                                    child: Wrap(
-                                                                  children: [
-                                                                    TextButton(
-                                                                        onPressed: () =>
-                                                                            showModalBottomSheet(
-                                                                              isScrollControlled: true,
-                                                                              shape: const RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.only(
-                                                                                  topLeft: Radius.circular(20),
-                                                                                  topRight: Radius.circular(20),
-                                                                                ),
-                                                                              ),
-                                                                              context: context,
-                                                                              builder: (context) => EditPaper(
-                                                                                subjects: subjects,
-                                                                                schoolCode: schoolCode,
-                                                                                selectedClass: selectedClass!,
-                                                                                termName: examTerms[i]['termName'],
-                                                                                paperName: termPapers[j]['paperName'],
-                                                                                maxMarks: termPapers[j]['maxMarks'],
-                                                                                selectedSubject: termPapers[j]['subject'],
-                                                                                index: j,
-                                                                                refresh: () {
+                                                                  TableCell(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              8.0),
+                                                                      child:
+                                                                          Text(
+                                                                        'Action',
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold),
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                ]),
+                                                            for (int j = 0;
+                                                                j <
+                                                                    termPapers
+                                                                        .length;
+                                                                j++)
+                                                              TableRow(
+                                                                children: [
+                                                                  TableCell(
+                                                                    verticalAlignment:
+                                                                        TableCellVerticalAlignment
+                                                                            .middle,
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              10),
+                                                                      child:
+                                                                          Text(
+                                                                        termPapers[j]
+                                                                            [
+                                                                            'paperName'],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    verticalAlignment:
+                                                                        TableCellVerticalAlignment
+                                                                            .middle,
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              10),
+                                                                      child: Text(
+                                                                          termPapers[j]
+                                                                              [
+                                                                              'maxMarks']),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    verticalAlignment:
+                                                                        TableCellVerticalAlignment
+                                                                            .middle,
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              10),
+                                                                      child:
+                                                                          Center(
+                                                                        child:
+                                                                            Text(
+                                                                          termPapers[j]
+                                                                              [
+                                                                              'subject'],
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding:
+                                                                          const EdgeInsets.all(
+                                                                              10),
+                                                                      child: Center(
+                                                                          child: Wrap(
+                                                                        children: [
+                                                                          TextButton(
+                                                                              onPressed: () => showModalBottomSheet(
+                                                                                    isScrollControlled: true,
+                                                                                    shape: const RoundedRectangleBorder(
+                                                                                      borderRadius: BorderRadius.only(
+                                                                                        topLeft: Radius.circular(20),
+                                                                                        topRight: Radius.circular(20),
+                                                                                      ),
+                                                                                    ),
+                                                                                    context: context,
+                                                                                    builder: (context) => EditPaper(
+                                                                                      subjects: subjects,
+                                                                                      schoolCode: schoolCode,
+                                                                                      selectedClass: selectedClass!,
+                                                                                      termName: examTerms[i]['termName'],
+                                                                                      paperName: termPapers[j]['paperName'],
+                                                                                      maxMarks: termPapers[j]['maxMarks'],
+                                                                                      selectedSubject: termPapers[j]['subject'],
+                                                                                      index: j,
+                                                                                      refresh: () {
+                                                                                        setState(() {
+                                                                                          _getPapers = getPaper();
+                                                                                        });
+                                                                                      },
+                                                                                    ),
+                                                                                  ),
+                                                                              child: Icon(Icons.edit)),
+                                                                          TextButton(
+                                                                              onPressed: () async {
+                                                                                var client = BrowserClient()..withCredentials = true;
+
+                                                                                var url = Uri.parse('$ipv4/deletePaper');
+
+                                                                                var res = await client.post(url, body: {
+                                                                                  'termName': examTerms[i]['termName'],
+                                                                                  'classTitle': selectedClass,
+                                                                                  'schoolCode': schoolCode,
+                                                                                  'index': j.toString()
+                                                                                });
+                                                                                if (res.body == 'true') {
                                                                                   setState(() {
                                                                                     _getPapers = getPaper();
                                                                                   });
-                                                                                },
-                                                                              ),
-                                                                            ),
-                                                                        child: Icon(
-                                                                            Icons.edit)),
-                                                                    TextButton(
-                                                                        onPressed:
-                                                                            () async {
-                                                                          var client = BrowserClient()
-                                                                            ..withCredentials =
-                                                                                true;
-
-                                                                          var url =
-                                                                              Uri.parse('$ipv4/deletePaper');
-
-                                                                          var res = await client.post(
-                                                                              url,
-                                                                              body: {
-                                                                                'termName': examTerms[i]['termName'],
-                                                                                'classTitle': selectedClass,
-                                                                                'schoolCode': schoolCode,
-                                                                                'index': j.toString()
-                                                                              });
-                                                                          if (res.body ==
-                                                                              'true') {
-                                                                            setState(() {
-                                                                              _getPapers = getPaper();
-                                                                            });
-                                                                          }
-                                                                        },
-                                                                        child:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .delete,
-                                                                          color:
-                                                                              Colors.red,
-                                                                        ))
-                                                                  ],
-                                                                )),
+                                                                                }
+                                                                              },
+                                                                              child: Icon(
+                                                                                Icons.delete,
+                                                                                color: Colors.red,
+                                                                              ))
+                                                                        ],
+                                                                      )),
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
-                                                            ),
                                                           ],
                                                         ),
-                                                    ],
-                                                  ),
-                                                );
-                                              } else {
-                                                return const Center(
-                                                    child:
-                                                        CircularProgressIndicator());
-                                              }
-                                            },
-                                          ),
-                                  ],
-                                ),
-                              )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
+                                                      );
+                                                    } else {
+                                                      return const Center(
+                                                          child:
+                                                              CircularProgressIndicator());
+                                                    }
+                                                  },
+                                                ),
+                                        ],
+                                      ),
+                                    )
+                                ],
+                              ),
+                            );
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -812,11 +919,13 @@ class AddPaper extends StatefulWidget {
       required this.schoolCode,
       required this.selectedClass,
       required this.termName,
+      required this.selectedSession,
       required this.refresh});
   final List subjects;
   final String schoolCode;
   final String selectedClass;
   final String termName;
+  final String selectedSession;
   final VoidCallback refresh;
 
   @override
@@ -855,6 +964,7 @@ class _AddPaperState extends State<AddPaper> {
     var url = Uri.parse('$ipv4/addPaper');
 
     var res = await client.post(url, body: {
+      'session': widget.selectedSession,
       'termName': widget.termName,
       'classTitle': widget.selectedClass,
       'schoolCode': widget.schoolCode,
@@ -1036,12 +1146,14 @@ class EditTerm extends StatefulWidget {
       required this.admitCardName,
       required this.resultName,
       required this.index,
+      required this.selectedSession,
       required this.refresh});
   final String schoolCode;
   final String termName;
   final String admitCardName;
   final String resultName;
   final int index;
+  final String selectedSession;
   final VoidCallback refresh;
   @override
   State<EditTerm> createState() => _EditTermState();
@@ -1057,6 +1169,7 @@ class _EditTermState extends State<EditTerm> {
     var url = Uri.parse('$ipv4/editTerm');
     var res = await client.post(url, body: {
       'schoolCode': widget.schoolCode,
+      'session': widget.selectedSession,
       'termName': termName.text.trim(),
       'admitCardName': admitCardName.text.trim(),
       'resultName': resultName.text.trim(),
@@ -1129,8 +1242,13 @@ class _EditTermState extends State<EditTerm> {
 }
 
 class AddTerm extends StatefulWidget {
-  const AddTerm({super.key, required this.schoolCode, required this.refresh});
+  const AddTerm(
+      {super.key,
+      required this.schoolCode,
+      required this.selectedSession,
+      required this.refresh});
   final String schoolCode;
+  final String selectedSession;
   final VoidCallback refresh;
 
   @override
@@ -1146,6 +1264,7 @@ class _AddTermState extends State<AddTerm> {
     var url = Uri.parse('$ipv4/addTerm');
     var res = await client.post(url, body: {
       'schoolCode': widget.schoolCode,
+      'session': widget.selectedSession,
       'termName': termName.text.trim(),
       'admitCardName': admitCardName.text.trim(),
       'resultName': resultName.text.trim()

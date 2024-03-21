@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/browser_client.dart';
@@ -22,13 +23,29 @@ class _GradeAssignmentState extends State<GradeAssignment> {
   late Future _getReport;
   List gradeFields = [];
   Map grades = {};
+  Map dropOptions = {};
+
+  List students = [];
+  bool? autoFillRemark = false;
+  List defaultRemarks = [
+    'Excellent! Keep it up',
+    'is able to find creative and constructive to solutions and problems and issues',
+    'has rich imaginationand is able to think out of the box',
+    'is independent in thinking',
+    'has fluency in expression',
+    'can make independent judgement in critical matters',
+    'examins the problem closely',
+    'listens carefully and gives feedback',
+    'tries to find out alternatives and solutions',
+    'questions relevantly'
+  ];
+
   getSession() async {
     var client = BrowserClient()..withCredentials = true;
 
     var url = Uri.parse('$ipv4/getCurrentSession');
     var res = await client.get(url);
 
-    print(res.body);
     var data = jsonDecode(res.body);
     setState(() {
       selectedSession =
@@ -58,21 +75,61 @@ class _GradeAssignmentState extends State<GradeAssignment> {
     var url = Uri.parse('$ipv4/getGrades');
 
     var res = await client.get(url);
-    print(res.body);
+
     var data = jsonDecode(res.body);
     grades = data['grades'];
     gradeFields = data['gradeFields'];
+    for (String a in gradeFields) {
+      if (grades[a]['groups'].isNotEmpty) {
+        dropOptions[a] =
+            grades[a]['grades'].map((e) => e['gradeName']).toList();
+      }
+    }
   }
 
   getReportDetails() async {
     var client = BrowserClient()..withCredentials = true;
 
-    var url = Uri.parse('$ipv4/getReportCardDetails/$selectedClass');
+    var url =
+        Uri.parse('$ipv4/getReportCardDetails/$selectedSession/$selectedClass');
     var res = await client.get(url);
 
-    print(res.body);
     var data = jsonDecode(res.body);
+
     return data;
+  }
+
+  addReportDetails() async {
+    var client = BrowserClient()..withCredentials = true;
+
+    var url = Uri.parse('$ipv4/addReportCardDetails');
+    var res = await client.post(url, body: {
+      'students': jsonEncode(students),
+      'session': selectedSession,
+      'schoolCode': schoolCode,
+    });
+    print(res.body);
+    if (res.body == 'true') {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green[600],
+            behavior: SnackBarBehavior.floating,
+            content: const Row(
+              children: [
+                Text(
+                  'Updated Successfully ',
+                ),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.white,
+                )
+              ],
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -125,7 +182,12 @@ class _GradeAssignmentState extends State<GradeAssignment> {
                                     DropdownMenuItem(value: e, child: Text(e)))
                                 .toList(),
                             onChanged: (value) {
-                              setState(() {});
+                              setState(() {
+                                selectedSession = value.toString();
+                                if (selectedClass != null) {
+                                  _getReport = getReportDetails();
+                                }
+                              });
                             },
                           ),
                         ),
@@ -165,7 +227,9 @@ class _GradeAssignmentState extends State<GradeAssignment> {
                             onChanged: (value) {
                               setState(() {
                                 selectedClass = value.toString();
-                                _getReport = getReportDetails();
+                                if (selectedSession != null) {
+                                  _getReport = getReportDetails();
+                                }
                               });
                             },
                           ),
@@ -178,207 +242,276 @@ class _GradeAssignmentState extends State<GradeAssignment> {
               SizedBox(
                 height: 20,
               ),
-              if (selectedClass != null)
+              if (selectedClass != null && selectedSession != null)
                 FutureBuilder(
                   future: _getReport,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      List students = snapshot.data;
-                      return Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(),
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Table(
-                          border: TableBorder(
-                            horizontalInside: BorderSide(),
-                            verticalInside: BorderSide(),
-                          ),
-                          children: [
-                            TableRow(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.orange.shade50),
-                                children: const [
-                                  TableCell(
-                                      child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Adm No.',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )),
-                                  TableCell(
-                                      child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Student Name',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )),
-                                  TableCell(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Father Name',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                  TableCell(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Field / Grade',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ),
-                                  // TableCell(
-                                  //   child: Padding(
-                                  //     padding: const EdgeInsets.all(8.0),
-                                  //     child: Text(
-                                  //       'Grade',
-                                  //       textAlign: TextAlign.center,
-                                  //       style: TextStyle(
-                                  //           fontWeight: FontWeight.bold),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  TableCell(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Remark',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  )
-                                ]),
-                            for (int s = 0; s < students.length; s++)
-                              TableRow(
-                                children: [
-                                  TableCell(
-                                    verticalAlignment:
-                                        TableCellVerticalAlignment.middle,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Text(
-                                        students[s]['admNo'],
-                                      ),
-                                    ),
-                                  ),
-                                  TableCell(
-                                    verticalAlignment:
-                                        TableCellVerticalAlignment.middle,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Text(
-                                        students[s]['fullName'],
-                                      ),
-                                    ),
-                                  ),
-                                  TableCell(
-                                    verticalAlignment:
-                                        TableCellVerticalAlignment.middle,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Text(
-                                        students[s]['fatherName'],
-                                      ),
-                                    ),
-                                  ),
-                                  TableCell(
-                                    verticalAlignment:
-                                        TableCellVerticalAlignment.middle,
-                                    child: Padding(
+                      students = snapshot.data;
+
+                      return Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(),
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Table(
+                              border: TableBorder(
+                                horizontalInside: BorderSide(),
+                                verticalInside: BorderSide(),
+                              ),
+                              children: [
+                                TableRow(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.orange.shade50),
+                                    children: [
+                                      TableCell(
+                                          child: Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            for (String a in gradeFields)
-                                              if (grades[a]['groups']
-                                                  .isNotEmpty)
-                                                for (String i in grades[a]
-                                                    ['groups'])
-                                                  Wrap(
-                                                    children: [
-                                                      SizedBox(
-                                                          width: 150,
-                                                          child: Text(i)),
-                                                      SizedBox(
-                                                        width: 75,
-                                                        height: 40,
-                                                        child: TextField(
-                                                          onChanged: (value) {
-                                                            students[s]
-                                                                    ['marks'] =
-                                                                value;
-                                                          },
-                                                          controller:
-                                                              TextEditingController(
-                                                                  text: students[
-                                                                          s][
-                                                                      'marks']),
-                                                          decoration: InputDecoration(
-                                                              contentPadding:
-                                                                  EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          10,
-                                                                      horizontal:
-                                                                          6),
-                                                              isDense: true,
-                                                              border:
-                                                                  OutlineInputBorder(),
-                                                              hintText:
-                                                                  'Grade'),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  )
-                                          ],
-                                        )),
-                                  ),
-                                  TableCell(
-                                    verticalAlignment:
-                                        TableCellVerticalAlignment.middle,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: SizedBox(
-                                        width: 100,
-                                        height: 40,
-                                        child: TextField(
-                                          onChanged: (value) {
-                                            students[s]['marks'] = value;
-                                          },
-                                          controller: TextEditingController(
-                                              text: students[s]['marks']),
-                                          decoration: InputDecoration(
-                                              contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 6),
-                                              isDense: true,
-                                              border: OutlineInputBorder(),
-                                              hintText: 'Remark'),
+                                        child: Text(
+                                          'Adm No.',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      )),
+                                      TableCell(
+                                          child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          'Student Name',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      )),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Father Name',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Field / Grade',
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                'Remark',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Checkbox(
+                                                value: autoFillRemark,
+                                                onChanged: (value) {
+                                                  if (value!) {
+                                                    Random random = Random();
+                                                    for (int i = 0;
+                                                        i < students.length;
+                                                        i++) {
+                                                      int randomIndex =
+                                                          random.nextInt(
+                                                              defaultRemarks
+                                                                  .length);
+                                                      students[i]['remark'] =
+                                                          defaultRemarks[
+                                                              randomIndex];
+                                                    }
+                                                  } else {
+                                                    for (int i = 0;
+                                                        i < students.length;
+                                                        i++) {
+                                                      students[i]['remark'] =
+                                                          '';
+                                                    }
+                                                  }
+                                                  setState(() {
+                                                    autoFillRemark = value;
+                                                  });
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ]),
+                                for (int s = 0; s < students.length; s++)
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text(
+                                            students[s]['admNo'],
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text(
+                                            students[s]['fullName'],
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text(
+                                            students[s]['fatherName'],
+                                          ),
+                                        ),
+                                      ),
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                for (String a in gradeFields)
+                                                  if (grades[a]['groups']
+                                                      .isNotEmpty)
+                                                    for (String i in grades[a]
+                                                        ['groups'])
+                                                      Wrap(
+                                                        crossAxisAlignment:
+                                                            WrapCrossAlignment
+                                                                .center,
+                                                        children: [
+                                                          SizedBox(
+                                                              width: 150,
+                                                              child: Text(i
+                                                                  .toString())),
+                                                          Container(
+                                                            margin:
+                                                                EdgeInsets.only(
+                                                                    bottom: 3),
+                                                            width: 75,
+                                                            decoration: BoxDecoration(
+                                                                border: Border
+                                                                    .all(),
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            4)),
+                                                            child:
+                                                                DropdownButton(
+                                                              // borderRadius: BorderRadius.circular(10),
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left: 3),
+                                                              value: students[s]
+                                                                      .containsKey(
+                                                                          'reportDetails')
+                                                                  ? students[s][
+                                                                      'reportDetails'][i]
+                                                                  : null,
+                                                              isDense: true,
+                                                              isExpanded: true,
+                                                              underline:
+                                                                  Text(''),
+                                                              hint:
+                                                                  Text('Grade'),
+                                                              items: dropOptions[a].map<
+                                                                  DropdownMenuItem<
+                                                                      String>>((e) {
+                                                                return DropdownMenuItem(
+                                                                    value: e
+                                                                        .toString(),
+                                                                    child: Text(
+                                                                        e.toString()));
+                                                              }).toList(),
+                                                              onChanged:
+                                                                  (value) {
+                                                                if (!students[s]
+                                                                    .containsKey(
+                                                                        'reportDetails')) {
+                                                                  students[s]
+                                                                      .addAll({
+                                                                    'reportDetails':
+                                                                        {}
+                                                                  });
+                                                                }
+                                                                setState(() {
+                                                                  students[s][
+                                                                          'reportDetails']
+                                                                      [
+                                                                      i] = value;
+                                                                });
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      )
+                                              ],
+                                            )),
+                                      ),
+                                      TableCell(
+                                        verticalAlignment:
+                                            TableCellVerticalAlignment.middle,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: SizedBox(
+                                            width: 100,
+                                            height: 40,
+                                            child: TextField(
+                                              onChanged: (value) {
+                                                students[s]['remark'] = value;
+                                              },
+                                              controller: TextEditingController(
+                                                  text: students[s]['remark']),
+                                              decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          vertical: 10,
+                                                          horizontal: 6),
+                                                  isDense: true,
+                                                  border: OutlineInputBorder(),
+                                                  hintText: 'Remark'),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                          ],
-                        ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          ElevatedButton(
+                              onPressed: addReportDetails, child: Text('Save'))
+                        ],
                       );
                     } else {
                       return CircularProgressIndicator();

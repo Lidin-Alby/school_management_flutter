@@ -259,6 +259,12 @@ class _AdminPageState extends State<AdminPage> {
                                         hide: hide,
                                       ),
                                       MyNavTile(
+                                        headIcon: Icons.access_alarm,
+                                        headTitle: 'Test',
+                                        link: 'test',
+                                        hide: hide,
+                                      ),
+                                      MyNavTile(
                                         headIcon: Icons.calendar_month,
                                         headTitle: 'Attendance',
                                         link: 'class-attendance',
@@ -279,7 +285,9 @@ class _AdminPageState extends State<AdminPage> {
                                           'exam-management',
                                           'marks-management',
                                           'grade-management',
-                                          'grade-assignment'
+                                          'grade-assignment',
+                                          'report-card-download',
+                                          'admit-card-download'
                                         ],
                                         hide: hide,
                                       ),
@@ -468,6 +476,10 @@ class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
         return 'Grade Management';
       case 'grade-assignment':
         return 'Grade Assignment';
+      case 'report-card-download':
+        return 'Report Cards';
+      case 'admit-card-download':
+        return 'Admit Cards';
     }
     return '';
   }
@@ -497,7 +509,9 @@ class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
       case '/exam-management' ||
             '/marks-management' ||
             '/grade-management' ||
-            '/grade-assignment':
+            '/grade-assignment' ||
+            '/report-card-download' ||
+            '/admit-card-download':
         selectedHead = 2;
         selected = selectedIndex;
       case '/staff':

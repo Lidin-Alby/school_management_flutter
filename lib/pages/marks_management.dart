@@ -70,12 +70,17 @@ class _MarksManagementState extends State<MarksManagement> {
   getPaper() async {
     var client = BrowserClient()..withCredentials = true;
 
-    var url = Uri.parse('$ipv4/getPaper/$selectedClass');
+    var url = Uri.parse('$ipv4/getPaper/$selectedSession/$selectedClass');
     var res = await client.get(url);
 
     print(res.body);
     var data = jsonDecode(res.body);
     return data;
+  }
+
+  setPaperNames(Map papers) {
+    paperNames = papers[_selectedKey].map((e) => e['paperName']).toList();
+    paperNames = paperNames.toSet().toList();
   }
 
   getMarksAll() async {
@@ -180,6 +185,9 @@ class _MarksManagementState extends State<MarksManagement> {
                             setState(() {
                               selectedSession = value.toString();
                               selectedPaper = null;
+                              if (selectedClass != null) {
+                                _papers = getPaper();
+                              }
                             });
                           },
                         ),
@@ -280,8 +288,13 @@ class _MarksManagementState extends State<MarksManagement> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     Map papers = snapshot.data;
-                    if (papers.isNotEmpty) {
-                      papers = papers['paper'];
+                    if (papers.containsKey(selectedSession)) {
+                      papers = papers[selectedSession];
+                    } else {
+                      papers = {};
+                    }
+                    if (_selectedKey != null) {
+                      setPaperNames(papers);
                     }
                     final newMap = {};
                     int index = 0;
@@ -308,11 +321,6 @@ class _MarksManagementState extends State<MarksManagement> {
                                   } else {
                                     setState(() {
                                       _selectedKey = newMap[panelIndex];
-
-                                      paperNames = papers[_selectedKey]
-                                          .map((e) => e['paperName'])
-                                          .toList();
-                                      paperNames = paperNames.toSet().toList();
                                     });
                                   }
                                 },
