@@ -21,6 +21,8 @@ import 'package:school_management/pages/grade_assignment.dart';
 import 'package:school_management/pages/grade_management.dart';
 import 'package:school_management/pages/login_page.dart';
 import 'package:school_management/pages/marks_management.dart';
+import 'package:school_management/pages/midCard/mid_agent_home.dart';
+import 'package:school_management/pages/midCard/mid_home.dart';
 import 'package:school_management/pages/online_admission.dart';
 import 'package:school_management/pages/online_application.dart';
 import 'package:school_management/pages/owner_page.dart';
@@ -98,6 +100,12 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/myApp',
       builder: (context, state) => OwnerPage(),
+      redirect: (context, state) => authFun(),
+    ),
+    GoRoute(
+      path: '/midCardHome',
+      builder: (context, state) => MidAgentHome(),
+      redirect: (context, state) => authFun(),
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,

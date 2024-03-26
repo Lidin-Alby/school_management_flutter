@@ -128,7 +128,7 @@ class _ClassManagementState extends State<ClassManagement> {
                             controller: className,
                             decoration: InputDecoration(
                               isDense: true,
-                              hintText: 'Class / Departmrnt',
+                              hintText: 'Class / Department',
                               errorText:
                                   validate ? 'This Field is required' : null,
                             ),
