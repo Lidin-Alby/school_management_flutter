@@ -42,14 +42,42 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
 
   addTeacherMid() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.parse('$ipv4/addTeacherMid');
+    var url = Uri.parse('$ipv4/addStaffMid');
     var res = await client.post(url, body: {
       'schoolCode': widget.schoolCode,
       'fullName': fullName.text.trim(),
-      'mob': mob.text.trim()
+      'mob': mob.text.trim(),
+      'password': mob.text.trim(),
+      'role': 'midTeacher',
+      'myClasses': jsonEncode(selectedClasses)
     });
 
-    print(res.body);
+    if (res.body == 'true') {
+      setState(() {
+        fullName.clear();
+        mob.clear();
+        selectedClasses = [];
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green[600],
+            behavior: SnackBarBehavior.floating,
+            content: const Row(
+              children: [
+                Text(
+                  'Added Sucessfully',
+                ),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.white,
+                )
+              ],
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -61,96 +89,83 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Add Teacher'),
-        ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FutureBuilder(
-              future: _getClasses,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List classes = [];
-                  classes = snapshot.data.map((e) => e['title']).toList();
-                  return Container(
-                    padding: EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.indigo, width: 3),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextFieldWidget(
-                            label: 'Full Name',
-                            controller: fullName,
-                            isEdit: true),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        TextFieldWidget(
-                            label: 'Mobile', controller: mob, isEdit: true),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        DropDownWidget(
-                            items: classes,
-                            title: 'Select Class',
-                            isEdit: true,
-                            callBack: (p0) {
-                              setState(() {
-                                if (!selectedClasses.contains(p0)) {
-                                  selectedClasses.add(p0);
-                                }
-                              });
-                            },
-                            selected: null),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: [
-                            for (String i in selectedClasses)
-                              OutlinedButton.icon(
-                                  icon: Icon(Icons.close),
-                                  onPressed: () {
-                                    setState(() {
-                                      selectedClasses.remove(i);
-                                    });
-                                  },
-                                  label: Text(i))
-                          ],
-                        ),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        ElevatedButton(
-                            onPressed: addTeacherMid,
-                            child: Text('Add Teacher'))
-                      ],
-                    ),
-                  );
-                } else {
-                  return Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
+      appBar: AppBar(
+        title: Text('Add Teacher'),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: FutureBuilder(
+            future: _getClasses,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List classes = [];
+                classes = snapshot.data.map((e) => e['title']).toList();
+                return Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.indigo, width: 3),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFieldWidget(
+                          label: 'Full Name',
+                          controller: fullName,
+                          isEdit: true),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      TextFieldWidget(
+                          label: 'Mobile', controller: mob, isEdit: true),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      DropDownWidget(
+                          items: classes,
+                          title: 'Select Class',
+                          isEdit: true,
+                          callBack: (p0) {
+                            setState(() {
+                              if (!selectedClasses.contains(p0)) {
+                                selectedClasses.add(p0);
+                              }
+                            });
+                          },
+                          selected: null),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          for (String i in selectedClasses)
+                            OutlinedButton.icon(
+                                icon: Icon(Icons.close),
+                                onPressed: () {
+                                  setState(() {
+                                    selectedClasses.remove(i);
+                                  });
+                                },
+                                label: Text(i))
+                        ],
+                      ),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      ElevatedButton(
+                          onPressed: addTeacherMid, child: Text('Add Teacher'))
+                    ],
+                  ),
+                );
+              } else {
+                return Center(child: CircularProgressIndicator());
+              }
+            },
           ),
-        ));
-  }
-}
-
-class AddStaffPage extends StatelessWidget {
-  const AddStaffPage({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Add Staff')),
+        ),
+      ),
     );
   }
 }

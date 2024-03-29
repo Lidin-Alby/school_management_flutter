@@ -72,6 +72,18 @@ FutureOr<String?> authFun() async {
   return null;
 }
 
+FutureOr<String?> midAuthFun() async {
+  var client = BrowserClient()..withCredentials = true;
+  var url = Uri.parse('$ipv4/getCookieMid');
+  http.Response response;
+  response = await client.get(url);
+  if (response.body == 'false') {
+    return '/login';
+  }
+
+  return null;
+}
+
 final GoRouter router = GoRouter(
   initialLocation: '/login',
   navigatorKey: _rootNavigatorKey,
@@ -105,7 +117,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/midCardHome',
       builder: (context, state) => MidAgentHome(),
-      redirect: (context, state) => authFun(),
+      redirect: (context, state) => midAuthFun(),
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,

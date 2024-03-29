@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
+import 'add_staff_page.dart';
+import 'add_student.dart';
 import 'add_teacher.dart';
 import 'form_settings.dart';
 import 'mid_tile_widget.dart';
@@ -102,7 +104,8 @@ class AddPage extends StatelessWidget {
                   callback: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => AddStaffPage(),
+                      builder: (context) =>
+                          AddStaffPage(schoolCode: schoolCode),
                     ));
                   },
                 ),
@@ -120,7 +123,8 @@ class AddPage extends StatelessWidget {
                   callback: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => AddStudentPage(),
+                      builder: (context) =>
+                          AddStudentPage(schoolCode: schoolCode),
                     ));
                   },
                 ),
@@ -131,21 +135,6 @@ class AddPage extends StatelessWidget {
             height: 20,
           )
         ],
-      ),
-    );
-  }
-}
-
-class AddStudentPage extends StatelessWidget {
-  const AddStudentPage({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Student'),
       ),
     );
   }
@@ -212,7 +201,7 @@ class _AddClassPageState extends State<AddClassPage> {
                       : validate = false;
                 });
                 if (!validate) {
-                  var url = Uri.parse('$ipv4/addClassOrBranch');
+                  var url = Uri.parse('$ipv4/addClassOrBranchMid');
                   var res = await http.post(url, body: {
                     'schoolCode': widget.schoolCode,
                     'title': '${className.text.trim()}-${section.text.trim()}',

@@ -13,11 +13,11 @@ class StudentFormMid extends StatefulWidget {
 }
 
 class _StudentFormMidState extends State<StudentFormMid> {
-  bool admDate = false;
+  // bool admDate = false;
   bool gender = false;
   bool dob = false;
   bool bloodgroup = false;
-  bool sibling = false;
+  // bool sibling = false;
   bool religion = false;
   bool caste = false;
   bool subCaste = false;
@@ -26,58 +26,25 @@ class _StudentFormMidState extends State<StudentFormMid> {
   bool session = false;
   bool boardingType = false;
   bool schoolHosuse = false;
-  bool schoolTransportRoute = false;
-  bool pickAndDrop = false;
+  bool address = false;
+  bool transportMode = false;
+
   bool vehicleNo = false;
   bool fatherName = false;
-  bool fatherOccupation = false;
+
   bool fatherMobNo = false;
   bool fatherWhatsapp = false;
-  bool fatherAadhaar = false;
+
   bool fatherPic = false;
   bool motherPic = false;
   bool studentPic = false;
-  bool gaurdianPic = false;
+
   bool motherName = false;
-  bool motherOccupation = false;
+
   bool motherMobNo = false;
   bool motherWhatsapp = false;
-  bool motherAadhaar = false;
-  bool gaurdianName = false;
-  bool gaurdianOccupation = false;
-  bool gaurdianMobNo = false;
-  bool gaurdianWhatsApp = false;
-  bool gaurdianAadhaar = false;
-  bool gaurdianRelation = false;
-  bool curAddressLine1 = false;
-  bool curAddressLine2 = false;
-  bool curAddressLine3 = false;
-  bool curPincode = false;
-  bool perAddressLine1 = false;
-  bool perAddressLine2 = false;
-  bool perAddressLine3 = false;
-  bool perPincode = false;
-  bool studentWeight = false;
-  bool studentHeight = false;
-  bool studentEyeSight = false;
-  bool medicalIssue = false;
-  bool operated = false;
-  bool allergies = false;
-  bool govIdNo = false;
-  bool tcNo = false;
-  bool bloodReport = false;
-  bool vaccine = false;
-  bool birthCertificate = false;
-  bool polio = false;
-  bool dpt = false;
-  bool dt = false;
-  bool measles = false;
-  bool mmr = false;
-  bool tetanus = false;
-  bool typhoid = false;
-  bool hepatitisA = false;
-  bool hepatitisB = false;
-  bool chickenPox = false;
+  bool classTitle = false;
+
   late Future _getFormAcces;
 
   getFormAccessStudent() async {
@@ -98,11 +65,11 @@ class _StudentFormMidState extends State<StudentFormMid> {
   }
 
   initialize(Map data) {
-    admDate = data['admDate'];
     gender = data['gender'];
     dob = data['dob'];
     bloodgroup = data['bloodgroup'];
-    sibling = data['sibling'];
+    classTitle = data['classTitle'];
+
     religion = data['religion'];
     caste = data['caste'];
     subCaste = data['subCaste'];
@@ -113,66 +80,24 @@ class _StudentFormMidState extends State<StudentFormMid> {
     boardingType = data['boardingType'];
     schoolHosuse = data['schoolHosuse'];
 
-    schoolTransportRoute = data['schoolTransportRoute'];
-    pickAndDrop = data['pickAndDrop'];
-
     vehicleNo = data['vehicleNo'];
     studentPic = data['studentPic'];
     fatherPic = data['fatherPic'];
     motherPic = data['motherPic'];
-    gaurdianPic = data['gaurdianPic'];
 
     fatherName = data['fatherName'];
-    fatherOccupation = data['fatherOccupation'];
 
     fatherMobNo = data['fatherMobNo'];
 
     fatherWhatsapp = data['fatherWhatsapp'];
-    fatherAadhaar = data['fatherAadhaar'];
 
     motherName = data['motherName'];
-    motherOccupation = data['motherOccupation'];
+
     motherMobNo = data['motherMobNo'];
 
     motherWhatsapp = data['motherWhatsapp'];
-    motherAadhaar = data['motherAadhaar'];
-    gaurdianName = data['gaurdianName'];
-
-    gaurdianOccupation = data['gaurdianOccupation'];
-    gaurdianMobNo = data['gaurdianMobNo'];
-    gaurdianWhatsApp = data['gaurdianWhatsApp'];
-    gaurdianAadhaar = data['gaurdianAadhaar'];
-    gaurdianRelation = data['gaurdianRelation'];
-    curAddressLine1 = data['curAddressLine1'];
-    curAddressLine2 = data['curAddressLine2'];
-    curAddressLine3 = data['curAddressLine3'];
-    curPincode = data['curPincode'];
-    perAddressLine1 = data['perAddressLine1'];
-    perAddressLine2 = data['perAddressLine2'];
-
-    perAddressLine3 = data['perAddressLine3'];
-    perPincode = data['perPincode'];
-    studentWeight = data['studentWeight'];
-    studentHeight = data['studentHeight'];
-    studentEyeSight = data['studentEyeSight'];
-    medicalIssue = data['medicalIssue'];
-    operated = data['operated'];
-    allergies = data['allergies'];
-    govIdNo = data['govIdNo'];
-    tcNo = data['tcNo'];
-    bloodReport = data['bloodReport'];
-    vaccine = data['vaccine'];
-    birthCertificate = data['birthCertificate'];
-    polio = data['polio'];
-    dpt = data['dpt'];
-    dt = data['dt'];
-    measles = data['measles'];
-    mmr = data['mmr'];
-    tetanus = data['tetanus'];
-    typhoid = data['typhoid'];
-    hepatitisA = data['hepatitisA'];
-    hepatitisB = data['hepatitisB'];
-    chickenPox = data['chickenPox'];
+    address = data['address'];
+    transportMode = data['transportMode'];
   }
 
   addFormAccessStudent() async {
@@ -180,11 +105,10 @@ class _StudentFormMidState extends State<StudentFormMid> {
     var url = Uri.parse('$ipv4/addFormAccessStudentMid');
     var res = await client.post(url, body: {
       'schoolCode': widget.schoolCode,
-      'admDate': admDate.toString(),
       'gender': gender.toString(),
       'dob': dob.toString(),
+      'classTitle': classTitle.toString(),
       'bloodgroup': bloodgroup.toString(),
-      'sibling': sibling.toString(),
       'religion': religion.toString(),
       'caste': caste.toString(),
       'subCaste': subCaste.toString(),
@@ -193,58 +117,18 @@ class _StudentFormMidState extends State<StudentFormMid> {
       'session': session.toString(),
       'boardingType': boardingType.toString(),
       'schoolHosuse': schoolHosuse.toString(),
-      'schoolTransportRoute': schoolTransportRoute.toString(),
-      'pickAndDrop': pickAndDrop.toString(),
       'vehicleNo': vehicleNo.toString(),
       'fatherName': fatherName.toString(),
-      'fatherOccupation': fatherOccupation.toString(),
       'fatherPic': fatherPic.toString(),
       'motherPic': motherPic.toString(),
       'studentPic': studentPic.toString(),
       'fatherMobNo': fatherMobNo.toString(),
       'fatherWhatsapp': fatherWhatsapp.toString(),
-      'gaurdianPic': gaurdianPic.toString(),
-      'fatherAadhaar': fatherAadhaar.toString(),
       'motherName': motherName.toString(),
-      'motherOccupation': motherOccupation.toString(),
       'motherMobNo': motherMobNo.toString(),
       'motherWhatsapp': motherWhatsapp.toString(),
-      'motherAadhaar': motherAadhaar.toString(),
-      'gaurdianName': gaurdianName.toString(),
-      'gaurdianOccupation': gaurdianOccupation.toString(),
-      'gaurdianMobNo': gaurdianMobNo.toString(),
-      'gaurdianWhatsApp': gaurdianWhatsApp.toString(),
-      'gaurdianAadhaar': gaurdianAadhaar.toString(),
-      'gaurdianRelation': gaurdianRelation.toString(),
-      'curAddressLine1': curAddressLine1.toString(),
-      'curAddressLine2': curAddressLine2.toString(),
-      'curAddressLine3': curAddressLine3.toString(),
-      'curPincode': curPincode.toString(),
-      'perAddressLine1': perAddressLine1.toString(),
-      'perAddressLine2': perAddressLine2.toString(),
-      'perAddressLine3': perAddressLine3.toString(),
-      'perPincode': perPincode.toString(),
-      'studentWeight': studentWeight.toString(),
-      'studentHeight': studentHeight.toString(),
-      'studentEyeSight': studentEyeSight.toString(),
-      'medicalIssue': medicalIssue.toString(),
-      'operated': operated.toString(),
-      'allergies': allergies.toString(),
-      'govIdNo': govIdNo.toString(),
-      'tcNo': tcNo.toString(),
-      'bloodReport': bloodReport.toString(),
-      'vaccine': vaccine.toString(),
-      'birthCertificate': birthCertificate.toString(),
-      'polio': polio.toString(),
-      'dpt': dpt.toString(),
-      'dt': dt.toString(),
-      'measles': measles.toString(),
-      'mmr': mmr.toString(),
-      'tetanus': tetanus.toString(),
-      'typhoid': typhoid.toString(),
-      'hepatitisA': hepatitisA.toString(),
-      'hepatitisB': hepatitisB.toString(),
-      'chickenPox': chickenPox.toString(),
+      'address': address.toString(),
+      'transportMode': transportMode.toString()
     });
     if (res.body == 'true') {
       if (mounted) {
@@ -307,11 +191,11 @@ class _StudentFormMidState extends State<StudentFormMid> {
                     ),
                     SwitchListTile(
                       dense: true,
-                      title: Text('Admission Date'),
-                      value: admDate,
+                      title: Text('Class'),
+                      value: classTitle,
                       onChanged: (value) {
                         setState(() {
-                          admDate = value;
+                          classTitle = value;
                         });
                       },
                     ),
@@ -342,16 +226,6 @@ class _StudentFormMidState extends State<StudentFormMid> {
                       onChanged: (value) {
                         setState(() {
                           bloodgroup = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Sibiling'),
-                      value: sibling,
-                      onChanged: (value) {
-                        setState(() {
-                          sibling = value;
                         });
                       },
                     ),
@@ -397,16 +271,6 @@ class _StudentFormMidState extends State<StudentFormMid> {
                     ),
                     SwitchListTile(
                       dense: true,
-                      title: Text('Gaurdian Picture'),
-                      value: gaurdianPic,
-                      onChanged: (value) {
-                        setState(() {
-                          gaurdianPic = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
                       title: Text('Caste'),
                       value: caste,
                       onChanged: (value) {
@@ -437,11 +301,31 @@ class _StudentFormMidState extends State<StudentFormMid> {
                     ),
                     SwitchListTile(
                       dense: true,
+                      title: Text('Address'),
+                      value: address,
+                      onChanged: (value) {
+                        setState(() {
+                          address = value;
+                        });
+                      },
+                    ),
+                    SwitchListTile(
+                      dense: true,
                       title: Text('RFID'),
                       value: rfid,
                       onChanged: (value) {
                         setState(() {
                           rfid = value;
+                        });
+                      },
+                    ),
+                    SwitchListTile(
+                      dense: true,
+                      title: Text('Transport Mode'),
+                      value: transportMode,
+                      onChanged: (value) {
+                        setState(() {
+                          transportMode = value;
                         });
                       },
                     ),
@@ -477,26 +361,6 @@ class _StudentFormMidState extends State<StudentFormMid> {
                     ),
                     SwitchListTile(
                       dense: true,
-                      title: Text('School Transport Route'),
-                      value: schoolTransportRoute,
-                      onChanged: (value) {
-                        setState(() {
-                          schoolTransportRoute = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Pick And Drop'),
-                      value: pickAndDrop,
-                      onChanged: (value) {
-                        setState(() {
-                          pickAndDrop = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
                       title: Text('Vehicle No.'),
                       value: vehicleNo,
                       onChanged: (value) {
@@ -512,16 +376,6 @@ class _StudentFormMidState extends State<StudentFormMid> {
                       onChanged: (value) {
                         setState(() {
                           fatherName = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Father Occupation'),
-                      value: fatherOccupation,
-                      onChanged: (value) {
-                        setState(() {
-                          fatherOccupation = value;
                         });
                       },
                     ),
@@ -547,31 +401,11 @@ class _StudentFormMidState extends State<StudentFormMid> {
                     ),
                     SwitchListTile(
                       dense: true,
-                      title: Text('Father Aadhaar'),
-                      value: fatherAadhaar,
-                      onChanged: (value) {
-                        setState(() {
-                          fatherAadhaar = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
                       title: Text('Mother\'s Name'),
                       value: motherName,
                       onChanged: (value) {
                         setState(() {
                           motherName = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Mother Occupation'),
-                      value: motherOccupation,
-                      onChanged: (value) {
-                        setState(() {
-                          motherOccupation = value;
                         });
                       },
                     ),
@@ -592,366 +426,6 @@ class _StudentFormMidState extends State<StudentFormMid> {
                       onChanged: (value) {
                         setState(() {
                           motherWhatsapp = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Mother Aadhaar'),
-                      value: motherAadhaar,
-                      onChanged: (value) {
-                        setState(() {
-                          motherAadhaar = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Gaurdian Name'),
-                      value: gaurdianName,
-                      onChanged: (value) {
-                        setState(() {
-                          gaurdianName = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Gaurdian Mobile No.'),
-                      value: gaurdianMobNo,
-                      onChanged: (value) {
-                        setState(() {
-                          gaurdianMobNo = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Gaurdian Whatsapp'),
-                      value: gaurdianWhatsApp,
-                      onChanged: (value) {
-                        setState(() {
-                          gaurdianWhatsApp = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Gaurdian Occupation'),
-                      value: gaurdianOccupation,
-                      onChanged: (value) {
-                        setState(() {
-                          gaurdianOccupation = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Gaurdian Aadhar'),
-                      value: gaurdianAadhaar,
-                      onChanged: (value) {
-                        setState(() {
-                          gaurdianAadhaar = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Gaurdian Relation'),
-                      value: gaurdianRelation,
-                      onChanged: (value) {
-                        setState(() {
-                          gaurdianRelation = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Current Address Line 1'),
-                      value: curAddressLine1,
-                      onChanged: (value) {
-                        setState(() {
-                          curAddressLine1 = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Current Address Line 2'),
-                      value: curAddressLine2,
-                      onChanged: (value) {
-                        setState(() {
-                          curAddressLine2 = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Current Address Line 3'),
-                      value: curAddressLine3,
-                      onChanged: (value) {
-                        setState(() {
-                          curAddressLine3 = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Current Pincode'),
-                      value: curPincode,
-                      onChanged: (value) {
-                        setState(() {
-                          curPincode = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Permanent Address Line 1'),
-                      value: perAddressLine1,
-                      onChanged: (value) {
-                        setState(() {
-                          perAddressLine1 = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Permanent Address Line 2'),
-                      value: perAddressLine2,
-                      onChanged: (value) {
-                        setState(() {
-                          perAddressLine2 = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Permanant Address Line 3'),
-                      value: perAddressLine3,
-                      onChanged: (value) {
-                        setState(() {
-                          perAddressLine3 = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Permanent Pincode'),
-                      value: perPincode,
-                      onChanged: (value) {
-                        setState(() {
-                          perPincode = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Student Weight'),
-                      value: studentWeight,
-                      onChanged: (value) {
-                        setState(() {
-                          studentWeight = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Student Height'),
-                      value: studentHeight,
-                      onChanged: (value) {
-                        setState(() {
-                          studentHeight = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Student Eye Sight'),
-                      value: studentEyeSight,
-                      onChanged: (value) {
-                        setState(() {
-                          studentEyeSight = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Medical Issue'),
-                      value: medicalIssue,
-                      onChanged: (value) {
-                        setState(() {
-                          medicalIssue = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Operated'),
-                      value: operated,
-                      onChanged: (value) {
-                        setState(() {
-                          operated = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Allergies'),
-                      value: allergies,
-                      onChanged: (value) {
-                        setState(() {
-                          allergies = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Government Id'),
-                      value: govIdNo,
-                      onChanged: (value) {
-                        setState(() {
-                          govIdNo = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Transfer Certificate No.'),
-                      value: tcNo,
-                      onChanged: (value) {
-                        setState(() {
-                          tcNo = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Blood Report'),
-                      value: bloodReport,
-                      onChanged: (value) {
-                        setState(() {
-                          bloodReport = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Vaccine'),
-                      value: vaccine,
-                      onChanged: (value) {
-                        setState(() {
-                          vaccine = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Birth Certificate'),
-                      value: birthCertificate,
-                      onChanged: (value) {
-                        setState(() {
-                          birthCertificate = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Polio'),
-                      value: polio,
-                      onChanged: (value) {
-                        setState(() {
-                          polio = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('DPT'),
-                      value: dpt,
-                      onChanged: (value) {
-                        setState(() {
-                          dpt = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('DT'),
-                      value: dt,
-                      onChanged: (value) {
-                        setState(() {
-                          dt = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Measles'),
-                      value: measles,
-                      onChanged: (value) {
-                        setState(() {
-                          measles = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('MMR'),
-                      value: mmr,
-                      onChanged: (value) {
-                        setState(() {
-                          mmr = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Tetanus'),
-                      value: tetanus,
-                      onChanged: (value) {
-                        setState(() {
-                          tetanus = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Typhoid'),
-                      value: typhoid,
-                      onChanged: (value) {
-                        setState(() {
-                          typhoid = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Hepatitus A'),
-                      value: hepatitisA,
-                      onChanged: (value) {
-                        setState(() {
-                          hepatitisA = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Hepatitus B'),
-                      value: hepatitisB,
-                      onChanged: (value) {
-                        setState(() {
-                          hepatitisB = value;
-                        });
-                      },
-                    ),
-                    SwitchListTile(
-                      dense: true,
-                      title: Text('Chicken Pox'),
-                      value: chickenPox,
-                      onChanged: (value) {
-                        setState(() {
-                          chickenPox = value;
                         });
                       },
                     ),

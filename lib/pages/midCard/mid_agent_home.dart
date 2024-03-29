@@ -2,10 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/browser_client.dart';
-import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
 import 'add_menu.dart';
@@ -22,21 +20,75 @@ class MidAgentHome extends StatefulWidget {
 class _MidAgentHomeState extends State<MidAgentHome> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController schoolCode = TextEditingController();
-  TextEditingController agentMob = TextEditingController();
+  TextEditingController schoolName = TextEditingController();
   TextEditingController schoolPassword = TextEditingController();
+  TextEditingController mob = TextEditingController();
+  TextEditingController email = TextEditingController();
   late Future _myMidSchools;
+  late String agentMob;
   int? _selectedIndex;
   List schools = [];
 
   getMyMidSchools() async {
-    print('hello');
     var client = BrowserClient()..withCredentials = true;
 
     var url = Uri.parse('$ipv4/getMyMidSchools');
     var res = await client.get(url);
     print(res.body);
     var data = jsonDecode(res.body);
-    return data;
+    agentMob = data['mob'];
+
+    return data['schools'];
+  }
+
+  addMidSchool() async {
+    if (_formKey.currentState!.validate()) {
+      var client = BrowserClient()..withCredentials = true;
+      var url = Uri.parse('$ipv4/addNewSchoolMid');
+      var res = await client.post(url, body: {
+        'schoolCode': schoolCode.text.trim(),
+        'mob': mob.text.trim(),
+        'schoolName': schoolName.text.trim(),
+        'schoolPassword': schoolPassword.text.trim(),
+        'agentMob': agentMob,
+        'email': email.text.trim()
+      });
+
+      if (res.body == 'true') {
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+        setState(() {
+          schoolCode.clear();
+          schoolName.clear();
+          schoolPassword.clear();
+          mob.clear();
+          email.clear();
+          _myMidSchools = getMyMidSchools();
+        });
+      } else {
+        if (mounted) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red[600],
+              behavior: SnackBarBehavior.floating,
+              content: Row(
+                children: [
+                  Text(
+                    res.body,
+                  ),
+                  Icon(
+                    Icons.error,
+                    color: Colors.white,
+                  )
+                ],
+              ),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -94,11 +146,26 @@ class _MidAgentHomeState extends State<MidAgentHome> {
                                                         EdgeInsets.all(10),
                                                     hintText: 'School Code',
                                                     isDense: true,
-                                                    helperText:
-                                                        '* Use the same school code used in CSV',
-                                                    helperStyle: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
+                                                    border:
+                                                        OutlineInputBorder()),
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              TextFormField(
+                                                controller: mob,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty) {
+                                                    return 'This field is required';
+                                                  }
+                                                  return null;
+                                                },
+                                                decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.all(10),
+                                                    hintText: 'Mobile No.',
+                                                    isDense: true,
                                                     border:
                                                         OutlineInputBorder()),
                                               ),
@@ -167,7 +234,7 @@ class _MidAgentHomeState extends State<MidAgentHome> {
                                                 height: 20,
                                               ),
                                               TextFormField(
-                                                controller: agentMob,
+                                                controller: schoolName,
                                                 validator: (value) {
                                                   if (value == null ||
                                                       value.isEmpty) {
@@ -178,16 +245,30 @@ class _MidAgentHomeState extends State<MidAgentHome> {
                                                 decoration: InputDecoration(
                                                     contentPadding:
                                                         EdgeInsets.all(10),
-                                                    hintText: 'Mobile Number',
+                                                    hintText: 'School Name',
                                                     isDense: true,
-                                                    helperText:
-                                                        '* Same number used to login',
-                                                    helperStyle: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold),
                                                     border:
                                                         OutlineInputBorder()),
                                               ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              TextFormField(
+                                                controller: email,
+                                                decoration: InputDecoration(
+                                                    contentPadding:
+                                                        EdgeInsets.all(10),
+                                                    hintText: 'Email',
+                                                    isDense: true,
+                                                    border:
+                                                        OutlineInputBorder()),
+                                              ),
+                                              SizedBox(
+                                                height: 20,
+                                              ),
+                                              ElevatedButton(
+                                                  onPressed: addMidSchool,
+                                                  child: Text('Add'))
                                             ],
                                           ),
                                         ),
@@ -195,89 +276,12 @@ class _MidAgentHomeState extends State<MidAgentHome> {
                                       SizedBox(
                                         height: 30,
                                       ),
-                                      ElevatedButton(
-                                          onPressed: () async {
-                                            if (_formKey.currentState!
-                                                .validate()) {
-                                              FilePickerResult? result =
-                                                  await FilePicker.platform
-                                                      .pickFiles();
-                                              Uint8List? fileByte =
-                                                  result!.files.first.bytes;
-
-                                              var url = Uri.parse(
-                                                  '$ipv4/uploadCSVStudentUsers');
-
-                                              var req = http.MultipartRequest(
-                                                'POST',
-                                                url,
-                                              );
-                                              var httpDoc =
-                                                  http.MultipartFile.fromBytes(
-                                                      'csvFile', fileByte!,
-                                                      filename: 'upl_doc.csv');
-                                              req.files.add(httpDoc);
-                                              req.fields.addAll({
-                                                'schoolCode':
-                                                    schoolCode.text.trim(),
-                                                'agentMob':
-                                                    agentMob.text.trim(),
-                                                'schoolPassword':
-                                                    schoolPassword.text.trim()
-                                              });
-                                              var res = await req.send();
-                                              var responded = await http
-                                                  .Response.fromStream(res);
-                                              if (responded.body == 'true') {
-                                                if (context.mounted) {
-                                                  Navigator.of(context).pop();
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      backgroundColor:
-                                                          Colors.green[600],
-                                                      behavior: SnackBarBehavior
-                                                          .floating,
-                                                      content: const Row(
-                                                        children: [
-                                                          Text(
-                                                            'Updated Successfully ',
-                                                          ),
-                                                          Icon(
-                                                            Icons.check_circle,
-                                                            color: Colors.white,
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              } else {
-                                                if (context.mounted) {
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      backgroundColor:
-                                                          Colors.red[700],
-                                                      behavior: SnackBarBehavior
-                                                          .floating,
-                                                      content: Text(
-                                                        responded.body
-                                                            .toString(),
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              }
-                                            }
-                                          },
-                                          child: Text('Pick File'))
                                     ],
                                   ),
                                 ),
                               ),
                             ),
-                        child: Text('Upload CSV')),
+                        child: Text('Add School')),
                   ),
                   SizedBox(
                     height: 5,
@@ -289,40 +293,44 @@ class _MidAgentHomeState extends State<MidAgentHome> {
                       if (snapshot.hasData) {
                         schools = snapshot.data;
 
-                        return ListView.builder(
-                          itemCount: schools.length,
-                          itemBuilder: (context, index) => Card(
-                            shape: RoundedRectangleBorder(
-                                side:
-                                    BorderSide(color: Colors.indigo, width: 2),
-                                borderRadius: BorderRadius.circular(8)),
-                            child: ListTile(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8)),
-                              selected: index == _selectedIndex,
-                              selectedColor: Colors.white,
-                              selectedTileColor: Colors.indigo,
-                              onTap: width > 645
-                                  ? () {
-                                      setState(() {
-                                        _selectedIndex = index;
-                                      });
-                                    }
-                                  : () => Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                        builder: (context) => RightMenu(
-                                          schoolCode: schools[index]
-                                              ['schoolCode'],
-                                          schoolName: schools[index]
-                                              ['schoolName'],
-                                        ),
-                                      )),
-                              title: Text(
-                                schools[index]['schoolName'],
-                              ),
-                            ),
-                          ),
-                        );
+                        return schools.isEmpty
+                            ? Center(child: Text('No schools Added'))
+                            : ListView.builder(
+                                itemCount: schools.length,
+                                itemBuilder: (context, index) => Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                          color: Colors.indigo, width: 2),
+                                      borderRadius: BorderRadius.circular(8)),
+                                  child: ListTile(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                    selected: index == _selectedIndex,
+                                    selectedColor: Colors.white,
+                                    selectedTileColor: Colors.indigo,
+                                    onTap: width > 645
+                                        ? () {
+                                            setState(() {
+                                              _selectedIndex = index;
+                                            });
+                                          }
+                                        : () => Navigator.of(context)
+                                                .push(MaterialPageRoute(
+                                              builder: (context) => RightMenu(
+                                                schoolCode: schools[index]
+                                                    ['schoolCode'],
+                                                schoolName: schools[index]
+                                                    ['schoolName'],
+                                              ),
+                                            )),
+                                    title: Text(
+                                      schools[index]['schoolName'],
+                                    ),
+                                    trailing:
+                                        Text(schools[index]['schoolCode']),
+                                  ),
+                                ),
+                              );
                       } else {
                         return Center(child: CircularProgressIndicator());
                       }
@@ -340,7 +348,9 @@ class _MidAgentHomeState extends State<MidAgentHome> {
                         schoolCode: schools[_selectedIndex!]['schoolCode'],
                         schoolName: schools[_selectedIndex!]['schoolName'],
                       )
-                    : SizedBox(),
+                    : schools.isNotEmpty
+                        ? SizedBox()
+                        : Center(child: Text('Select School to show menu')),
               )
           ],
         ),
@@ -368,98 +378,100 @@ class RightMenu extends StatelessWidget {
           style: width > 645 ? TextStyle(color: Colors.black) : null,
         ),
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              MidTile(
-                  icon: Icons.school_rounded,
-                  title: 'Unchecked Data',
-                  color: Colors.indigo,
-                  callback: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              UncheckedDataPage(schoolCode: schoolCode),
-                        ),
-                      )),
-              MidTile(
-                  icon: Icons.no_photography_rounded,
-                  title: 'Without Photos',
-                  color: Colors.pink,
-                  callback: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => Scaffold(
-                            appBar: AppBar(
-                              title: Text('Without Photos'),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                MidTile(
+                    icon: Icons.school_rounded,
+                    title: 'Unchecked Data',
+                    color: Colors.indigo,
+                    callback: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                UncheckedDataPage(schoolCode: schoolCode),
+                          ),
+                        )),
+                MidTile(
+                    icon: Icons.no_photography_rounded,
+                    title: 'Without Photos',
+                    color: Colors.pink,
+                    callback: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => Scaffold(
+                              appBar: AppBar(
+                                title: Text('Without Photos'),
+                              ),
                             ),
                           ),
-                        ),
-                      )),
-            ],
-          ),
-          Row(
-            children: [
-              MidTile(
-                  icon: Icons.print_rounded,
-                  title: 'Ready to Print',
-                  color: Colors.green,
-                  callback: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => Scaffold(
-                            appBar: AppBar(
-                              title: Text('Ready to Print'),
+                        )),
+              ],
+            ),
+            Row(
+              children: [
+                MidTile(
+                    icon: Icons.print_rounded,
+                    title: 'Ready to Print',
+                    color: Colors.green,
+                    callback: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => Scaffold(
+                              appBar: AppBar(
+                                title: Text('Ready to Print'),
+                              ),
                             ),
                           ),
+                        )),
+                MidTile(
+                  icon: Icons.login_rounded,
+                  title: 'Login Pending',
+                  color: Colors.teal,
+                  callback: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Scaffold(
+                        appBar: AppBar(
+                          title: Text('Login Pending'),
                         ),
-                      )),
-              MidTile(
-                icon: Icons.login_rounded,
-                title: 'Login Pending',
-                color: Colors.teal,
-                callback: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Scaffold(
-                      appBar: AppBar(
-                        title: Text('Login Pending'),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              MidTile(
-                  icon: Icons.list_alt_rounded,
-                  title: 'List',
-                  color: Colors.orange.shade200,
-                  callback: () => Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => Scaffold(
-                            appBar: AppBar(
-                              title: Text('List'),
+              ],
+            ),
+            Row(
+              children: [
+                MidTile(
+                    icon: Icons.list_alt_rounded,
+                    title: 'List',
+                    color: Colors.orange.shade200,
+                    callback: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => Scaffold(
+                              appBar: AppBar(
+                                title: Text('List'),
+                              ),
                             ),
                           ),
+                        )),
+                MidTile(
+                  icon: Icons.badge_rounded,
+                  title: 'Card Designs',
+                  color: Colors.cyan,
+                  callback: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Scaffold(
+                        appBar: AppBar(
+                          title: Text('Card Designs'),
                         ),
-                      )),
-              MidTile(
-                icon: Icons.badge_rounded,
-                title: 'Card Designs',
-                color: Colors.cyan,
-                callback: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Scaffold(
-                      appBar: AppBar(
-                        title: Text('Card Designs'),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add_rounded),
