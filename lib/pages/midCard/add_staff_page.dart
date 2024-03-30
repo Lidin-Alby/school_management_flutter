@@ -15,7 +15,9 @@ class AddStaffPage extends StatefulWidget {
 }
 
 class _AddStaffPageState extends State<AddStaffPage> {
-  TextEditingController fullName = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController firstName = TextEditingController();
+  TextEditingController lastName = TextEditingController();
   TextEditingController mob = TextEditingController();
   TextEditingController role = TextEditingController();
   // List selectedClasses = [];
@@ -41,41 +43,60 @@ class _AddStaffPageState extends State<AddStaffPage> {
   // }
 
   addStaffMid() async {
-    var client = BrowserClient()..withCredentials = true;
-    var url = Uri.parse('$ipv4/addStaffMid');
-    var res = await client.post(url, body: {
-      'schoolCode': widget.schoolCode,
-      'fullName': fullName.text.trim(),
-      'mob': mob.text.trim(),
-      'password': mob.text.trim(),
-      'role': role.text.trim(),
-      'myClasses': jsonEncode([])
-    });
-
-    if (res.body == 'true') {
-      setState(() {
-        fullName.clear();
-        mob.clear();
-        role.clear();
+    if (_formKey.currentState!.validate()) {
+      var client = BrowserClient()..withCredentials = true;
+      var url = Uri.parse('$ipv4/addStaffMid');
+      var res = await client.post(url, body: {
+        'schoolCode': widget.schoolCode,
+        'firstName': firstName.text.trim(),
+        'lastName': lastName.text.trim(),
+        'mob': mob.text.trim(),
+        'password': mob.text.trim(),
+        'role': role.text.trim(),
+        'myClasses': jsonEncode([]),
+        'subCaste': '',
+        'email': '',
+        'rfid': '',
+        'address': '',
+        'fatherOrHusName': '',
+        'religion': '',
+        'caste': '',
+        'gender': '',
+        'dob': '',
+        'bloodGroup': '',
+        'qualification': '',
+        'panNo': '',
+        'dlValidity': '',
+        'dlNo': '',
+        'aadhaarNo': '',
       });
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.green[600],
-            behavior: SnackBarBehavior.floating,
-            content: const Row(
-              children: [
-                Text(
-                  'Added Sucessfully',
-                ),
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.white,
-                )
-              ],
+
+      if (res.body == 'true') {
+        setState(() {
+          firstName.clear();
+          lastName.clear();
+          mob.clear();
+          role.clear();
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.green[600],
+              behavior: SnackBarBehavior.floating,
+              content: const Row(
+                children: [
+                  Text(
+                    'Added Sucessfully',
+                  ),
+                  Icon(
+                    Icons.check_circle,
+                    color: Colors.white,
+                  )
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        }
       }
     }
   }
@@ -89,32 +110,46 @@ class _AddStaffPageState extends State<AddStaffPage> {
         body: Center(
           child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.indigo, width: 3),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFieldWidget(
-                        label: 'Full Name', controller: fullName, isEdit: true),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    TextFieldWidget(
-                        label: 'Mobile', controller: mob, isEdit: true),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    TextFieldWidget(
-                        label: 'Designation', controller: role, isEdit: true),
-                    SizedBox(
-                      height: 15,
-                    ),
-                    ElevatedButton(
-                        onPressed: addStaffMid, child: Text('Add Staff'))
-                  ],
+              child: Form(
+                key: _formKey,
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.indigo, width: 3),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextFieldWidget(
+                          isValidted: true,
+                          label: 'First Name',
+                          controller: firstName,
+                          isEdit: true),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      TextFieldWidget(
+                          isValidted: true,
+                          label: 'Last Name',
+                          controller: lastName,
+                          isEdit: true),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      TextFieldWidget(
+                          label: 'Mobile', controller: mob, isEdit: true),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      TextFieldWidget(
+                          label: 'Designation', controller: role, isEdit: true),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      ElevatedButton(
+                          onPressed: addStaffMid, child: Text('Add Staff'))
+                    ],
+                  ),
                 ),
               )),
         ));

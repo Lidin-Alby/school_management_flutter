@@ -5,6 +5,7 @@ import 'package:http/browser_client.dart';
 import 'package:school_management/pages/midCard/each_student_page.dart';
 
 import '../../ip_address.dart';
+import 'each_staff_page.dart';
 
 class UncheckedDataPage extends StatefulWidget {
   const UncheckedDataPage({super.key, required this.schoolCode});
@@ -24,24 +25,24 @@ class _UncheckedDataPageState extends State<UncheckedDataPage> {
           title: Text('Unchecked Data'),
           bottom: TabBar(tabs: [
             Tab(
+              child: Text('Class'),
+            ),
+            Tab(
               child: Text('Teachers'),
             ),
             Tab(
               child: Text('Staff'),
             ),
-            Tab(
-              child: Text('Class'),
-            ),
           ]),
         ),
         body: TabBarView(children: [
+          ClassTab(
+            schoolCode: widget.schoolCode,
+          ),
           TeacherTab(
             schoolCode: widget.schoolCode,
           ),
           StaffTab(schoolCode: widget.schoolCode),
-          ClassTab(
-            schoolCode: widget.schoolCode,
-          )
         ]),
       ),
     );
@@ -85,9 +86,19 @@ class _StaffTabState extends State<StaffTab> {
           return ListView.builder(
             itemCount: staffs.length,
             itemBuilder: (context, index) => Card(
-                child: ListTile(
-              title: Text(staffs[index]['fullName']),
-            )),
+              child: ListTile(
+                title: Text(staffs[index]['fullName']),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => EachStaffPage(
+                      schoolCode: widget.schoolCode,
+                      mob: staffs[index]['mob'],
+                      isTeacher: false,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           );
         } else {
           return Center(child: CircularProgressIndicator());
@@ -135,7 +146,16 @@ class _TeacherTabState extends State<TeacherTab> {
           return ListView.builder(
             itemCount: teachers.length,
             itemBuilder: (context, index) => Card(
-              child: ListTile(title: Text(teachers[index]['fullName'])),
+              child: ListTile(
+                title: Text(teachers[index]['fullName']),
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => EachStaffPage(
+                    schoolCode: widget.schoolCode,
+                    mob: teachers[index]['mob'],
+                    isTeacher: true,
+                  ),
+                )),
+              ),
             ),
           );
         } else {

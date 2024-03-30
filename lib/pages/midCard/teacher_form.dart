@@ -5,15 +5,15 @@ import 'package:http/browser_client.dart';
 
 import '../../ip_address.dart';
 
-class StaffFormMid extends StatefulWidget {
-  const StaffFormMid({super.key, required this.schoolCode});
+class TeacherFormMid extends StatefulWidget {
+  const TeacherFormMid({super.key, required this.schoolCode});
   final String schoolCode;
 
   @override
-  State<StaffFormMid> createState() => _StaffFormMidState();
+  State<TeacherFormMid> createState() => _TeacherFormMidState();
 }
 
-class _StaffFormMidState extends State<StaffFormMid> {
+class _TeacherFormMidState extends State<TeacherFormMid> {
   bool joiningDate = false;
   // bool reportsTo = false;
   bool department = false;
@@ -40,16 +40,16 @@ class _StaffFormMidState extends State<StaffFormMid> {
 
   late Future _getFormStaff;
 
-  getFormAccessStaff() async {
+  getFormAccessTeacher() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.parse('$ipv4/getFormAccessStaffMid/${widget.schoolCode}');
+    var url = Uri.parse('$ipv4/getFormAccessTeacherMid/${widget.schoolCode}');
     var res = await client.get(url);
 
     print('done');
     print(res.body);
     Map data = jsonDecode(res.body);
-    if (data.containsKey('staffFormMid')) {
-      data = data['staffFormMid'];
+    if (data.containsKey('teacherFormMid')) {
+      data = data['teacherFormMid'];
       data = {...data.map((key, value) => MapEntry(key, bool.parse(value)))};
       initialize(data);
     }
@@ -83,9 +83,9 @@ class _StaffFormMidState extends State<StaffFormMid> {
     setState(() {});
   }
 
-  addFormAccessStaff() async {
+  addFormAccessTeacher() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.parse('$ipv4/addFormAccessStaffMid');
+    var url = Uri.parse('$ipv4/addFormAccessTeacherMid');
     var res = await client.post(url, body: {
       'joiningDate': joiningDate.toString(),
       'department': department.toString(),
@@ -133,7 +133,7 @@ class _StaffFormMidState extends State<StaffFormMid> {
 
   @override
   void initState() {
-    _getFormStaff = getFormAccessStaff();
+    _getFormStaff = getFormAccessTeacher();
     super.initState();
   }
 
@@ -157,7 +157,7 @@ class _StaffFormMidState extends State<StaffFormMid> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         ElevatedButton(
-                          onPressed: addFormAccessStaff,
+                          onPressed: addFormAccessTeacher,
                           child: Text('Save'),
                         ),
                         SizedBox(

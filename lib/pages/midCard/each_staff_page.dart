@@ -9,45 +9,45 @@ import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
 
-class EachStudentPage extends StatefulWidget {
-  const EachStudentPage(
-      {super.key, required this.schoolCode, required this.admNo});
+class EachStaffPage extends StatefulWidget {
+  const EachStaffPage(
+      {super.key,
+      required this.schoolCode,
+      required this.mob,
+      required this.isTeacher});
   final String schoolCode;
-  final String admNo;
+  final String mob;
+  final bool isTeacher;
 
   @override
-  State<EachStudentPage> createState() => _EachStudentPageState();
+  State<EachStaffPage> createState() => _EachStaffPageState();
 }
 
-class _EachStudentPageState extends State<EachStudentPage> {
+class _EachStaffPageState extends State<EachStaffPage> {
   final _formKey = GlobalKey<FormState>();
   TextEditingController firstName = TextEditingController();
   TextEditingController lastName = TextEditingController();
-  TextEditingController admNo = TextEditingController();
   TextEditingController subCaste = TextEditingController();
   TextEditingController email = TextEditingController();
+  TextEditingController mob = TextEditingController();
+  TextEditingController qualification = TextEditingController();
+  TextEditingController fatherOrHusName = TextEditingController();
+  TextEditingController aadhaarNo = TextEditingController();
+  TextEditingController panNo = TextEditingController();
+  TextEditingController dlNo = TextEditingController();
   TextEditingController rfid = TextEditingController();
-  TextEditingController session = TextEditingController();
-
-  TextEditingController schoolHosuse = TextEditingController();
   TextEditingController address = TextEditingController();
-  // TextEditingController  = TextEditingController();
+  String? joiningDate;
+  String? gender;
+  String? dob;
+  String? bloodGroup;
+  String? religion;
+  String? caste;
+  String? dlValidity;
 
-  TextEditingController vehicleNo = TextEditingController();
-  TextEditingController fatherName = TextEditingController();
-
-  TextEditingController fatherMobNo = TextEditingController();
-  TextEditingController fatherWhatsapp = TextEditingController();
-
-  // TextEditingController fatherPic = TextEditingController();
-  // TextEditingController motherPic = TextEditingController();
-  // TextEditingController studentPic = TextEditingController();
-
-  TextEditingController motherName = TextEditingController();
-
-  TextEditingController motherMobNo = TextEditingController();
-  TextEditingController motherWhatsapp = TextEditingController();
-  List boardingDropdownList = ['Day Scholer', 'Hostel'];
+  late Future _getProfilePic;
+  Uint8List? _staffImagebytes;
+  PlatformFile? _staffImage;
   List religionDropdownList = [
     'Hindu',
     'Islam',
@@ -59,91 +59,86 @@ class _EachStudentPageState extends State<EachStudentPage> {
     'Yahudi',
     'Other'
   ];
-  List classDropdownList = [];
-  String? religion;
-  String? caste;
-  String? schoolHouse;
-  String? boardingType;
-  String? classNo;
-  String? gender;
-  String? dob;
-  String? bloodGroup;
-  String? transportMode;
 
   bool isEdit = false;
-  Map form = {};
   bool getAll = false;
   bool opacity = false;
-  Uint8List? _imagebytes;
-  PlatformFile? _image;
-  Map oneStudent = {};
-  late Future _getProfilePic;
+  Map form = {};
 
-  getFormAccessStudent() async {
+  getFormAccessStaff() async {
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.parse('$ipv4/getFormAccessStudentMid/${widget.schoolCode}');
+    var url = Uri.parse('$ipv4/getFormAccessStaffMid/${widget.schoolCode}');
     var res = await client.get(url);
 
     Map data = jsonDecode(res.body);
     // Map form = data['studentForm'];
     print(data);
-    form = data['studentFormMid'];
+    form = data['staffFormMid'];
 
     setState(() {
       getAll = true;
     });
   }
 
-  getOneStudent() async {
+  getFormAccessTeacher() async {
     var client = BrowserClient()..withCredentials = true;
-    var url =
-        Uri.parse('$ipv4/getOneStudent/${widget.schoolCode}/${widget.admNo}');
+    var url = Uri.parse('$ipv4/getFormAccessTeacherMid/${widget.schoolCode}');
+    var res = await client.get(url);
+
+    print('done');
+    print(res.body);
+    Map data = jsonDecode(res.body);
+    form = data['teacherFormMid'];
+    setState(() {
+      getAll = true;
+    });
+  }
+
+  getOneStaff() async {
+    print('helllo');
+    var client = BrowserClient()..withCredentials = true;
+    var url = Uri.parse('$ipv4/getOneStaff/${widget.schoolCode}/${widget.mob}');
     var res = await client.get(url);
 
     Map data = jsonDecode(res.body);
+    print(res.body);
 
-    print(data);
     firstName.text = data['firstName'];
     lastName.text = data['lastName'];
-    fatherName.text = data['fatherName'];
-    motherName.text = data['motherName'];
-    classNo = data['classTitle'] == '' ? null : data['classTitle'];
-    gender = data['gender'] == '' ? null : data['gender'];
-    dob = data['dob'];
-    admNo.text = data['admNo'];
-
-    bloodGroup = data['bloodGroup'] == '' ? null : data['bloodGroup'];
-
-    religion = data['religion'] == '' ? null : data['religion'];
-    caste = data['caste'] == '' ? null : data['caste'];
+    mob.text = data['mob'];
     subCaste.text = data['subCaste'];
     email.text = data['email'];
-    fatherMobNo.text = data['fatherMobNo'];
-
-    boardingType = data['boardingType'] == '' ? null : data['boardingType'];
-    // schoolHouse = data['schoolHouse'] == '' ? null : data['schoolHouse'];
-
-    vehicleNo.text = data['vehicleNo'];
-    transportMode = data['transportMode'] == '' ? null : data['transportMode'];
-
     rfid.text = data['rfid'];
     address.text = data['address'];
-    // session.text = data['session'] == '' ? null : data['session'];
+    fatherOrHusName.text = data['fatherOrHusName'];
+    religion = data['religion'] == '' ? null : data['religion'];
+    caste = data['caste'] == '' ? null : data['caste'];
+    gender = data['gender'] == '' ? null : data['gender'];
+    dob = data['dob'];
+    bloodGroup = data['bloodGroup'] == '' ? null : data['bloodGroup'];
+    qualification.text = data['qualification'];
+    panNo.text = data['panNo'];
+    dlValidity = data['dob'];
+    aadhaarNo.text = data['aadhaarNo'];
 
-    getFormAccessStudent();
+    if (widget.isTeacher) {
+      getFormAccessTeacher();
+    } else {
+      getFormAccessStaff();
+    }
   }
 
   getProfilePic() async {
-    var url2 = Uri.parse(
-        '$ipv4/getProfilePicMid/${widget.schoolCode}/${widget.admNo}');
+    var url2 =
+        Uri.parse('$ipv4/getStaffPicMid/${widget.schoolCode}/${widget.mob}');
     var client = BrowserClient()..withCredentials = true;
     var response2 = await client.get(url2);
 
     return (response2.bodyBytes);
   }
 
-  saveStudentPic() async {
-    var url = Uri.parse('$ipv4/saveStudentPicMid');
+  saveStaffPic() async {
+    var url = Uri.parse('$ipv4/saveStaffPicMid');
 
     var req = http.MultipartRequest(
       'POST',
@@ -151,12 +146,11 @@ class _EachStudentPageState extends State<EachStudentPage> {
     );
     var httpImage = http.MultipartFile.fromBytes(
       'profilePic',
-      _imagebytes!,
-      filename:
-          '${widget.schoolCode}_${admNo.text.trim()}_${firstName.text.trim()}_${lastName.text.trim()}.${_image!.extension}',
+      _staffImagebytes!,
+      filename: '${mob.text}-staff-Profile-Pic.${_staffImage!.extension}',
     );
     req.files.add(httpImage);
-    req.fields.addAll({'admNo': widget.admNo, 'schoolCode': widget.schoolCode});
+    req.fields.addAll({'mob': widget.mob, 'schoolCode': widget.schoolCode});
     var res = await req.send();
     var responded = await http.Response.fromStream(res);
     if (responded.body == 'true') {
@@ -183,35 +177,29 @@ class _EachStudentPageState extends State<EachStudentPage> {
     }
   }
 
-  saveStudentInfo() async {
+  saveStaffInfo() async {
     if (_formKey.currentState!.validate()) {
       var client = BrowserClient()..withCredentials = true;
-      var url = Uri.parse('$ipv4/updateStudentInfoMid');
+      var url = Uri.parse('$ipv4/updateStaffInfoMid');
       var res = await client.post(url, body: {
         'firstName': firstName.text.trim(),
         'lastName': lastName.text.trim(),
-        'admNo': admNo.text.trim(),
+        'mob': mob.text.trim(),
         'subCaste': subCaste.text.trim(),
         'email': email.text.trim(),
         'rfid': rfid.text.trim(),
-        'session': session.text.trim(),
-        'schoolHosuse': schoolHosuse.text.trim(),
         'address': address.text.trim(),
-        'vehicleNo': vehicleNo.text.trim(),
-        'fatherName': fatherName.text.trim(),
-        'fatherMobNo': fatherMobNo.text.trim(),
-        'fatherWhatsapp': fatherWhatsapp.text.trim(),
-        'motherName': motherName.text.trim(),
-        'motherMobNo': motherMobNo.text.trim(),
-        'motherWhatsapp': motherWhatsapp.text.trim(),
+        'fatherOrHusName': fatherOrHusName.text.trim(),
         'religion': religion ?? '',
         'caste': caste ?? '',
-        'boardingType': boardingType ?? '',
-        'classTitle': classNo ?? '',
         'gender': gender ?? '',
         'dob': dob ?? '',
         'bloodGroup': bloodGroup ?? '',
-        'transportMode': transportMode ?? '',
+        'qualification': qualification.text.trim(),
+        'panNo': panNo.text.trim(),
+        'dlValidity': dlValidity ?? '',
+        'dlNo': dlNo.text.trim(),
+        'aadhaarNo': aadhaarNo.text.trim(),
         'schoolCode': widget.schoolCode,
       });
       if (res.body == 'true') {
@@ -241,7 +229,7 @@ class _EachStudentPageState extends State<EachStudentPage> {
 
   @override
   void initState() {
-    getOneStudent();
+    getOneStaff();
     _getProfilePic = getProfilePic();
     super.initState();
   }
@@ -281,10 +269,10 @@ class _EachStudentPageState extends State<EachStudentPage> {
                                       .platform
                                       .pickFiles(type: FileType.image);
                                   if (result != null) {
-                                    _image = result.files.first;
-                                    _imagebytes = _image!.bytes;
+                                    _staffImage = result.files.first;
+                                    _staffImagebytes = _staffImage!.bytes;
                                     // profileStatus = true;
-                                    saveStudentPic();
+                                    saveStaffPic();
 
                                     // setState(() {
                                     // });
@@ -360,36 +348,19 @@ class _EachStudentPageState extends State<EachStudentPage> {
                         child: Wrap(
                           runSpacing: 20,
                           spacing: 20,
-                          // crossAxisAlignment: CrossAxisAlignment.start,
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            if (form['classTitle'] == 'true')
-                              MidDropDownWidget(
-                                isEdit: isEdit,
-                                selected: classNo,
-                                title: 'Class/Course',
-                                items: classDropdownList,
-                                callBack: (p0) {
-                                  setState(() {
-                                    classNo = p0;
-                                  });
-                                },
-                              ),
-
-                            //  Text('sec'),
-
-                            MidTextField(
+                            MidDateSelectWidget(
                               isEdit: isEdit,
-                              isValidted: true,
-                              label: 'Admission No.',
-                              controller: admNo,
+                              title: 'Joining Date',
+                              selectedDate: joiningDate,
+                              callBack: (p0) {
+                                setState(() {
+                                  joiningDate = p0;
+                                });
+                              },
                             ),
-
-                            if (form['session'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Session',
-                                controller: session,
-                              ),
                             MidTextField(
                               isEdit: isEdit,
                               isValidted: true,
@@ -402,171 +373,132 @@ class _EachStudentPageState extends State<EachStudentPage> {
                               label: 'Last Name',
                               controller: lastName,
                             ),
-                            if (form['gender'] == 'true')
-                              MidDropDownWidget(
-                                isEdit: isEdit,
-                                selected: gender,
-                                items: ['Male', 'Female'],
-                                title: 'Gender',
-                                callBack: (p0) {
-                                  setState(() {
-                                    gender = p0;
-                                  });
-                                },
-                              ),
-                            if (form['dob'] == 'true')
-                              MidDateSelectWidget(
-                                isEdit: isEdit,
-                                title: 'Date of Birth',
-                                selectedDate: dob,
-                                callBack: (p0) {
-                                  setState(() {
-                                    dob = p0;
-                                  });
-                                },
-                              ),
-                            if (form['bloodGroup'] == 'true')
-                              MidDropDownWidget(
-                                  isEdit: isEdit,
-                                  items: [
-                                    'A+',
-                                    'A-',
-                                    'B+',
-                                    'B-',
-                                    'O+',
-                                    'O-',
-                                    'AB+',
-                                    'AB-'
-                                  ],
-                                  title: 'Blood Group',
-                                  callBack: (p0) {
-                                    setState(() {
-                                      bloodGroup = p0;
-                                    });
-                                  },
-                                  selected: bloodGroup),
-                            if (form['fatherName'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Father\'s Name',
-                                controller: fatherName,
-                                isValidted: true,
-                              ),
-                            if (form['fatherMobNo'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Father\'s Mobile No.',
-                                controller: fatherMobNo,
-                              ),
-                            if (form['fatherWhatsapp'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Father\'s Whatsapp No.',
-                                controller: fatherWhatsapp,
-                              ),
-                            if (form['motherName'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Mother\'s Name',
-                                controller: motherName,
-                                isValidted: true,
-                              ),
-                            if (form['motherMobNo'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Mother\'s Mobile No.',
-                                controller: motherMobNo,
-                              ),
-                            if (form['motherWhatsapp'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Mother\'s Whatsapp No.',
-                                controller: motherWhatsapp,
-                              ),
-                            if (form['religion'] == 'true')
-                              MidDropDownWidget(
-                                isEdit: isEdit,
-                                items: religionDropdownList,
-                                title: 'Religion',
-                                callBack: (p0) {
-                                  setState(() {
-                                    religion = p0;
-                                  });
-                                },
-                                selected: religion,
-                              ),
-                            if (form['caste'] == 'true')
-                              MidDropDownWidget(
-                                isEdit: isEdit,
-                                items: ['General', 'OBC', 'SC', 'ST'],
-                                title: 'Caste',
-                                callBack: (p0) {
-                                  setState(() {
-                                    caste = p0;
-                                  });
-                                },
-                                selected: caste,
-                              ),
-                            if (form['subCaste'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Sub-Caste',
-                                controller: subCaste,
-                              ),
-                            if (form['email'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'Email',
-                                controller: email,
-                              ),
-                            if (form['address'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
+                            MidDropDownWidget(
+                              isEdit: isEdit,
+                              selected: gender,
+                              items: ['Male', 'Female'],
+                              title: 'Gender',
+                              callBack: (p0) {
+                                setState(() {
+                                  gender = p0;
+                                });
+                              },
+                            ),
+                            MidDateSelectWidget(
+                              isEdit: isEdit,
+                              title: 'Date of Birth',
+                              selectedDate: dob,
+                              callBack: (p0) {
+                                setState(() {
+                                  dob = p0;
+                                });
+                              },
+                            ),
+                            MidDropDownWidget(
+                              isEdit: isEdit,
+                              items: [
+                                'A+',
+                                'A-',
+                                'B+',
+                                'B-',
+                                'O+',
+                                'O-',
+                                'AB+',
+                                'AB-'
+                              ],
+                              title: 'Blood Group',
+                              callBack: (p0) {
+                                setState(() {
+                                  bloodGroup = p0;
+                                });
+                              },
+                              selected: bloodGroup,
+                            ),
+                            MidDropDownWidget(
+                              isEdit: isEdit,
+                              items: religionDropdownList,
+                              title: 'Religion',
+                              callBack: (p0) {
+                                setState(() {
+                                  religion = p0;
+                                });
+                              },
+                              selected: religion,
+                            ),
+                            MidDropDownWidget(
+                              isEdit: isEdit,
+                              items: ['General', 'OBC', 'SC', 'ST'],
+                              title: 'Caste',
+                              callBack: (p0) {
+                                setState(() {
+                                  caste = p0;
+                                });
+                              },
+                              selected: caste,
+                            ),
+                            MidTextField(
+                              isEdit: isEdit,
+                              label: 'Sub-Caste',
+                              controller: subCaste,
+                            ),
+                            MidTextField(
+                              isEdit: isEdit,
+                              label: 'Email',
+                              controller: email,
+                            ),
+                            MidTextField(
+                              isEdit: isEdit,
+                              label: 'RFId',
+                              controller: rfid,
+                            ),
+                            MidTextField(
+                              isEdit: isEdit,
+                              isValidted: true,
+                              label: 'Mobile Number',
+                              controller: mob,
+                            ),
+                            MidTextField(
+                              isEdit: isEdit,
+                              label: 'Qualification',
+                              controller: qualification,
+                            ),
+                            MidTextField(
+                              isEdit: isEdit,
+                              label: 'Father/Husband Name',
+                              controller: fatherOrHusName,
+                            ),
+                            MidTextField(
                                 label: 'Address',
                                 controller: address,
-                              ),
-
-                            if (form['boardingType'] == 'true')
-                              MidDropDownWidget(
-                                  isEdit: isEdit,
-                                  items: boardingDropdownList,
-                                  title: 'Boarding Type',
-                                  callBack: (p0) {
-                                    setState(() {
-                                      boardingType = p0;
-                                    });
-                                  },
-                                  selected: boardingType),
-
-                            if (form['transportMode'] == 'true')
-                              MidDropDownWidget(
-                                  isEdit: isEdit,
-                                  items: [
-                                    'Pedistrian',
-                                    'Parent',
-                                    'School Transport',
-                                    'Cycle',
-                                    'Other'
-                                  ],
-                                  title: 'Transport Mode',
-                                  callBack: (p0) {
-                                    setState(() {
-                                      transportMode = p0;
-                                    });
-                                  },
-                                  selected: transportMode),
-
-                            if (form['vehicleNo'] == 'true')
-                              MidTextField(
-                                  label: 'Vehicle No.',
-                                  controller: vehicleNo,
-                                  isEdit: isEdit),
-                            if (form['rfid'] == 'true')
-                              MidTextField(
-                                isEdit: isEdit,
-                                label: 'RFId',
-                                controller: rfid,
-                              ),
+                                isEdit: isEdit),
+                            MidTextField(
+                                label: 'Aadhaar No.',
+                                controller: aadhaarNo,
+                                isEdit: isEdit),
+                            MidTextField(
+                              label: 'Pan No.',
+                              controller: panNo,
+                              isEdit: isEdit,
+                            ),
+                            MidTextField(
+                                label: 'DL No.',
+                                controller: dlNo,
+                                isEdit: isEdit),
+                            MidTextField(
+                              label: 'Pan No.',
+                              controller: panNo,
+                              isEdit: isEdit,
+                            ),
+                            MidDateSelectWidget(
+                              isEdit: isEdit,
+                              title: 'DL Validity',
+                              selectedDate: dlValidity,
+                              callBack: (p0) {
+                                setState(() {
+                                  dlValidity = p0;
+                                });
+                              },
+                            )
                           ],
                         ),
                       ),
@@ -604,7 +536,7 @@ class _EachStudentPageState extends State<EachStudentPage> {
                           children: [
                             IconButton(
                               color: Colors.green[600],
-                              onPressed: saveStudentInfo,
+                              onPressed: saveStaffInfo,
                               icon: Icon(Icons.save_outlined),
                             ),
                             Text(

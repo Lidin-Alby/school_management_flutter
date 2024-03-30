@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:school_management/pages/midCard/staff_form_mid.dart';
 
 import 'package:school_management/pages/midCard/student_form_settings.dart';
+import 'package:school_management/pages/midCard/teacher_form.dart';
 
 class FormSettingsPage extends StatefulWidget {
   const FormSettingsPage({super.key, required this.schoolCode});
@@ -21,22 +22,22 @@ class _FormSettingsPageState extends State<FormSettingsPage> {
           title: Text('Form Settings'),
           bottom: TabBar(tabs: [
             Tab(
+              child: Text('Student Form'),
+            ),
+            Tab(
               child: Text('Teachers Form'),
             ),
             Tab(
               child: Text('Staff Form'),
             ),
-            Tab(
-              child: Text('Student Form'),
-            ),
           ]),
         ),
         body: TabBarView(children: [
-          Text('teachers'),
-          StaffFormMid(schoolCode: widget.schoolCode),
           StudentFormMid(
             schoolCode: widget.schoolCode,
-          )
+          ),
+          TeacherFormMid(schoolCode: widget.schoolCode),
+          StaffFormMid(schoolCode: widget.schoolCode),
         ]),
       ),
     );

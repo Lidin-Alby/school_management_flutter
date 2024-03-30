@@ -324,7 +324,6 @@ class _AddStudentPageState extends State<AddStudentPage> {
                   var responded = await http.Response.fromStream(res);
                   if (responded.body == 'true') {
                     if (context.mounted) {
-                      Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           backgroundColor: Colors.green[600],
