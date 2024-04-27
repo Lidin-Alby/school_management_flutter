@@ -69,6 +69,7 @@ class _AddStaffPageState extends State<AddStaffPage> {
         'dlValidity': '',
         'dlNo': '',
         'aadhaarNo': '',
+        'ready': false.toString()
       });
 
       if (res.body == 'true') {
@@ -129,7 +130,6 @@ class _AddStaffPageState extends State<AddStaffPage> {
                         height: 15,
                       ),
                       TextFieldWidget(
-                          isValidted: true,
                           label: 'Last Name',
                           controller: lastName,
                           isEdit: true),

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:js_interop';
+
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -460,7 +460,7 @@ class _StudentDocumetState extends State<StudentDocumet> {
                                         icon: Icon(Icons.delete))
                                 ],
                               )
-                            : govDocBytes.isNull
+                            : govDocBytes == null
                                 ? OutlinedButton(
                                     onPressed: !isEdit
                                         ? () {}
@@ -535,7 +535,7 @@ class _StudentDocumetState extends State<StudentDocumet> {
                                         icon: Icon(Icons.delete))
                                 ],
                               )
-                            : tcBytes.isNull
+                            : tcBytes == null
                                 ? OutlinedButton(
                                     onPressed: !isEdit
                                         ? () {}
@@ -615,7 +615,7 @@ class _StudentDocumetState extends State<StudentDocumet> {
                                         icon: Icon(Icons.delete))
                                 ],
                               )
-                            : bloodReportBytes.isNull
+                            : bloodReportBytes == null
                                 ? OutlinedButton(
                                     onPressed: !isEdit
                                         ? () {}
@@ -697,7 +697,7 @@ class _StudentDocumetState extends State<StudentDocumet> {
                                         icon: Icon(Icons.delete))
                                 ],
                               )
-                            : vaccineBytes.isNull
+                            : vaccineBytes == null
                                 ? OutlinedButton(
                                     onPressed: !isEdit
                                         ? () {}
@@ -778,7 +778,7 @@ class _StudentDocumetState extends State<StudentDocumet> {
                                         icon: Icon(Icons.delete))
                                 ],
                               )
-                            : birthCertificateDocBytes.isNull
+                            : birthCertificateDocBytes == null
                                 ? OutlinedButton(
                                     onPressed: !isEdit
                                         ? () {}

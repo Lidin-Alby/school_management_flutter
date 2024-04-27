@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -295,7 +294,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             icon: Icon(Icons.delete))
                                     ],
                                   )
-                                : aadhaarDocBytes.isNull
+                                : aadhaarDocBytes == null
                                     ? OutlinedButton(
                                         onPressed: !isEdit
                                             ? () {}
@@ -388,7 +387,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             icon: Icon(Icons.delete))
                                     ],
                                   )
-                                : panDocBytes.isNull
+                                : panDocBytes == null
                                     ? OutlinedButton(
                                         onPressed: !isEdit
                                             ? () {}
@@ -478,7 +477,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             icon: Icon(Icons.delete))
                                     ],
                                   )
-                                : bloodReportDocBytes.isNull
+                                : bloodReportDocBytes == null
                                     ? OutlinedButton(
                                         onPressed: !isEdit
                                             ? () {}
@@ -571,7 +570,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             icon: Icon(Icons.delete))
                                     ],
                                   )
-                                : joiningLetterDocBytes.isNull
+                                : joiningLetterDocBytes == null
                                     ? OutlinedButton(
                                         onPressed: !isEdit
                                             ? () {}
@@ -666,7 +665,7 @@ class _StaffDocumentState extends State<StaffDocument> {
                                             icon: Icon(Icons.delete))
                                     ],
                                   )
-                                : drivingLicenceDocBytes.isNull
+                                : drivingLicenceDocBytes == null
                                     ? OutlinedButton(
                                         onPressed: !isEdit
                                             ? () {}

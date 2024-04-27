@@ -308,13 +308,13 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/school-settings',
           builder: (context, state) => SchoolSettings(
-              index: state.extra.isNull ? 0 : state.extra as int),
+              index: state.extra == null ? 0 : state.extra as int),
           redirect: (context, state) => authFun(),
         ),
         GoRoute(
             path: '/accessControl',
             builder: (context, state) => AccessControl(
-                  isrefered: state.extra.isNull ? false : state.extra as bool,
+                  isrefered: state.extra == null ? false : state.extra as bool,
                 ),
             redirect: (context, state) => authFun(),
             routes: [

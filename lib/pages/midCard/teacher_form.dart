@@ -21,7 +21,7 @@ class _TeacherFormMidState extends State<TeacherFormMid> {
   bool rfid = false;
   bool gender = false;
   bool dob = false;
-  bool bloodgroup = false;
+  bool bloodGroup = false;
   // bool wardInSchool = false;
   bool email = false;
   bool fatherorHusName = false;
@@ -65,7 +65,7 @@ class _TeacherFormMidState extends State<TeacherFormMid> {
     rfid = data['rfid'];
     gender = data['gender'];
     dob = data['dob'];
-    bloodgroup = data['bloodgroup'];
+    bloodGroup = data['bloodGroup'];
 
     email = data['email'];
     fatherorHusName = data['fatherorHusName'];
@@ -93,7 +93,7 @@ class _TeacherFormMidState extends State<TeacherFormMid> {
       'rfid': rfid.toString(),
       'gender': gender.toString(),
       'dob': dob.toString(),
-      'bloodgroup': bloodgroup.toString(),
+      'bloodGroup': bloodGroup.toString(),
       'email': email.toString(),
       'fatherorHusName': fatherorHusName.toString(),
       'qualification': qualification.toString(),
@@ -211,10 +211,10 @@ class _TeacherFormMidState extends State<TeacherFormMid> {
                     SwitchListTile(
                       dense: true,
                       title: Text('Blood group'),
-                      value: bloodgroup,
+                      value: bloodGroup,
                       onChanged: (value) {
                         setState(() {
-                          bloodgroup = value;
+                          bloodGroup = value;
                         });
                       },
                     ),

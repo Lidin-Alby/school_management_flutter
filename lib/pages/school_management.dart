@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
 
@@ -238,17 +237,15 @@ class _BulkUplaodDialogState extends State<BulkUplaodDialog> {
       } else {
         messagge = responded.body.toString();
         if (context.mounted) {
-          if (!messagge.isNull) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.red[700],
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  messagge.toString(),
-                ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red[700],
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                messagge.toString(),
               ),
-            );
-          }
+            ),
+          );
         }
         setState(() {
           isSaved = true;
@@ -306,11 +303,11 @@ class _BulkUplaodDialogState extends State<BulkUplaodDialog> {
                     ),
                     OutlinedButton(
                         onPressed: () async {
-                          FilePickerResult? result = await FilePicker.platform
-                              .pickFiles(
-                                  type: FileType.image,
-                                  allowMultiple: true,
-                                  dialogTitle: 'hello');
+                          FilePickerResult? result =
+                              await FilePicker.platform.pickFiles(
+                            type: FileType.image,
+                            allowMultiple: true,
+                          );
                           if (result != null) {
                             files = result.files;
 
@@ -329,7 +326,10 @@ class _BulkUplaodDialogState extends State<BulkUplaodDialog> {
                   child: Container(
                     height: 500,
                     width: 800,
-                    child: !files.isNull
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.circular(5)),
+                    child: files != null
                         ? Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: SingleChildScrollView(
@@ -345,9 +345,6 @@ class _BulkUplaodDialogState extends State<BulkUplaodDialog> {
                             ),
                           )
                         : Center(child: Text('No items selected')),
-                    decoration: BoxDecoration(
-                        border: Border.all(),
-                        borderRadius: BorderRadius.circular(5)),
                   ),
                 ),
                 SizedBox(

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/browser_client.dart';
@@ -229,7 +230,8 @@ class _LoginPageState extends State<LoginPage> {
                             body: {
                               'userName': userId.text.trim(),
                               'password': password.text.trim(),
-                              'schoolCode': schoolCode.text.trim()
+                              'schoolCode': schoolCode.text.trim(),
+                              'ver': kIsWeb.toString()
                             },
                           );
 

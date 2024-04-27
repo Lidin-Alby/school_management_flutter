@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 
 import 'class_tab.dart';
-
 import 'staff_tab.dart';
 import 'teacher_tab.dart';
 
-class UncheckedDataPage extends StatefulWidget {
-  const UncheckedDataPage({super.key, required this.schoolCode});
+class ListAll extends StatelessWidget {
+  const ListAll({super.key, required this.schoolCode});
   final String schoolCode;
 
-  @override
-  State<UncheckedDataPage> createState() => _UncheckedDataPageState();
-}
-
-class _UncheckedDataPageState extends State<UncheckedDataPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Unchecked Data'),
+          title: Text('List'),
           bottom: TabBar(tabs: [
             Tab(
               child: Text('Class'),
@@ -35,16 +29,16 @@ class _UncheckedDataPageState extends State<UncheckedDataPage> {
         ),
         body: TabBarView(children: [
           ClassTab(
-            schoolCode: widget.schoolCode,
-            menuName: 'unchecked',
+            schoolCode: schoolCode,
+            menuName: 'list',
           ),
           TeacherTab(
-            schoolCode: widget.schoolCode,
-            menuName: 'unchecked',
+            schoolCode: schoolCode,
+            menuName: 'list',
           ),
           StaffTab(
-            schoolCode: widget.schoolCode,
-            menuName: 'unchecked',
+            schoolCode: schoolCode,
+            menuName: 'list',
           ),
         ]),
       ),

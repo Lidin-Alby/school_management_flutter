@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:js_interop';
+
 import 'dart:math';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -328,17 +328,15 @@ class _PersonalInfoState extends State<PersonalInfo> {
       } else {
         messagge = responded.body.toString();
         if (context.mounted) {
-          if (!messagge.isNull) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                backgroundColor: Colors.red[700],
-                behavior: SnackBarBehavior.floating,
-                content: Text(
-                  messagge.toString(),
-                ),
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.red[700],
+              behavior: SnackBarBehavior.floating,
+              content: Text(
+                messagge.toString(),
               ),
-            );
-          }
+            ),
+          );
         }
         setState(() {
           isSaved = true;

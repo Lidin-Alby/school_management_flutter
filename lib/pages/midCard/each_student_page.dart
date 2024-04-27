@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+// import 'package:go_router/go_router.dart';
 import 'package:http/browser_client.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
@@ -11,9 +12,13 @@ import '../../ip_address.dart';
 
 class EachStudentPage extends StatefulWidget {
   const EachStudentPage(
-      {super.key, required this.schoolCode, required this.admNo});
+      {super.key,
+      required this.schoolCode,
+      required this.admNo,
+      required this.listRefresh});
   final String schoolCode;
   final String admNo;
+  final VoidCallback listRefresh;
 
   @override
   State<EachStudentPage> createState() => _EachStudentPageState();
@@ -74,8 +79,8 @@ class _EachStudentPageState extends State<EachStudentPage> {
   Map form = {};
   bool getAll = false;
   bool opacity = false;
-  Uint8List? _imagebytes;
-  PlatformFile? _image;
+  // Uint8List? _imagebytes;
+  // PlatformFile? _image;
   Map oneStudent = {};
   late Future _getProfilePic;
 
@@ -127,7 +132,7 @@ class _EachStudentPageState extends State<EachStudentPage> {
     transportMode = data['transportMode'] == '' ? null : data['transportMode'];
 
     rfid.text = data['rfid'];
-    address.text = data['address'];
+    // address.text = data['address'];
     // session.text = data['session'] == '' ? null : data['session'];
 
     getFormAccessStudent();
@@ -140,47 +145,6 @@ class _EachStudentPageState extends State<EachStudentPage> {
     var response2 = await client.get(url2);
 
     return (response2.bodyBytes);
-  }
-
-  saveStudentPic() async {
-    var url = Uri.parse('$ipv4/saveStudentPicMid');
-
-    var req = http.MultipartRequest(
-      'POST',
-      url,
-    );
-    var httpImage = http.MultipartFile.fromBytes(
-      'profilePic',
-      _imagebytes!,
-      filename:
-          '${widget.schoolCode}_${admNo.text.trim()}_${firstName.text.trim()}_${lastName.text.trim()}.${_image!.extension}',
-    );
-    req.files.add(httpImage);
-    req.fields.addAll({'admNo': widget.admNo, 'schoolCode': widget.schoolCode});
-    var res = await req.send();
-    var responded = await http.Response.fromStream(res);
-    if (responded.body == 'true') {
-      _getProfilePic = getProfilePic();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: Colors.green[600],
-            behavior: SnackBarBehavior.floating,
-            content: const Row(
-              children: [
-                Text(
-                  'Profile Picture Updated Sucessfully',
-                ),
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.white,
-                )
-              ],
-            ),
-          ),
-        );
-      }
-    }
   }
 
   saveStudentInfo() async {
@@ -215,7 +179,7 @@ class _EachStudentPageState extends State<EachStudentPage> {
         'schoolCode': widget.schoolCode,
       });
       if (res.body == 'true') {
-        _getProfilePic = getProfilePic();
+        widget.listRefresh();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -274,58 +238,47 @@ class _EachStudentPageState extends State<EachStudentPage> {
                               opacity = value;
                             });
                           },
-                          onTap: !isEdit
-                              ? () {}
-                              : () async {
-                                  FilePickerResult? result = await FilePicker
-                                      .platform
-                                      .pickFiles(type: FileType.image);
-                                  if (result != null) {
-                                    _image = result.files.first;
-                                    _imagebytes = _image!.bytes;
-                                    // profileStatus = true;
-                                    saveStudentPic();
-
-                                    // setState(() {
-                                    // });
-                                  }
-                                },
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) => ProfilePicView(
+                                      admNo: admNo.text,
+                                      firstName: firstName.text,
+                                      lastName: lastName.text,
+                                      schoolCode: widget.schoolCode,
+                                      refresh: () {
+                                        setState(() {
+                                          _getProfilePic = getProfilePic();
+                                        });
+                                        widget.listRefresh();
+                                      },
+                                    )),
+                          ),
                           child: Stack(
                             children: [
-                              FutureBuilder(
-                                future: _getProfilePic,
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData) {
-                                    return CircleAvatar(
-                                      onForegroundImageError:
-                                          (exception, stackTrace) =>
-                                              Text('data'),
-                                      child: Icon(
-                                        Icons.account_circle,
-                                        size: 100,
-                                      ),
-                                      radius: 50,
-                                      foregroundImage: MemoryImage(
-                                          snapshot.data as Uint8List),
-                                    );
-                                  } else {
-                                    return Icon(Icons.error_outline_rounded);
-                                  }
-                                },
+                              Hero(
+                                tag: 'profile-pic',
+                                child: FutureBuilder(
+                                  future: _getProfilePic,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return CircleAvatar(
+                                        onForegroundImageError:
+                                            (exception, stackTrace) =>
+                                                Text('data'),
+                                        child: Icon(
+                                          Icons.account_circle,
+                                          size: 100,
+                                        ),
+                                        radius: 50,
+                                        foregroundImage: MemoryImage(
+                                            snapshot.data as Uint8List),
+                                      );
+                                    } else {
+                                      return Icon(Icons.error_outline_rounded);
+                                    }
+                                  },
+                                ),
                               ),
-                              // _imagebytes == null
-                              //     ? Icon(
-                              //         color: Colors.grey,
-                              //         Icons.account_circle_rounded,
-                              //         size: 100,
-                              //       )
-                              //     : CircleAvatar(
-                              //         radius: 50,
-                              //         backgroundImage: MemoryImage(
-                              //           _imagebytes!,
-                              //           //  fit: BoxFit.contain,
-                              //         ),
-                              //       ),
                               if (opacity)
                                 CircleAvatar(
                                     radius: 50,
@@ -337,10 +290,43 @@ class _EachStudentPageState extends State<EachStudentPage> {
                                   left: 35,
                                   child: Icon(
                                     color: Colors.white,
-                                    Icons.edit_outlined,
+                                    Icons.open_in_full_rounded,
                                     size: 30,
                                   ),
                                 ),
+                              Positioned(
+                                bottom: 0,
+                                right: -10,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.indigo,
+                                        padding: EdgeInsets.all(15),
+                                        shape: CircleBorder()),
+                                    onPressed: () => showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(20),
+                                                  topRight:
+                                                      Radius.circular(20))),
+                                          context: context,
+                                          builder: (context) => ChangePicDialog(
+                                            admNo: admNo.text,
+                                            firstName: firstName.text,
+                                            lastName: lastName.text,
+                                            schoolCode: widget.schoolCode,
+                                            refresh: () {
+                                              setState(() {
+                                                _getProfilePic =
+                                                    getProfilePic();
+                                              });
+                                              widget.listRefresh();
+                                            },
+                                          ),
+                                        ),
+                                    child: Icon(Icons.camera_alt_rounded)),
+                              )
                             ],
                           ),
                         ),
@@ -398,7 +384,6 @@ class _EachStudentPageState extends State<EachStudentPage> {
                             ),
                             MidTextField(
                               isEdit: isEdit,
-                              isValidted: true,
                               label: 'Last Name',
                               controller: lastName,
                             ),
@@ -620,7 +605,65 @@ class _EachStudentPageState extends State<EachStudentPage> {
                         children: [
                           IconButton(
                               color: Colors.red[600],
-                              onPressed: () {},
+                              onPressed: () => showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text('Delete Permanently'),
+                                      content: Text(
+                                        'Are you sure you want to delete?',
+                                      ),
+                                      actions: [
+                                        OutlinedButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text('Cancel'),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red),
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            var client = BrowserClient()
+                                              ..withCredentials = true;
+                                            var url = Uri.parse(
+                                                '$ipv4/deleteMidStudent');
+                                            var res = await client
+                                                .post(url, body: {
+                                              'admNo': widget.admNo,
+                                              'schoolCode': widget.schoolCode
+                                            });
+                                            if (res.body == 'true') {
+                                              if (mounted) {
+                                                Navigator.of(context).pop();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    backgroundColor:
+                                                        Colors.red[600],
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content: const Row(
+                                                      children: [
+                                                        Text(
+                                                          'Deleted Sucessfully',
+                                                        ),
+                                                        Icon(
+                                                          Icons.check_circle,
+                                                          color: Colors.white,
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                              widget.listRefresh();
+                                            }
+                                          },
+                                          child: Text('Delete'),
+                                        )
+                                      ],
+                                    ),
+                                  ),
                               icon: Icon(Icons.delete)),
                           Text(
                             'Delete',
@@ -645,6 +688,77 @@ class _EachStudentPageState extends State<EachStudentPage> {
                             ),
                           )
                         ],
+                      ),
+                      Column(
+                        children: [
+                          IconButton(
+                              color: Colors.indigo,
+                              onPressed: () => showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text('Warning'),
+                                      content: Text(
+                                        'The data send to printing can\'t be edited further. Confirm before submiting.',
+                                      ),
+                                      actions: [
+                                        OutlinedButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text('Cancel'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            var client = BrowserClient()
+                                              ..withCredentials = true;
+                                            var url =
+                                                Uri.parse('$ipv4/readyStudent');
+                                            var res = await client
+                                                .post(url, body: {
+                                              'admNo': widget.admNo,
+                                              'schoolCode': widget.schoolCode
+                                            });
+                                            if (res.body == 'true') {
+                                              if (mounted) {
+                                                Navigator.of(context).pop();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    backgroundColor:
+                                                        Colors.green[600],
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content: const Row(
+                                                      children: [
+                                                        Text(
+                                                          'Updated Sucessfully',
+                                                        ),
+                                                        Icon(
+                                                          Icons.check_circle,
+                                                          color: Colors.white,
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                                widget.listRefresh();
+                                              }
+                                            }
+                                          },
+                                          child: Text('Submit'),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                              icon: Icon(Icons.print)),
+                          Text(
+                            'Send print',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.indigo,
+                            ),
+                          )
+                        ],
                       )
                     ],
                   ),
@@ -652,6 +766,235 @@ class _EachStudentPageState extends State<EachStudentPage> {
               ],
             )
           : Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class ProfilePicView extends StatefulWidget {
+  const ProfilePicView(
+      {super.key,
+      required this.admNo,
+      required this.firstName,
+      required this.lastName,
+      required this.schoolCode,
+      required this.refresh});
+  final String firstName;
+  final String lastName;
+  final String admNo;
+  final String schoolCode;
+  final VoidCallback refresh;
+
+  @override
+  State<ProfilePicView> createState() => _ProfilePicViewState();
+}
+
+class _ProfilePicViewState extends State<ProfilePicView> {
+  late Future _getProfilePic;
+  getProfilePic() async {
+    var url2 = Uri.parse(
+        '$ipv4/getProfilePicMid/${widget.schoolCode}/${widget.admNo}');
+    var client = BrowserClient()..withCredentials = true;
+    var response2 = await client.get(url2);
+
+    return (response2.bodyBytes);
+  }
+
+  @override
+  void initState() {
+    _getProfilePic = getProfilePic();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text('Profile Photo'),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () => showModalBottomSheet(
+                isScrollControlled: true,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20))),
+                context: context,
+                builder: (context) => ChangePicDialog(
+                      admNo: widget.admNo.trim(),
+                      firstName: widget.firstName.trim(),
+                      lastName: widget.lastName.trim(),
+                      schoolCode: widget.schoolCode,
+                      refresh: () {
+                        setState(() {
+                          _getProfilePic = getProfilePic();
+                        });
+                        widget.refresh();
+                      },
+                    )),
+            icon: Icon(Icons.edit),
+          )
+        ],
+      ),
+      body: Hero(
+        tag: 'profile-pic',
+        child: Center(
+          child: FutureBuilder(
+            future: _getProfilePic,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return FutureBuilder(
+                  future: _getProfilePic,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Image.memory(
+                        snapshot.data,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Text(
+                          'No Profile Photo',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    } else {
+                      return Icon(Icons.error_outline_rounded);
+                    }
+                  },
+                );
+              } else {
+                return Icon(Icons.error_outline_rounded);
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChangePicDialog extends StatefulWidget {
+  const ChangePicDialog(
+      {super.key,
+      required this.admNo,
+      required this.firstName,
+      required this.lastName,
+      required this.schoolCode,
+      required this.refresh});
+  final String firstName;
+  final String lastName;
+  final String admNo;
+  final String schoolCode;
+  final VoidCallback refresh;
+
+  @override
+  State<ChangePicDialog> createState() => _ChangePicDialogState();
+}
+
+class _ChangePicDialogState extends State<ChangePicDialog> {
+  Uint8List? _imagebytes;
+  PlatformFile? _image;
+  saveStudentPic() async {
+    var url = Uri.parse('$ipv4/saveStudentPicMid');
+
+    var req = http.MultipartRequest(
+      'POST',
+      url,
+    );
+    var httpImage = http.MultipartFile.fromBytes(
+      'profilePic',
+      _imagebytes!,
+      filename:
+          '${widget.schoolCode}_${widget.admNo.trim()}_${widget.firstName.trim()}_${widget.lastName.trim()}.${_image!.extension}',
+    );
+    req.files.add(httpImage);
+    req.fields.addAll({'admNo': widget.admNo, 'schoolCode': widget.schoolCode});
+    var res = await req.send();
+    var responded = await http.Response.fromStream(res);
+    if (responded.body == 'true') {
+      // _getProfilePic = getProfilePic();
+      widget.refresh();
+      if (mounted) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green[600],
+            behavior: SnackBarBehavior.floating,
+            content: const Row(
+              children: [
+                Text(
+                  'Profile Picture Updated Sucessfully',
+                ),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.white,
+                )
+              ],
+            ),
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Profile Photo',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Row(
+            children: [
+              Column(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.camera_alt),
+                  ),
+                  Text('Camera')
+                ],
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Column(
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      FilePickerResult? result = await FilePicker.platform
+                          .pickFiles(type: FileType.image);
+                      if (result != null) {
+                        _image = result.files.first;
+                        _imagebytes = _image!.bytes;
+                        // profileStatus = true;
+                        saveStudentPic();
+
+                        // setState(() {
+                        // });
+                      }
+                    },
+                    icon: Icon(Icons.photo_library),
+                  ),
+                  Text('Pick Photo')
+                ],
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

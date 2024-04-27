@@ -14,10 +14,12 @@ class EachStaffPage extends StatefulWidget {
       {super.key,
       required this.schoolCode,
       required this.mob,
-      required this.isTeacher});
+      required this.isTeacher,
+      required this.refresh});
   final String schoolCode;
   final String mob;
   final bool isTeacher;
+  final VoidCallback refresh;
 
   @override
   State<EachStaffPage> createState() => _EachStaffPageState();
@@ -351,16 +353,17 @@ class _EachStaffPageState extends State<EachStaffPage> {
                           alignment: WrapAlignment.center,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
-                            MidDateSelectWidget(
-                              isEdit: isEdit,
-                              title: 'Joining Date',
-                              selectedDate: joiningDate,
-                              callBack: (p0) {
-                                setState(() {
-                                  joiningDate = p0;
-                                });
-                              },
-                            ),
+                            if (form['joiningDate'] == 'true')
+                              MidDateSelectWidget(
+                                isEdit: isEdit,
+                                title: 'Joining Date',
+                                selectedDate: joiningDate,
+                                callBack: (p0) {
+                                  setState(() {
+                                    joiningDate = p0;
+                                  });
+                                },
+                              ),
                             MidTextField(
                               isEdit: isEdit,
                               isValidted: true,
@@ -369,136 +372,145 @@ class _EachStaffPageState extends State<EachStaffPage> {
                             ),
                             MidTextField(
                               isEdit: isEdit,
-                              isValidted: true,
                               label: 'Last Name',
                               controller: lastName,
                             ),
-                            MidDropDownWidget(
-                              isEdit: isEdit,
-                              selected: gender,
-                              items: ['Male', 'Female'],
-                              title: 'Gender',
-                              callBack: (p0) {
-                                setState(() {
-                                  gender = p0;
-                                });
-                              },
-                            ),
-                            MidDateSelectWidget(
-                              isEdit: isEdit,
-                              title: 'Date of Birth',
-                              selectedDate: dob,
-                              callBack: (p0) {
-                                setState(() {
-                                  dob = p0;
-                                });
-                              },
-                            ),
-                            MidDropDownWidget(
-                              isEdit: isEdit,
-                              items: [
-                                'A+',
-                                'A-',
-                                'B+',
-                                'B-',
-                                'O+',
-                                'O-',
-                                'AB+',
-                                'AB-'
-                              ],
-                              title: 'Blood Group',
-                              callBack: (p0) {
-                                setState(() {
-                                  bloodGroup = p0;
-                                });
-                              },
-                              selected: bloodGroup,
-                            ),
-                            MidDropDownWidget(
-                              isEdit: isEdit,
-                              items: religionDropdownList,
-                              title: 'Religion',
-                              callBack: (p0) {
-                                setState(() {
-                                  religion = p0;
-                                });
-                              },
-                              selected: religion,
-                            ),
-                            MidDropDownWidget(
-                              isEdit: isEdit,
-                              items: ['General', 'OBC', 'SC', 'ST'],
-                              title: 'Caste',
-                              callBack: (p0) {
-                                setState(() {
-                                  caste = p0;
-                                });
-                              },
-                              selected: caste,
-                            ),
-                            MidTextField(
-                              isEdit: isEdit,
-                              label: 'Sub-Caste',
-                              controller: subCaste,
-                            ),
-                            MidTextField(
-                              isEdit: isEdit,
-                              label: 'Email',
-                              controller: email,
-                            ),
-                            MidTextField(
-                              isEdit: isEdit,
-                              label: 'RFId',
-                              controller: rfid,
-                            ),
+                            if (form['gender'] == 'true')
+                              MidDropDownWidget(
+                                isEdit: isEdit,
+                                selected: gender,
+                                items: ['Male', 'Female'],
+                                title: 'Gender',
+                                callBack: (p0) {
+                                  setState(() {
+                                    gender = p0;
+                                  });
+                                },
+                              ),
+                            if (form['dob'] == 'true')
+                              MidDateSelectWidget(
+                                isEdit: isEdit,
+                                title: 'Date of Birth',
+                                selectedDate: dob,
+                                callBack: (p0) {
+                                  setState(() {
+                                    dob = p0;
+                                  });
+                                },
+                              ),
+                            if (form['bloodGroup'] == 'true')
+                              MidDropDownWidget(
+                                isEdit: isEdit,
+                                items: [
+                                  'A+',
+                                  'A-',
+                                  'B+',
+                                  'B-',
+                                  'O+',
+                                  'O-',
+                                  'AB+',
+                                  'AB-'
+                                ],
+                                title: 'Blood Group',
+                                callBack: (p0) {
+                                  setState(() {
+                                    bloodGroup = p0;
+                                  });
+                                },
+                                selected: bloodGroup,
+                              ),
+                            if (form['religion'] == 'true')
+                              MidDropDownWidget(
+                                isEdit: isEdit,
+                                items: religionDropdownList,
+                                title: 'Religion',
+                                callBack: (p0) {
+                                  setState(() {
+                                    religion = p0;
+                                  });
+                                },
+                                selected: religion,
+                              ),
+                            if (form['caste'] == 'true')
+                              MidDropDownWidget(
+                                isEdit: isEdit,
+                                items: ['General', 'OBC', 'SC', 'ST'],
+                                title: 'Caste',
+                                callBack: (p0) {
+                                  setState(() {
+                                    caste = p0;
+                                  });
+                                },
+                                selected: caste,
+                              ),
+                            if (form['subCaste'] == 'true')
+                              MidTextField(
+                                isEdit: isEdit,
+                                label: 'Sub-Caste',
+                                controller: subCaste,
+                              ),
+                            if (form['email'] == 'true')
+                              MidTextField(
+                                isEdit: isEdit,
+                                label: 'Email',
+                                controller: email,
+                              ),
+                            if (form['rfid'] == 'true')
+                              MidTextField(
+                                isEdit: isEdit,
+                                label: 'RFId',
+                                controller: rfid,
+                              ),
                             MidTextField(
                               isEdit: isEdit,
                               isValidted: true,
                               label: 'Mobile Number',
                               controller: mob,
                             ),
-                            MidTextField(
-                              isEdit: isEdit,
-                              label: 'Qualification',
-                              controller: qualification,
-                            ),
-                            MidTextField(
-                              isEdit: isEdit,
-                              label: 'Father/Husband Name',
-                              controller: fatherOrHusName,
-                            ),
-                            MidTextField(
-                                label: 'Address',
-                                controller: address,
-                                isEdit: isEdit),
-                            MidTextField(
-                                label: 'Aadhaar No.',
-                                controller: aadhaarNo,
-                                isEdit: isEdit),
-                            MidTextField(
-                              label: 'Pan No.',
-                              controller: panNo,
-                              isEdit: isEdit,
-                            ),
-                            MidTextField(
-                                label: 'DL No.',
-                                controller: dlNo,
-                                isEdit: isEdit),
-                            MidTextField(
-                              label: 'Pan No.',
-                              controller: panNo,
-                              isEdit: isEdit,
-                            ),
-                            MidDateSelectWidget(
-                              isEdit: isEdit,
-                              title: 'DL Validity',
-                              selectedDate: dlValidity,
-                              callBack: (p0) {
-                                setState(() {
-                                  dlValidity = p0;
-                                });
-                              },
-                            )
+                            if (form['qualification'] == 'true')
+                              MidTextField(
+                                isEdit: isEdit,
+                                label: 'Qualification',
+                                controller: qualification,
+                              ),
+                            if (form['fatherorHusName'] == 'true')
+                              MidTextField(
+                                isEdit: isEdit,
+                                label: 'Father/Husband Name',
+                                controller: fatherOrHusName,
+                              ),
+                            if (form['address'] == 'true')
+                              MidTextField(
+                                  label: 'Address',
+                                  controller: address,
+                                  isEdit: isEdit),
+                            if (form['aadhaarNo'] == 'true')
+                              MidTextField(
+                                  label: 'Aadhaar No.',
+                                  controller: aadhaarNo,
+                                  isEdit: isEdit),
+                            if (form['panNo'] == 'true')
+                              MidTextField(
+                                label: 'Pan No.',
+                                controller: panNo,
+                                isEdit: isEdit,
+                              ),
+                            if (form['dlNo'] == 'true')
+                              MidTextField(
+                                  label: 'DL No.',
+                                  controller: dlNo,
+                                  isEdit: isEdit),
+                            if (form['dlValidity'] == 'true')
+                              MidDateSelectWidget(
+                                isEdit: isEdit,
+                                title: 'DL Validity',
+                                selectedDate: dlValidity,
+                                callBack: (p0) {
+                                  setState(() {
+                                    dlValidity = p0;
+                                  });
+                                },
+                              )
                           ],
                         ),
                       ),
@@ -571,6 +583,77 @@ class _EachStaffPageState extends State<EachStaffPage> {
                               icon: Icon(Icons.close)),
                           Text(
                             'Unchecked',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.indigo,
+                            ),
+                          )
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          IconButton(
+                              color: Colors.indigo,
+                              onPressed: () => showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text('Warning'),
+                                      content: Text(
+                                        'The data send to printing can\'t be edited further. Confirm before submiting.',
+                                      ),
+                                      actions: [
+                                        OutlinedButton(
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                          child: Text('Cancel'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            Navigator.of(context).pop();
+                                            var client = BrowserClient()
+                                              ..withCredentials = true;
+                                            var url =
+                                                Uri.parse('$ipv4/readyStaff');
+                                            var res = await client
+                                                .post(url, body: {
+                                              'mob': widget.mob,
+                                              'schoolCode': widget.schoolCode
+                                            });
+                                            if (res.body == 'true') {
+                                              if (mounted) {
+                                                Navigator.of(context).pop();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    backgroundColor:
+                                                        Colors.green[600],
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content: const Row(
+                                                      children: [
+                                                        Text(
+                                                          'Updated Sucessfully',
+                                                        ),
+                                                        Icon(
+                                                          Icons.check_circle,
+                                                          color: Colors.white,
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                );
+                                                widget.refresh();
+                                              }
+                                            }
+                                          },
+                                          child: Text('Submit'),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                              icon: Icon(Icons.print)),
+                          Text(
+                            'Send print',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.indigo,

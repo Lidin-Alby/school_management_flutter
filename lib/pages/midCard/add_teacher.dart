@@ -28,7 +28,7 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
     var client = BrowserClient()..withCredentials = true;
     var url = Uri.parse('$ipv4/getMidClasses/${widget.schoolCode}');
     var res = await client.get(url);
-    List data = jsonDecode(res.body);
+    Map data = jsonDecode(res.body);
     return data;
   }
 
@@ -69,6 +69,7 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
         'dlValidity': '',
         'dlNo': '',
         'aadhaarNo': '',
+        'ready': false.toString()
       });
 
       if (res.body == 'true') {
@@ -121,7 +122,9 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List classes = [];
-                classes = snapshot.data.map((e) => e['title']).toList();
+
+                classes =
+                    snapshot.data['classes'].map((e) => e['title']).toList();
                 return Form(
                   key: _formKey,
                   child: Container(
@@ -141,7 +144,6 @@ class _AddTeacherPageState extends State<AddTeacherPage> {
                           height: 15,
                         ),
                         TextFieldWidget(
-                            isValidted: true,
                             label: 'Last Name',
                             controller: lastName,
                             isEdit: true),
