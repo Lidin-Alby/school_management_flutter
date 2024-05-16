@@ -25,7 +25,7 @@ class _StudentFormMidState extends State<StudentFormMid> {
   bool rfid = false;
   bool session = false;
   bool boardingType = false;
-  bool schoolHosuse = false;
+  bool schoolHouse = false;
   bool address = false;
   bool transportMode = false;
 
@@ -78,7 +78,7 @@ class _StudentFormMidState extends State<StudentFormMid> {
     rfid = data['rfid'];
     session = data['session'];
     boardingType = data['boardingType'];
-    schoolHosuse = data['schoolHosuse'];
+    schoolHouse = data['schoolHouse'];
 
     vehicleNo = data['vehicleNo'];
     studentPic = data['studentPic'];
@@ -116,7 +116,7 @@ class _StudentFormMidState extends State<StudentFormMid> {
       'rfid': rfid.toString(),
       'session': session.toString(),
       'boardingType': boardingType.toString(),
-      'schoolHosuse': schoolHosuse.toString(),
+      'schoolHouse': schoolHouse.toString(),
       'vehicleNo': vehicleNo.toString(),
       'fatherName': fatherName.toString(),
       'fatherPic': fatherPic.toString(),
@@ -352,10 +352,10 @@ class _StudentFormMidState extends State<StudentFormMid> {
                     SwitchListTile(
                       dense: true,
                       title: Text('School House'),
-                      value: schoolHosuse,
+                      value: schoolHouse,
                       onChanged: (value) {
                         setState(() {
-                          schoolHosuse = value;
+                          schoolHouse = value;
                         });
                       },
                     ),

@@ -193,19 +193,17 @@ class _AddStudentPageState extends State<AddStudentPage> {
                             ),
                             TextFieldWidget(
                                 isValidted: true,
-                                label: 'First Name',
+                                label: 'Full Name',
                                 controller: firstName,
                                 isEdit: true),
                             SizedBox(
                               height: 15,
                             ),
-                            TextFieldWidget(
-                                label: 'Last Name',
-                                controller: lastName,
-                                isEdit: true),
-                            SizedBox(
-                              height: 15,
-                            ),
+                            // TextFieldWidget(
+                            //     label: 'Last Name',
+                            //     controller: lastName,
+                            //     isEdit: true),
+
                             TextFieldWidget(
                                 isValidted: true,
                                 label: 'Admission No./ Sr. No.',

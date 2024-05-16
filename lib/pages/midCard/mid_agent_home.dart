@@ -52,7 +52,7 @@ class _MidAgentHomeState extends State<MidAgentHome> {
       var url = Uri.parse('$ipv4/addNewSchoolMid');
       var res = await client.post(url, body: {
         'schoolCode': schoolCode.text.trim(),
-        'mob': mob.text.trim(),
+        'principalPhone': mob.text.trim(),
         'schoolName': schoolName.text.trim(),
         'schoolPassword': schoolPassword.text.trim(),
         'agentMob': agentMob,

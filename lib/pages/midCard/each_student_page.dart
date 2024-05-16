@@ -379,14 +379,14 @@ class _EachStudentPageState extends State<EachStudentPage> {
                             MidTextField(
                               isEdit: isEdit,
                               isValidted: true,
-                              label: 'First Name + Middle Name',
+                              label: 'Full Name',
                               controller: firstName,
                             ),
-                            MidTextField(
-                              isEdit: isEdit,
-                              label: 'Last Name',
-                              controller: lastName,
-                            ),
+                            // MidTextField(
+                            //   isEdit: isEdit,
+                            //   label: 'Last Name',
+                            //   controller: lastName,
+                            // ),
                             if (form['gender'] == 'true')
                               MidDropDownWidget(
                                 isEdit: isEdit,

@@ -123,19 +123,17 @@ class _AddStaffPageState extends State<AddStaffPage> {
                     children: [
                       TextFieldWidget(
                           isValidted: true,
-                          label: 'First Name',
+                          label: 'Full Name',
                           controller: firstName,
                           isEdit: true),
                       SizedBox(
                         height: 15,
                       ),
-                      TextFieldWidget(
-                          label: 'Last Name',
-                          controller: lastName,
-                          isEdit: true),
-                      SizedBox(
-                        height: 15,
-                      ),
+                      // TextFieldWidget(
+                      //     label: 'Last Name',
+                      //     controller: lastName,
+                      //     isEdit: true),
+
                       TextFieldWidget(
                           label: 'Mobile', controller: mob, isEdit: true),
                       SizedBox(
