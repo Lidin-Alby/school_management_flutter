@@ -20,7 +20,7 @@ class _MidHomeState extends State<MidHome> {
   TextEditingController password = TextEditingController();
   TextEditingController mob = TextEditingController();
   late Future _getAgents;
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
 
   addAgent() async {
     var url = Uri.parse('$ipv4/addAgent');

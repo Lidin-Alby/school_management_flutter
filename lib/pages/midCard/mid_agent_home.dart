@@ -3,10 +3,11 @@ import 'dart:math';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:http/browser_client.dart';
 import 'package:school_management/pages/midCard/all_list.dart';
 import 'package:http/http.dart' as http;
+import 'package:school_management/pages/midCard/call_api_settings.dart';
 
 import '../../ip_address.dart';
 import 'add_menu.dart';
@@ -587,15 +588,13 @@ class _RightMenuState extends State<RightMenu> {
                 Row(
                   children: [
                     MidTile(
-                      icon: Icons.badge_rounded,
-                      title: 'Attendance',
+                      icon: Icons.api_rounded,
+                      title: 'API Settings',
                       color: Colors.purple,
                       callback: () => Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (context) => AttendanceMid(
-                            schoolCode: widget.schoolCode,
-                          ),
-                        ),
+                            builder: (context) =>
+                                CallApiSettings(schoolCode: widget.schoolCode)),
                       ),
                     ),
                   ],

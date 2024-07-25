@@ -14,21 +14,158 @@ class MidDashboard extends StatefulWidget {
 }
 
 class _MidDashboardState extends State<MidDashboard> {
+  late Future _getStats;
+  @override
+  void initState() {
+    _getStats = getStats();
+    super.initState();
+  }
+
+  getStats() async {
+    var url = Uri.parse('$ipv4/getStats');
+    var res = await http.get(url);
+    return jsonDecode(res.body);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Card(
-          child: InkWell(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => AllLogins(),
-                  )),
-              child: SizedBox(
-                  width: 200,
-                  height: 100,
-                  child: Center(child: Text('Logins')))),
-        )
-      ],
+    return FutureBuilder(
+      future: _getStats,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          Map stats = snapshot.data;
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  children: [
+                    Card(
+                      child: InkWell(
+                        onTap: () =>
+                            Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => AllLogins(),
+                        )),
+                        child: SizedBox(
+                          width: 200,
+                          height: 100,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Logins'),
+                              Text(stats['logins'].toString())
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: InkWell(
+                        onTap: () =>
+                            Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => AllAgents(),
+                        )),
+                        child: SizedBox(
+                          width: 200,
+                          height: 100,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Agents'),
+                              Text(stats['agents'].toString())
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Students'),
+                            Text(stats['students'].toString())
+                          ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Staff / Teachers'),
+                            Text(stats['staffs'].toString())
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        } else {
+          return CircularProgressIndicator();
+        }
+      },
+    );
+  }
+}
+
+class AllAgents extends StatefulWidget {
+  const AllAgents({super.key});
+
+  @override
+  State<AllAgents> createState() => _AllAgentsState();
+}
+
+class _AllAgentsState extends State<AllAgents> {
+  late Future _getAgents;
+
+  getAgents() async {
+    var url = Uri.parse('$ipv4/getAgents');
+    var res = await http.get(url);
+    print(res.body);
+    return jsonDecode(res.body);
+  }
+
+  @override
+  void initState() {
+    _getAgents = getAgents();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Agents'),
+      ),
+      body: FutureBuilder(
+        future: _getAgents,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            List agents = snapshot.data;
+            return ListView.builder(
+              itemCount: agents.length,
+              itemBuilder: (context, index) => Card(
+                child: ListTile(
+                  title: Text(agents[index]['fullName']),
+                  subtitle: Text('Mobile - ${agents[index]['mob']}'),
+                ),
+              ),
+            );
+          } else {
+            return CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }
