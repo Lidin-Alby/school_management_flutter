@@ -21,8 +21,8 @@ class _StudentShellWidgetState extends State<StudentShellWidget> {
 
   @override
   Widget build(BuildContext context) {
-    int selectedIndex = links.indexWhere(
-        (element) => GoRouter.of(context).location.startsWith(element));
+    int selectedIndex = links.indexWhere((element) =>
+        GoRouter.of(context).namedLocation(element).startsWith(element));
 
     return Scaffold(
       backgroundColor: Colors.white,

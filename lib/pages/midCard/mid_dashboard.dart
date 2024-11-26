@@ -24,6 +24,7 @@ class _MidDashboardState extends State<MidDashboard> {
   getStats() async {
     var url = Uri.parse('$ipv4/getStats');
     var res = await http.get(url);
+
     return jsonDecode(res.body);
   }
 
@@ -101,6 +102,101 @@ class _MidDashboardState extends State<MidDashboard> {
                           children: [
                             Text('Staff / Teachers'),
                             Text(stats['staffs'].toString())
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width - 500,
+                  child: Divider(),
+                ),
+                Wrap(
+                  children: [
+                    Card(
+                      child: SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Ready To Print',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text((stats['staffReadyCount'] +
+                                    stats['studentReadyCount'])
+                                .toString()),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text('Student: ${stats['studentReadyCount']}'),
+                            SizedBox(
+                              height: 2,
+                            ),
+                            Text('Staff: ${stats['staffReadyCount']}')
+                          ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Printing',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text((stats['staffPrintingCount'] +
+                                    stats['studentPrintingCount'])
+                                .toString()),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text('Students: ${stats['studentPrintingCount']}'),
+                            SizedBox(
+                              height: 2,
+                            ),
+                            Text('Staffs: ${stats['staffPrintingCount']}'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Delivered',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text((stats['staffPrintedCount'] +
+                                    stats['studentPrintedCount'])
+                                .toString()),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text('Student: ${stats['studentPrintedCount']}'),
+                            SizedBox(
+                              height: 2,
+                            ),
+                            Text('Staff: ${stats['staffPrintedCount']}')
                           ],
                         ),
                       ),

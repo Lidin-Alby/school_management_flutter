@@ -95,14 +95,14 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/shareProfile/:scCode/:admNo',
       builder: (context, state) => SinglePageProfile(
-        schoolCode: state.params['scCode'].toString(),
-        admNo: state.params['admNo'].toString(),
+        schoolCode: state.pathParameters['scCode'].toString(),
+        admNo: state.pathParameters['admNo'].toString(),
       ),
     ),
     GoRoute(
       path: '/onlineApplication/:code',
       builder: (context, state) => OnlyForm(
-        code: state.params['code'].toString(),
+        code: state.pathParameters['code'].toString(),
       ),
     ),
     GoRoute(
@@ -203,7 +203,7 @@ final GoRouter router = GoRouter(
               path: ':subjectName',
               pageBuilder: (context, state) => NoTransitionPage(
                 child: ChaptersPage(
-                  subjectName: state.params['subjectName'].toString(),
+                  subjectName: state.pathParameters['subjectName'].toString(),
                   //   chapters: state.extra as Map,
                 ),
               ),
@@ -213,7 +213,7 @@ final GoRouter router = GoRouter(
                   pageBuilder: (context, state) => NoTransitionPage(
                     child: ChapterContent(
                         // chapterName:
-                        //     state.params['chapterName'].toString(),
+                        //     state.pathParameters['chapterName'].toString(),
                         ),
                   ),
                 )
@@ -249,7 +249,7 @@ final GoRouter router = GoRouter(
             GoRoute(
               path: ':admNo',
               builder: (context, state) => EachStudent(
-                admNo: state.params['admNo'].toString(),
+                admNo: state.pathParameters['admNo'].toString(),
               ),
             ),
           ],
@@ -284,7 +284,7 @@ final GoRouter router = GoRouter(
               GoRoute(
                 path: ':mobNo',
                 builder: (context, state) => EachStaff(
-                  mobNo: state.params['mobNo'].toString(),
+                  mobNo: state.pathParameters['mobNo'].toString(),
                 ),
               ),
             ]),
@@ -301,7 +301,7 @@ final GoRouter router = GoRouter(
               GoRoute(
                   path: ':formNo',
                   builder: (context, state) => FullApplication(
-                        formNo: state.params['formNo'].toString(),
+                        formNo: state.pathParameters['formNo'].toString(),
                       ),
                   redirect: (context, state) => authFun())
             ]),
@@ -321,7 +321,7 @@ final GoRouter router = GoRouter(
               GoRoute(
                 path: ':userType',
                 builder: (context, state) => ControlList(
-                  userType: state.params['userType'].toString(),
+                  userType: state.pathParameters['userType'].toString(),
                 ),
               ),
             ]),
@@ -333,12 +333,12 @@ final GoRouter router = GoRouter(
             GoRoute(
                 path: 'promotion:class',
                 builder: (context, state) => PromoteClass(
-                      className: state.params['class'].toString(),
+                      className: state.pathParameters['class'].toString(),
                     )),
             GoRoute(
               path: ':class',
               // builder: (context, state) => ClassMenu(
-              //   title: state.params['class'].toString(),
+              //   title: state.pathParameters['class'].toString(),
               // ),
               pageBuilder: (context, state) => CustomTransitionPage(
                 transitionDuration: Duration(milliseconds: 500),
@@ -352,7 +352,7 @@ final GoRouter router = GoRouter(
                   child: child,
                 ),
                 child: ClassMenu(
-                  title: state.params['class'].toString(),
+                  title: state.pathParameters['class'].toString(),
                 ),
               ),
             ),

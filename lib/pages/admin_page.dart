@@ -374,7 +374,7 @@ class MyNavTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool selected = GoRouter.of(context).location.contains('/$link');
+    bool selected = GoRouter.of(context).namedLocation(link).contains('/$link');
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       child: InkWell(
@@ -495,9 +495,10 @@ class _MyExpandingNavTileState extends State<MyExpandingNavTile> {
   @override
   Widget build(BuildContext context) {
     expanded = !widget.hide;
-    int? selectedIndex = subDivsions.indexWhere(
-        (element) => GoRouter.of(context).location.startsWith('/$element'));
-    String currentRoute = GoRouter.of(context).location;
+    int? selectedIndex = subDivsions.indexWhere((element) =>
+        GoRouter.of(context).namedLocation(element).startsWith('/$element'));
+    String currentRoute =
+        GoRouter.of(context).namedLocation(subDivsions[selectedIndex]);
     switch (currentRoute) {
       case '/students' || '/subject-management' || '/online-admission':
         selectedHead = 0;
@@ -763,8 +764,8 @@ class CustomNavigationRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // double width = MediaQuery.of(context).size.width;
-    int? selectedIndex = accesses.indexWhere(
-        (element) => GoRouter.of(context).location.startsWith('/$element'));
+    int? selectedIndex = accesses.indexWhere((element) =>
+        GoRouter.of(context).namedLocation(element).startsWith('/$element'));
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
       child: ClipRRect(

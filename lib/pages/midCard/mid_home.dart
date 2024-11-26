@@ -3,6 +3,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:school_management/pages/idCardEditor/design_main.dart';
+import 'package:school_management/pages/midCard/face_detection.dart';
 import '/pages/midCard/manage_profiles.dart';
 import '/pages/midCard/mid_dashboard.dart';
 
@@ -79,11 +81,16 @@ class _MidHomeState extends State<MidHome> {
                   icon: Icon(Icons.groups),
                   label: Text('Manage Profiles'),
                 ),
+                // NavigationRailDestination(
+                //   icon: Icon(Icons.design_services_rounded),
+                //   label: Text('Card Designer'),
+                // ),
               ],
               selectedIndex: _selectedIndex,
             ),
             if (_selectedIndex == 0) MidDashboard(),
-            if (_selectedIndex == 1) Expanded(child: ManageProfiles())
+            if (_selectedIndex == 1) Expanded(child: ManageProfiles()),
+            // if (_selectedIndex == 2) Expanded(child: DesignMain())
           ],
         )
         // Padding(

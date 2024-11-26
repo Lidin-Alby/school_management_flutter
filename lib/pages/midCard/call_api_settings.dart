@@ -24,6 +24,7 @@ class _CallApiSettingsState extends State<CallApiSettings> {
   bool absentCallAPI = false;
   TextEditingController presentCallAudio = TextEditingController();
   TextEditingController absentCallAudio = TextEditingController();
+  TextEditingController smsText = TextEditingController();
 
   @override
   void initState() {
@@ -41,8 +42,9 @@ class _CallApiSettingsState extends State<CallApiSettings> {
     absentCallAPI = details['absentCallApi'];
     presentsmsAPI = details['presentsmsApi'];
     absentsmsAPI = details['absentsmsApi'];
-    presentCallAudio.text = details['presentCallAudio'];
-    absentCallAudio.text = details['absentCallAudio'];
+    presentCallAudio.text = details['presentCallAudio'] ?? '';
+    absentCallAudio.text = details['absentCallAudio'] ?? '';
+    smsText.text = details['smsText'] ?? '';
     print(details);
     return details;
   }
@@ -56,7 +58,8 @@ class _CallApiSettingsState extends State<CallApiSettings> {
       'presentsmsApi': presentsmsAPI.toString(),
       'absentsmsApi': absentsmsAPI.toString(),
       'presentCallAudio': presentCallAudio.text.trim(),
-      'absentCallAudio': absentCallAudio.text.trim()
+      'absentCallAudio': absentCallAudio.text.trim(),
+      'smsText': smsText.text.trim(),
     });
     popBar(res.body);
   }
@@ -146,6 +149,17 @@ class _CallApiSettingsState extends State<CallApiSettings> {
                       label: 'Absent Audio Name',
                       controller: absentCallAudio,
                       isEdit: true),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: smsText,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      label: Text('Enter SMS Content'),
+                    ),
+                  ),
                 ),
                 SizedBox(
                   height: 40,

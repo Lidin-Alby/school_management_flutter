@@ -4,12 +4,17 @@ import 'dart:convert';
 import 'package:file_saver/file_saver.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:http/browser_client.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:school_management/pages/midCard/admin__student_edit.dart';
+import 'dart:io';
+import 'dart:html' as html;
+import 'dart:js' as js;
 
 import '../../ip_address.dart';
 // import '../../widgets/dropdown_widget.dart';
@@ -31,6 +36,7 @@ class _ManageProfilesState extends State<ManageProfiles> {
   List selectedList = [];
   bool ascending = true;
   bool next = false;
+  late String selectedSchoolName;
 
   getAllSchools() async {
     var client = BrowserClient()..withCredentials = true;
@@ -70,7 +76,7 @@ class _ManageProfilesState extends State<ManageProfiles> {
     final csvBytes = res.bodyBytes;
     FileSaver.instance.saveFile(
       name:
-          '${selectedSchool}_${DateFormat('MMMM dd, yyyy h:mm a').format(DateTime.now())}',
+          '${selectedSchool}_${selectedSchoolName}_${DateFormat('MMMM dd, yyyy h:mm a').format(DateTime.now())}',
       bytes: csvBytes,
       ext: 'csv',
       mimeType: MimeType.csv,
@@ -127,74 +133,63 @@ class _ManageProfilesState extends State<ManageProfiles> {
       padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
+          Align(
+            alignment: Alignment.topRight,
+            child: ElevatedButton(
+              onPressed: selectedUser != null && selectedStatus != null
+                  ? () async {
+                      var client = BrowserClient()..withCredentials = true;
+                      var url = Uri.parse('$ipv4/prepareZipCSV');
+
+                      var res = await client.post(url, body: {
+                        'selectedUser': selectedUser,
+                        'selectedStatus': selectedStatus
+                      });
+                      // final dir = await getDownloadsDirectory();
+
+                      final zip = res.bodyBytes;
+                      FileSaver.instance.saveFile(
+                        name: 'All-Csv',
+                        bytes: zip,
+                        ext: 'zip',
+                        mimeType: MimeType.zip,
+                      );
+                    }
+                  : null,
+              child: Text('Download All Csv'),
+            ),
+          ),
           FutureBuilder(
             future: _getAllSchools,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List schools = snapshot.data;
+                Map schoolNames = {};
 
                 return Row(
                   children: [
-                    Flexible(
-                      child: Stack(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(top: 3),
-                            alignment: AlignmentDirectional.center,
-                            // width: 250,
-                            height: 43,
-                            // margin: EdgeInsets.only(top: 10),
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey,
-                                ),
-                                borderRadius: BorderRadius.circular(5)),
-                            child: DropdownButton(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 4, horizontal: 10),
-                              disabledHint: selectedSchool != null
-                                  ? Text(
-                                      selectedSchool.toString(),
-                                      style: TextStyle(color: Colors.black),
-                                    )
-                                  : Text(
-                                      'Select School',
-                                      style: TextStyle(color: Colors.grey[600]),
-                                    ),
-                              value: selectedSchool,
-                              isExpanded: true,
-                              underline: Text(''),
-                              hint: Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: Text('Select School'),
-                              ),
-                              items: schools
-                                  .map((e) => DropdownMenuItem(
-                                        child: Text(
-                                            '${e['schoolCode']} - ${e['schoolName']}'),
-                                        value: e['schoolCode'],
-                                      ))
-                                  .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedSchool = value.toString();
-                                  selectedList = [];
-                                  _getData = getData();
-                                });
-                              },
-                            ),
-                          ),
-                          if (selectedSchool != null)
-                            Container(
-                                margin: EdgeInsets.only(left: 8),
-                                padding: EdgeInsets.symmetric(horizontal: 3),
-                                color: Colors.blue[50],
-                                child: Text(
-                                  'Select School',
-                                  style: TextStyle(
-                                      color: Colors.black54, fontSize: 13),
-                                ))
-                        ],
+                    Padding(
+                      padding: EdgeInsets.only(top: 8),
+                      child: DropdownMenu(
+                        enableFilter: true,
+                        label: Text('Select School'),
+                        dropdownMenuEntries: schools.map((e) {
+                          schoolNames
+                              .addAll({e['schoolCode']: e['schoolName']});
+                          return DropdownMenuEntry(
+                            label: '${e['schoolCode']} - ${e['schoolName']}',
+                            value: e['schoolCode'],
+                          );
+                        }).toList(),
+                        onSelected: (value) {
+                          setState(() {
+                            selectedSchool = value.toString();
+                            selectedSchoolName = schoolNames[selectedSchool];
+
+                            selectedList = [];
+                            _getData = getData();
+                          });
+                        },
                       ),
                     ),
                     SizedBox(
@@ -322,10 +317,17 @@ class _ManageProfilesState extends State<ManageProfiles> {
                     List listOf = snapshot.data;
                     if (searchText != '') {
                       listOf = listOf
-                          .where((element) => element['admNo']
-                              .toString()
-                              .toLowerCase()
-                              .contains(searchText.toString().toLowerCase()))
+                          .where((element) =>
+                              element['admNo']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(
+                                      searchText.toString().toLowerCase()) ||
+                              element['fullName']
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(
+                                      searchText.toString().toLowerCase()))
                           .toList();
                     }
                     List admList = listOf.map((e) => e['admNo']).toList();
@@ -1016,9 +1018,14 @@ class _ManageProfilesState extends State<ManageProfiles> {
                                             if (!next)
                                               SizedBox(
                                                 width: width + 75,
-                                                child: Text(listOf[index - 1]
-                                                        ['profilePic']
-                                                    .toString()),
+                                                child: InkWell(
+                                                  onTap: () => html.window.open(
+                                                      '$ipv4/img/$selectedSchool/${listOf[index - 1]['profilePic']}',
+                                                      'Image'),
+                                                  child: Text(listOf[index - 1]
+                                                          ['profilePic']
+                                                      .toString()),
+                                                ),
                                               ),
                                             if (!next)
                                               SizedBox(
