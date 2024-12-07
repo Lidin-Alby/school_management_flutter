@@ -1,11 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 // import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
+import 'package:http/http.dart' as http;
 
-import 'myText_class.dart';
+import '../../ip_address.dart';
+import 'Save_dialog.dart';
+import 'design_class.dart';
+import 'movable_object.dart';
+import 'my_text_class.dart';
 
 class DeleteIntent extends Intent {}
 
@@ -17,36 +24,69 @@ class DesignMain extends StatefulWidget {
 }
 
 class _DesignMainState extends State<DesignMain> {
-  Uint8List? backgroundImage;
-  double backgroundImageHeight = 0;
+  Uint8List? frontBackgroundImageBytes;
+  Uint8List? backBackgroundImageBytes;
+  XFile? frontBackgroundImage;
+  XFile? backBackgroundImage;
+
   double backgroundImageWidth = 0;
 
-  Offset backgroundImageOffset = Offset(0, 0);
-  Offset offset = Offset(0, 0);
-  Offset topLeftOffset = Offset(0, 0);
-  late Offset topRightOffset;
+  List<MyText> frontTexts = [];
+  List<MyText> backTexts = [];
 
-  bool backgroundImageSelected = false;
-  bool topleft = false;
-  TextEditingController backgroundImageHeightController =
-      TextEditingController();
-
-  List texts = [];
-  MyText? selectedText;
+  MyText? selectedObj;
+  Design? design;
   // List fonts = GoogleFonts.asMap().keys.toList().sublist(0, 200);
+
+  late Future _getFieldNames;
+  bool isBack = false;
+
+  @override
+  void initState() {
+    _getFieldNames = getFieldNames();
+    super.initState();
+  }
+
+  getFieldNames() async {
+    var url = Uri.parse("$ipv4/getFieldNames");
+    var res = await http.get(url);
+    var fieldNames = jsonDecode(res.body);
+
+    return fieldNames;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.grey[200],
-        appBar: AppBar(),
+        appBar: AppBar(
+          actions: [
+            IconButton(
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => SaveDialog(
+                  design: Design(
+                      designName: '',
+                      frontImageName: frontBackgroundImage!.name,
+                      backImageName: backBackgroundImage?.name,
+                      frontBackgroundImage: frontBackgroundImageBytes!,
+                      backBackgroundImage: backBackgroundImageBytes,
+                      frontTexts: frontTexts,
+                      backTexts: backTexts,
+                      backgroundImageWidth: backgroundImageWidth),
+                ),
+              ),
+              icon: Icon(Icons.save_rounded),
+            )
+          ],
+        ),
         body: Shortcuts(
           shortcuts: {LogicalKeySet(LogicalKeyboardKey.delete): DeleteIntent()},
           child: Actions(
             actions: {
               DeleteIntent: CallbackAction(onInvoke: (intent) {
                 setState(() {
-                  texts.remove(selectedText);
+                  // texts.remove(selectedObj);
                 });
                 return;
               })
@@ -54,253 +94,339 @@ class _DesignMainState extends State<DesignMain> {
             child: Row(
               children: [
                 Container(
-                    width: 150,
+                    width: 160,
                     color: Colors.grey,
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 20,
+                          height: 15,
                         ),
-                        for (MyText text in texts)
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                selectedText = text;
-                              });
-                            },
-                            child: Container(
-                                width: double.infinity,
-                                color: selectedText == text
-                                    ? Colors.black26
-                                    : null,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 10),
-                                child: Text(text.textName)),
-                          )
+                        FutureBuilder(
+                          future: _getFieldNames,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              List fields = snapshot.data;
+                              return Expanded(
+                                child: ListView.builder(
+                                    itemCount: fields.length,
+                                    itemBuilder: (context, index) => Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: PopupMenuButton(
+                                            child: Text(fields[index]),
+                                            itemBuilder: (context) => [
+                                              PopupMenuItem(
+                                                child: Text('At Front'),
+                                                onTap: () {
+                                                  setState(() {
+                                                    frontTexts.add(MyText(
+                                                        fields[index], true));
+                                                  });
+                                                },
+                                              ),
+                                              PopupMenuItem(
+                                                child: Text('At Back'),
+                                                onTap: () {
+                                                  backTexts.add(MyText(
+                                                      fields[index], true));
+                                                },
+                                              )
+                                            ],
+                                          ),
+                                        )),
+                              );
+                            } else {
+                              return CircularProgressIndicator();
+                            }
+                          },
+                        ),
                       ],
                     )),
                 Expanded(
-                  child: SizedBox(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              FilledButton(
-                                onPressed: () async {
-                                  final picker = ImagePickerPlugin();
-                                  final XFile? image =
-                                      await picker.getImageFromSource(
-                                          source: ImageSource.gallery);
-                                  final imgBytes = await image!.readAsBytes();
-                                  // final decodedImage =
-                                  //     await decodeImageFromList(imgBytes);
-                                  // backgroundImageHeight = decodedImage.height.toDouble();
-                                  // backgroundImageWidth = decodedImage.width.toDouble();
-                                  // ratio = backgroundImageWidth / backgroundImageHeight;
-                                  // if (backgroundImageHeight > 600) {
-                                  //   backgroundImageHeight = 600;
-                                  //   backgroundImageWidth = backgroundImageHeight * ratio;
-                                  // }
+                  child: SingleChildScrollView(
+                    child: SizedBox(
+                      height: frontBackgroundImageBytes == null
+                          ? MediaQuery.of(context).size.height
+                          : null,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  Text('Back Side'),
+                                  Switch(
+                                    value: isBack,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        isBack = !isBack;
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  FilledButton(
+                                    onPressed: () async {
+                                      final picker = ImagePickerPlugin();
+                                      frontBackgroundImage =
+                                          await picker.getImageFromSource(
+                                        source: ImageSource.gallery,
+                                      );
 
-                                  setState(() {
-                                    backgroundImage = imgBytes;
-                                    // topRightOffset = Offset(backgroundImageWidth, 10);
-                                    backgroundImageWidth =
-                                        backgroundImageHeight = 200;
-                                  });
-                                },
-                                child: Text('Pick Background Image'),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              if (backgroundImage != null)
-                                FilledButton.icon(
-                                  onPressed: () {
-                                    setState(() {
-                                      texts.add(
-                                          MyText('Text${texts.length + 1}'));
-                                    });
-                                  },
-                                  icon: Icon(Icons.add),
-                                  label: Text('Add Text'),
-                                ),
-                            ],
-                          ),
-                        ),
-                        Divider(),
-                        SizedBox(
-                          height: 15,
-                        ),
-                        if (backgroundImage != null)
-                          InteractiveViewer(
-                            child: Stack(
-                              children: [
-                                Image.memory(
-                                  backgroundImage!,
-                                  fit: BoxFit.cover,
-                                ),
-                                for (MyText text in texts)
-                                  Positioned(
-                                    top: text.top,
-                                    left: text.left,
-                                    child: Focus(
-                                      autofocus: true,
-                                      child: SizedBox(
-                                        width: text.width + 3,
-                                        height: text.height + 3,
-                                        child: Stack(
-                                          children: [
-                                            Container(
-                                              width: text.width,
-                                              height: text.height,
-                                              decoration: selectedText == text
-                                                  ? BoxDecoration(
-                                                      border: Border.all(),
-                                                    )
-                                                  : null,
-                                              child: Padding(
-                                                padding: selectedText == text
-                                                    ? EdgeInsets.zero
-                                                    : EdgeInsets.only(
-                                                        top: 1, left: 1),
-                                                child: TextField(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      selectedText = text;
-                                                    });
-                                                  },
-                                                  onTapOutside: (event) {
-                                                    setState(() {
-                                                      selectedText = null;
-                                                    });
-                                                  },
-                                                  controller: text
-                                                      .textEditingController,
-                                                  maxLines: null,
-                                                  textAlign: text.texAlign,
-                                                  decoration: InputDecoration(
-                                                      hintText: 'Type Here',
-                                                      isCollapsed: true,
-                                                      border: InputBorder.none),
-                                                  style: TextStyle(
-                                                    color: text.textcolor,
-                                                    fontSize: text.fontSize,
-                                                    fontStyle: text.fontStyle,
-                                                    fontWeight: text.fontWeight,
-                                                    decoration:
-                                                        text.textDecoration,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            if (selectedText == text)
-                                              Positioned(
-                                                right: 0,
-                                                top:
-                                                    (selectedText!.height - 6) /
-                                                        2,
-                                                child: MouseRegion(
-                                                  cursor: SystemMouseCursors
-                                                      .resizeLeftRight,
-                                                  child: GestureDetector(
-                                                    onHorizontalDragUpdate:
-                                                        (details) {
-                                                      double width =
-                                                          selectedText!.width +
-                                                              details.delta.dx;
-                                                      if (width > 8) {
-                                                        setState(() {
-                                                          selectedText!.width =
-                                                              width;
-                                                        });
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 6,
-                                                      width: 6,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        border: Border.all(),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            if (selectedText == text)
-                                              Positioned(
-                                                right:
-                                                    (selectedText!.width) / 2,
-                                                bottom: 0,
-                                                child: MouseRegion(
-                                                  cursor: SystemMouseCursors
-                                                      .resizeUpDown,
-                                                  child: GestureDetector(
-                                                    onVerticalDragUpdate:
-                                                        (details) {
-                                                      double height =
-                                                          selectedText!.height +
-                                                              details.delta.dy;
-                                                      if (height > 8) {
-                                                        setState(() {
-                                                          selectedText!.height =
-                                                              height;
-                                                        });
-                                                      }
-                                                    },
-                                                    child: Container(
-                                                      height: 6,
-                                                      width: 6,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        border: Border.all(),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            if (selectedText == text)
-                                              Positioned(
-                                                child: MouseRegion(
-                                                  cursor:
-                                                      SystemMouseCursors.move,
-                                                  child: GestureDetector(
-                                                    onPanUpdate: (details) {
-                                                      setState(() {
-                                                        selectedText!.top +=
-                                                            details.delta.dy;
-                                                        selectedText!.left +=
-                                                            details.delta.dx;
-                                                      });
-                                                    },
-                                                    child: Container(
-                                                      height: 5,
-                                                      width: 5,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
+                                      final imgBytes =
+                                          await frontBackgroundImage!
+                                              .readAsBytes();
+                                      final decodedImage =
+                                          await decodeImageFromList(imgBytes);
+
+                                      backgroundImageWidth =
+                                          decodedImage.width.toDouble();
+
+                                      setState(() {
+                                        frontBackgroundImageBytes = imgBytes;
+                                      });
+                                    },
+                                    child: Text('Front Background Image'),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  if (isBack)
+                                    FilledButton(
+                                      onPressed: () async {
+                                        final picker = ImagePickerPlugin();
+                                        backBackgroundImage =
+                                            await picker.getImageFromSource(
+                                                source: ImageSource.gallery);
+                                        final imgBytes =
+                                            await backBackgroundImage!
+                                                .readAsBytes();
+                                        final decodedImage =
+                                            await decodeImageFromList(imgBytes);
+
+                                        backgroundImageWidth =
+                                            decodedImage.width.toDouble();
+
+                                        setState(() {
+                                          backBackgroundImageBytes = imgBytes;
+                                        });
+                                      },
+                                      child: Text('Back Background Image'),
                                     ),
-                                  )
-                              ],
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text('Width:'),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  SizedBox(
+                                    width: 70,
+                                    child: TextField(
+                                      decoration:
+                                          InputDecoration(isDense: true),
+                                      controller: TextEditingController(
+                                        text: backgroundImageWidth
+                                            .toStringAsFixed(2),
+                                      ),
+                                      onSubmitted: (value) {
+                                        setState(() {
+                                          backgroundImageWidth =
+                                              double.parse(value);
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          )
-                      ],
+                            Divider(),
+                            Column(
+                              children: [
+                                LayoutBuilder(
+                                  builder: (context, constraints) => Row(
+                                    children: [
+                                      SizedBox(
+                                        width: isBack
+                                            ? constraints.maxWidth / 2
+                                            : constraints.maxWidth - 20,
+                                        child: frontBackgroundImage != null
+                                            ? Column(
+                                                children: [
+                                                  if (frontBackgroundImage !=
+                                                      null)
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: TextButton.icon(
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            frontTexts.add(MyText(
+                                                                "Text${frontTexts.length + 1}",
+                                                                false));
+                                                          });
+                                                        },
+                                                        icon: Icon(Icons.add),
+                                                        label: Text('Add Text'),
+                                                      ),
+                                                    ),
+                                                  SizedBox(
+                                                    height: 10,
+                                                  ),
+                                                  InteractiveViewer(
+                                                    child: Stack(
+                                                      children: [
+                                                        Image.memory(
+                                                          width:
+                                                              backgroundImageWidth,
+                                                          frontBackgroundImageBytes!,
+                                                        ),
+                                                        for (MyText text
+                                                            in frontTexts)
+                                                          MovableObject(
+                                                            object: text,
+                                                            auto: text.auto,
+                                                            selected:
+                                                                selectedObj,
+                                                            onSelected: (p0) {
+                                                              setState(() {
+                                                                selectedObj =
+                                                                    p0;
+                                                              });
+                                                            },
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : null,
+                                      ),
+                                      if (isBack)
+                                        SizedBox(
+                                          height: 500,
+                                          child: VerticalDivider(),
+                                        ),
+                                      if (isBack)
+                                        SizedBox(
+                                          width: constraints.maxWidth / 2 - 20,
+                                          child: backBackgroundImage != null
+                                              ? Column(
+                                                  children: [
+                                                    if (backBackgroundImage !=
+                                                        null)
+                                                      Align(
+                                                        alignment:
+                                                            Alignment.topLeft,
+                                                        child: TextButton.icon(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              backTexts.add(MyText(
+                                                                  "Text${backTexts.length + 1}",
+                                                                  false));
+                                                            });
+                                                          },
+                                                          icon: Icon(Icons.add),
+                                                          label:
+                                                              Text('Add Text'),
+                                                        ),
+                                                      ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    ),
+                                                    InteractiveViewer(
+                                                      child: Stack(
+                                                        children: [
+                                                          Image.memory(
+                                                            width:
+                                                                backgroundImageWidth,
+                                                            backBackgroundImageBytes!,
+                                                          ),
+                                                          for (MyText text
+                                                              in backTexts)
+                                                            MovableObject(
+                                                              object: text,
+                                                              auto: text.auto,
+                                                              selected:
+                                                                  selectedObj,
+                                                              onSelected: (p0) {
+                                                                setState(() {
+                                                                  selectedObj =
+                                                                      p0;
+                                                                });
+                                                              },
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              : null,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
                 Container(
+                    width: 150,
+                    color: Colors.grey,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: frontTexts.length,
+                            itemBuilder: (context, index) => InkWell(
+                              onTap: () {
+                                setState(() {
+                                  selectedObj = frontTexts[index];
+                                });
+                              },
+                              child: Container(
+                                  width: double.infinity,
+                                  color: selectedObj == frontTexts[index]
+                                      ? Colors.black26
+                                      : null,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 10),
+                                  child: Text(frontTexts[index].textName)),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: backTexts.length,
+                            itemBuilder: (context, index) => InkWell(
+                              onTap: () {
+                                setState(() {
+                                  selectedObj = backTexts[index];
+                                });
+                              },
+                              child: Container(
+                                  width: double.infinity,
+                                  color: selectedObj == backTexts[index]
+                                      ? Colors.black26
+                                      : null,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 10),
+                                  child: Text(backTexts[index].textName)),
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                Container(
                   width: 250,
                   color: Colors.grey,
-                  child: selectedText != null
+                  child: selectedObj != null
                       ? Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: Column(
@@ -309,7 +435,7 @@ class _DesignMainState extends State<DesignMain> {
                               SizedBox(
                                 height: 10,
                               ),
-                              Center(child: Text(selectedText!.textName)),
+                              Center(child: Text(selectedObj!.textName)),
                               SizedBox(
                                 height: 20,
                               ),
@@ -324,12 +450,12 @@ class _DesignMainState extends State<DesignMain> {
                                       decoration:
                                           InputDecoration(isDense: true),
                                       controller: TextEditingController(
-                                        text: selectedText!.width
+                                        text: selectedObj!.width
                                             .toStringAsFixed(2),
                                       ),
                                       onSubmitted: (value) {
                                         setState(() {
-                                          selectedText!.width =
+                                          selectedObj!.width =
                                               double.parse(value);
                                         });
                                       },
@@ -352,11 +478,11 @@ class _DesignMainState extends State<DesignMain> {
                                       Icons.align_horizontal_left_rounded,
                                       size: 20,
                                     ),
-                                    selected: selectedText!.texAlign ==
-                                        TextAlign.left,
+                                    selected:
+                                        selectedObj!.texAlign == TextAlign.left,
                                     onSelected: (value) {
                                       setState(() {
-                                        selectedText!.texAlign = TextAlign.left;
+                                        selectedObj!.texAlign = TextAlign.left;
                                       });
                                     },
                                   ),
@@ -367,11 +493,11 @@ class _DesignMainState extends State<DesignMain> {
                                       Icons.align_horizontal_center,
                                       size: 20,
                                     ),
-                                    selected: selectedText!.texAlign ==
+                                    selected: selectedObj!.texAlign ==
                                         TextAlign.center,
                                     onSelected: (value) {
                                       setState(() {
-                                        selectedText!.texAlign =
+                                        selectedObj!.texAlign =
                                             TextAlign.center;
                                       });
                                     },
@@ -383,12 +509,11 @@ class _DesignMainState extends State<DesignMain> {
                                       Icons.align_horizontal_right,
                                       size: 20,
                                     ),
-                                    selected: selectedText!.texAlign ==
+                                    selected: selectedObj!.texAlign ==
                                         TextAlign.right,
                                     onSelected: (value) {
                                       setState(() {
-                                        selectedText!.texAlign =
-                                            TextAlign.right;
+                                        selectedObj!.texAlign = TextAlign.right;
                                       });
                                     },
                                   )
@@ -408,12 +533,12 @@ class _DesignMainState extends State<DesignMain> {
                                       decoration:
                                           InputDecoration(isDense: true),
                                       controller: TextEditingController(
-                                        text: selectedText!.fontSize
+                                        text: selectedObj!.fontSize
                                             .toStringAsFixed(1),
                                       ),
                                       onSubmitted: (value) {
                                         setState(() {
-                                          selectedText!.fontSize =
+                                          selectedObj!.fontSize =
                                               double.parse(value);
                                         });
                                       },
@@ -436,15 +561,15 @@ class _DesignMainState extends State<DesignMain> {
                                       Icons.format_bold_rounded,
                                       size: 20,
                                     ),
-                                    selected: selectedText!.fontWeight ==
+                                    selected: selectedObj!.fontWeight ==
                                         FontWeight.bold,
                                     onSelected: (value) {
                                       setState(() {
                                         if (value) {
-                                          selectedText!.fontWeight =
+                                          selectedObj!.fontWeight =
                                               FontWeight.bold;
                                         } else {
-                                          selectedText!.fontWeight =
+                                          selectedObj!.fontWeight =
                                               FontWeight.normal;
                                         }
                                       });
@@ -457,15 +582,15 @@ class _DesignMainState extends State<DesignMain> {
                                       Icons.format_italic_rounded,
                                       size: 20,
                                     ),
-                                    selected: selectedText!.fontStyle ==
+                                    selected: selectedObj!.fontStyle ==
                                         FontStyle.italic,
                                     onSelected: (value) {
                                       setState(() {
                                         if (value) {
-                                          selectedText!.fontStyle =
+                                          selectedObj!.fontStyle =
                                               FontStyle.italic;
                                         } else {
-                                          selectedText!.fontStyle =
+                                          selectedObj!.fontStyle =
                                               FontStyle.normal;
                                         }
                                       });
@@ -478,15 +603,15 @@ class _DesignMainState extends State<DesignMain> {
                                       Icons.format_underline_rounded,
                                       size: 20,
                                     ),
-                                    selected: selectedText!.textDecoration ==
+                                    selected: selectedObj!.textDecoration ==
                                         TextDecoration.underline,
                                     onSelected: (value) {
                                       setState(() {
                                         if (value) {
-                                          selectedText!.textDecoration =
+                                          selectedObj!.textDecoration =
                                               TextDecoration.underline;
                                         } else {
-                                          selectedText!.textDecoration =
+                                          selectedObj!.textDecoration =
                                               TextDecoration.none;
                                         }
                                       });
@@ -512,10 +637,10 @@ class _DesignMainState extends State<DesignMain> {
                               ColorPicker(
                                 colorPickerWidth: 200,
                                 portraitOnly: true,
-                                pickerColor: selectedText!.textcolor,
+                                pickerColor: selectedObj!.textcolor,
                                 onColorChanged: (value) {
                                   setState(() {
-                                    selectedText!.textcolor = value;
+                                    selectedObj!.textcolor = value;
                                   });
                                 },
                               ),

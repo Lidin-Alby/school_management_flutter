@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class MyText {
   String textName;
+  bool auto;
   double top = 0;
   double left = 0;
   double width = 100;
@@ -14,5 +15,5 @@ class MyText {
   TextEditingController textEditingController = TextEditingController();
   Color textcolor = Color(0xff000000);
 
-  MyText(this.textName);
+  MyText(this.textName, this.auto);
 }
