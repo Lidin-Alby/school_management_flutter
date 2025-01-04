@@ -1,8 +1,11 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-import '../../ip_address.dart';
+import 'package:flutter/material.dart';
+import 'package:school_management/ip_address.dart';
+
 import 'design_class.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
+import 'dart:html' as html;
 
 class SaveDialog extends StatefulWidget {
   const SaveDialog({super.key, required this.design});
@@ -16,44 +19,77 @@ class _SaveDialogState extends State<SaveDialog> {
   bool uploaded = true;
   final _formKey = GlobalKey<FormState>();
   TextEditingController designNameController = TextEditingController();
+  double progress = 0;
 
   saveDesign() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        uploaded = false;
-      });
-      var url = Uri.parse("$ipv4/saveDesign");
-      var request = http.MultipartRequest('POST', url);
+      final xhr = html.HttpRequest();
+      // var url = Uri.parse("$ipv4/saveDesign");
+      xhr.open('POST', '$ipv4/saveDesign');
 
-      final stream = http.ByteStream(
-          Stream.fromIterable(widget.design.frontBackgroundImage.map(
-        (e) => [e],
-      )));
-      // print(await stream.length);
-      int length = await stream.length;
+      // var request = http.MultipartRequest('POST', url);
+      xhr.upload.onProgress.listen(
+        (event) {
+          if (event.lengthComputable) {
+            setState(() {
+              progress = event.loaded! / event.total!;
+            });
+            if (progress == 1) {
+              Navigator.pop(context);
+            }
+          }
+        },
+      );
+      xhr.onLoad.listen(
+        (event) {
+          if (xhr.status == 200) {
+            print('done');
+          }
+        },
+      );
+      String designName = designNameController.text.trim();
+      widget.design.designName = designName;
+      final formData = html.FormData();
+      String frontext = widget.design.frontImageName!.split('.').last;
+      String backext = widget.design.frontImageName!.split('.').last;
+      widget.design.frontImageName = '$designName-frontImage.$frontext';
 
-      var httpImage = http.MultipartFile('image', stream, length,
-          filename: widget.design.frontImageName);
-
-      request.files.add(httpImage);
-      var response = await request.send();
-      var responded = await http.Response.fromStream(response);
-      print(responded.body);
-      if (responded.body == 'done') {
-        Navigator.pop(context);
-        setState(() {
-          uploaded = true;
-        });
+      formData.appendBlob(
+          'image',
+          html.Blob([widget.design.frontBackgroundImage]),
+          '$designName-frontImage.$frontext');
+      if (widget.design.backBackgroundImage != null) {
+        widget.design.backImageName = '$designName-backImage.$backext';
+        formData.appendBlob(
+            'image',
+            html.Blob([widget.design.backBackgroundImage]),
+            '$designName-backImage.$backext');
       }
-      // response. stream. transform(utf8.decoder).listen((event) {
-      //   print(event);
-      //   if (event == 'done') {
-      //     Navigator.pop(context);
-      //     setState(() {
-      //       uploaded = true;
-      //     });
-      //   }
-      // });
+      formData.append('data', jsonEncode(widget.design.toMap()));
+      xhr.send(formData);
+
+      // var httpImage = http.MultipartFile.fromBytes(
+      //     'image', widget.design.frontBackgroundImage,
+      //     filename: widget.design.frontImageName);
+
+      // request.files.add(httpImage);
+
+      // // request.fields.addAll(widget.design.toMap());
+      // var streamedResponse = await request.send();
+      // var totalBytes = streamedResponse.contentLength;
+      // var bytesUploaded = 0;
+      // streamedResponse.stream.listen(
+      //   (value) {
+      //     bytesUploaded += value.length;
+      //     print(bytesUploaded);
+      //   },
+      //   onDone: () async {
+      //     var response = await http.Response.fromStream(streamedResponse);
+      //     if (response.statusCode == 200) {
+      //       print('done');
+      //     }
+      //   },
+      // );
     }
   }
 
@@ -82,12 +118,23 @@ class _SaveDialogState extends State<SaveDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text('Cancel'),
         ),
-        uploaded
+        progress == 0
             ? FilledButton(
                 onPressed: saveDesign,
                 child: Text('Save'),
               )
-            : CircularProgressIndicator(),
+            : Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: progress,
+                  ),
+                  Text(
+                    '${progress.toStringAsFixed(1)}%',
+                    style: TextStyle(fontSize: 12),
+                  )
+                ],
+              ),
       ],
     );
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:school_management/pages/idCardEditor/design_main.dart';
+
 import 'package:school_management/pages/midCard/mid_home.dart';
 import 'package:school_management/pages/school_management.dart';
 
@@ -42,18 +42,18 @@ class _OwnerPageState extends State<OwnerPage> {
                       child: Text('Mid Card')),
                 ),
               ),
-              Card(
-                child: InkWell(
-                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => DesignMain(),
-                  )),
-                  child: Container(
-                      alignment: Alignment.center,
-                      width: 200,
-                      height: 200,
-                      child: Text('Card Designer')),
-                ),
-              )
+              // Card(
+              //   child: InkWell(
+              //     onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              //       builder: (context) => DesignMain(),
+              //     )),
+              //     child: Container(
+              //         alignment: Alignment.center,
+              //         width: 200,
+              //         height: 200,
+              //         child: Text('Card Designer')),
+              //   ),
+              // )
             ],
           ),
         ));

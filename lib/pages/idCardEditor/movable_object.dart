@@ -1,111 +1,140 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
-import 'my_text_class.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
+import 'movable_and_extra_class.dart';
 
 class MovableObject extends StatefulWidget {
   const MovableObject(
       {super.key,
-      required this.object,
-      this.auto = false,
+      required this.element,
       required this.onSelected,
-      this.selected});
-  final MyText object;
-  final bool auto;
-  final MyText? selected;
-  final Function(MyText?) onSelected;
+      required this.selected});
+  final Movable element;
+  final Movable? selected;
+  final Function(Movable?) onSelected;
 
   @override
   State<MovableObject> createState() => _MovableObjectState();
 }
 
 class _MovableObjectState extends State<MovableObject> {
-  late MyText object;
-  MyText? selectedObj;
+  late Movable element;
+  Movable? selectedObj;
   @override
   void initState() {
-    object = widget.object;
+    element = widget.element;
 
     super.initState();
+  }
+
+  Widget getElement(Movable element) {
+    if (element is MyText) {
+      return Padding(
+        padding: selectedObj == element
+            ? EdgeInsets.zero
+            : EdgeInsets.only(top: 1, left: 1),
+        child: TextField(
+          onTap: () {
+            setState(() {
+              selectedObj = element;
+            });
+            widget.onSelected(selectedObj);
+          },
+          onTapOutside: (event) {
+            setState(() {
+              selectedObj = null;
+            });
+            widget.onSelected(null);
+          },
+          controller: element.textEditingController,
+          maxLines: null,
+          textAlign: element.textAlign,
+          decoration: InputDecoration(
+              hintStyle: TextStyle(color: element.textcolor),
+              hintText: 'Type Here',
+              isCollapsed: true,
+              border: InputBorder.none),
+          style: TextStyle(
+            color: element.textcolor,
+            fontSize: element.fontSize,
+            fontStyle: element.fontStyle,
+            fontWeight: element.fontWeight,
+            decoration: element.textDecoration,
+          ),
+        ),
+      );
+    } else if (element is MyAutoText) {
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            selectedObj = element;
+          });
+          widget.onSelected(selectedObj);
+        },
+        child: element.isQR
+            ? QrImageView(
+                data: element.name,
+                backgroundColor: Colors.white,
+                padding: EdgeInsets.zero,
+              )
+            : Padding(
+                padding: selectedObj == element
+                    ? EdgeInsets.zero
+                    : EdgeInsets.only(top: 1, left: 1),
+                child: AutoSizeText(
+                  element.name,
+                  textAlign: element.textAlign,
+                  minFontSize: 5,
+                  style: TextStyle(
+                    color: element.textcolor,
+                    fontSize: element.fontSize,
+                    fontStyle: element.fontStyle,
+                    fontWeight: element.fontWeight,
+                    decoration: element.textDecoration,
+                  ),
+                ),
+              ),
+      );
+    } else if (element is MyImage) {
+      return GestureDetector(
+          onTap: () {
+            setState(() {
+              selectedObj = element;
+            });
+            widget.onSelected(selectedObj);
+          },
+          child: element.getImage());
+    } else {
+      return Text('Error');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     selectedObj = widget.selected;
     return Positioned(
-      top: object.top,
-      left: object.left,
+      top: element.top,
+      left: element.left,
       child: Focus(
         autofocus: true,
         child: SizedBox(
-          width: object.width + 3,
-          height: object.height + 3,
+          width: element.width + 3,
+          height: element.height + 3,
           child: Stack(
             children: [
               Container(
-                width: object.width,
-                height: object.height,
-                decoration: selectedObj == object
+                width: element.width,
+                height: element.height,
+                decoration: selectedObj == element
                     ? BoxDecoration(
                         border: Border.all(),
                       )
                     : null,
-                child: Padding(
-                  padding: selectedObj == object
-                      ? EdgeInsets.zero
-                      : EdgeInsets.only(top: 1, left: 1),
-                  child: !widget.auto
-                      ? TextField(
-                          onTap: () {
-                            setState(() {
-                              selectedObj = object;
-                            });
-                            widget.onSelected(object);
-                          },
-                          onTapOutside: (event) {
-                            setState(() {
-                              selectedObj = null;
-                            });
-                            widget.onSelected(null);
-                          },
-                          controller: object.textEditingController,
-                          maxLines: null,
-                          textAlign: object.texAlign,
-                          decoration: InputDecoration(
-                              hintText: 'Type Here',
-                              isCollapsed: true,
-                              border: InputBorder.none),
-                          style: TextStyle(
-                            color: object.textcolor,
-                            fontSize: object.fontSize,
-                            fontStyle: object.fontStyle,
-                            fontWeight: object.fontWeight,
-                            decoration: object.textDecoration,
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedObj = object;
-                            });
-                            widget.onSelected(object);
-                          },
-                          child: AutoSizeText(
-                            object.textName,
-                            textAlign: object.texAlign,
-                            minFontSize: 5,
-                            style: TextStyle(
-                              color: object.textcolor,
-                              fontSize: object.fontSize,
-                              fontStyle: object.fontStyle,
-                              fontWeight: object.fontWeight,
-                              decoration: object.textDecoration,
-                            ),
-                          ),
-                        ),
-                ),
+                child: getElement(element),
               ),
-              if (selectedObj == object)
+              if (selectedObj == element)
                 Positioned(
                   right: 0,
                   top: (selectedObj!.height - 6) / 2,
@@ -118,6 +147,7 @@ class _MovableObjectState extends State<MovableObject> {
                           setState(() {
                             selectedObj!.width = width;
                           });
+                          widget.onSelected(selectedObj);
                         }
                       },
                       child: Container(
@@ -131,7 +161,7 @@ class _MovableObjectState extends State<MovableObject> {
                     ),
                   ),
                 ),
-              if (selectedObj == object)
+              if (selectedObj == element)
                 Positioned(
                   right: (selectedObj!.width) / 2,
                   bottom: 0,
@@ -144,6 +174,7 @@ class _MovableObjectState extends State<MovableObject> {
                           setState(() {
                             selectedObj!.height = height;
                           });
+                          widget.onSelected(selectedObj);
                         }
                       },
                       child: Container(
@@ -157,7 +188,7 @@ class _MovableObjectState extends State<MovableObject> {
                     ),
                   ),
                 ),
-              if (selectedObj == object)
+              if (selectedObj == element)
                 Positioned(
                   child: MouseRegion(
                     cursor: SystemMouseCursors.move,
@@ -167,6 +198,7 @@ class _MovableObjectState extends State<MovableObject> {
                           selectedObj!.top += details.delta.dy;
                           selectedObj!.left += details.delta.dx;
                         });
+                        widget.onSelected(selectedObj);
                       },
                       child: Container(
                         height: 5,
