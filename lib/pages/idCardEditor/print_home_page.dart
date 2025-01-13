@@ -35,6 +35,7 @@ class _PrintHomePageState extends State<PrintHomePage> {
   late Design design;
   List<List<Map>> studentProgress = [];
   List students = [];
+  List screenshotAdded = [];
 
   Future<List> getAllSchools() async {
     var url = Uri.parse('$ipv4/getAllMidSchools');
@@ -129,6 +130,9 @@ class _PrintHomePageState extends State<PrintHomePage> {
           fit: pw.BoxFit.fill,
         ),
       );
+      setState(() {
+        screenshotAdded[ims.length - 1] = true;
+      });
     }
     print(studentProgress);
     generatePdf(ims);
@@ -216,7 +220,7 @@ class _PrintHomePageState extends State<PrintHomePage> {
                   SizedBox(
                     width: 30,
                   ),
-                  if (selectedClass != null)
+                  if (selectedClass != null && selectedDesign != null)
                     FilledButton(
                       onPressed: () {
                         for (var ele in design.frontElements) {
@@ -229,6 +233,10 @@ class _PrintHomePageState extends State<PrintHomePage> {
                             );
                           }
                         }
+                        screenshotAdded = List.generate(
+                          students.length,
+                          (index) => false,
+                        );
                         setState(() {});
                         startDataCollection();
                       },
@@ -296,54 +304,69 @@ class _PrintHomePageState extends State<PrintHomePage> {
                               return Expanded(
                                 child: ListView.builder(
                                   itemCount: students.length,
-                                  itemBuilder: (context, index) => ListTile(
-                                    leading: SizedBox(
-                                      width: 150,
-                                      child: Text(students[index]['fullName']),
+                                  itemBuilder: (context, index) => Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 8),
+                                    child: ListTile(
+                                      tileColor: Colors.grey[300],
+                                      leading: SizedBox(
+                                        width: 150,
+                                        child:
+                                            Text(students[index]['fullName']),
+                                      ),
+                                      title: studentProgress.isNotEmpty
+                                          ? Column(
+                                              children: [
+                                                for (Map progressMap
+                                                    in studentProgress[index])
+                                                  progressMap['progress']
+                                                          is double
+                                                      ? Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            LinearProgressIndicator(
+                                                              value: progressMap[
+                                                                  'progress'],
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                  progressMap[
+                                                                      'fieldName'],
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12),
+                                                                ),
+                                                                Text(
+                                                                  '${(progressMap['progress'] * 100).toStringAsFixed(1)}%',
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12),
+                                                                ),
+                                                              ],
+                                                            )
+                                                          ],
+                                                        )
+                                                      : Text(progressMap[
+                                                          'progress']),
+                                              ],
+                                            )
+                                          : null,
+                                      trailing: screenshotAdded.isNotEmpty
+                                          ? SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: screenshotAdded[index]
+                                                  ? Icon(Icons
+                                                      .check_circle_outline)
+                                                  : CircularProgressIndicator())
+                                          : null,
                                     ),
-                                    title: studentProgress.isNotEmpty
-                                        ? Column(
-                                            children: [
-                                              for (Map progressMap
-                                                  in studentProgress[index])
-                                                progressMap['progress']
-                                                        is double
-                                                    ? Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          LinearProgressIndicator(
-                                                            value: progressMap[
-                                                                'progress'],
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                progressMap[
-                                                                    'fieldName'],
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
-                                                              ),
-                                                              Text(
-                                                                '${(progressMap['progress'] * 100).toStringAsFixed(1)}%',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        12),
-                                                              ),
-                                                            ],
-                                                          )
-                                                        ],
-                                                      )
-                                                    : Text(progressMap[
-                                                        'progress']),
-                                            ],
-                                          )
-                                        : null,
                                   ),
                                 ),
                               );

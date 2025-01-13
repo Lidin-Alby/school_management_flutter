@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:school_management/pages/idCardEditor/design_home_page.dart';
+import 'package:school_management/pages/idCardEditor/print_home_page.dart';
 
 import 'package:school_management/pages/midCard/face_detection.dart';
 import '/pages/midCard/manage_profiles.dart';
@@ -86,12 +87,17 @@ class _MidHomeState extends State<MidHome> {
                   icon: Icon(Icons.design_services_rounded),
                   label: Text('Card Designs'),
                 ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.print),
+                  label: Text('Printing'),
+                ),
               ],
               selectedIndex: _selectedIndex,
             ),
             if (_selectedIndex == 0) MidDashboard(),
             if (_selectedIndex == 1) Expanded(child: ManageProfiles()),
-            if (_selectedIndex == 2) Expanded(child: DesignHomePage())
+            if (_selectedIndex == 2) Expanded(child: DesignHomePage()),
+            if (_selectedIndex == 3) Expanded(child: PrintHomePage())
           ],
         )
         // Padding(
