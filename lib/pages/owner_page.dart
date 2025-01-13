@@ -36,10 +36,11 @@ class _OwnerPageState extends State<OwnerPage> {
                     builder: (context) => MidHome(),
                   )),
                   child: Container(
-                      alignment: Alignment.center,
-                      width: 200,
-                      height: 200,
-                      child: Text('Mid Card')),
+                    alignment: Alignment.center,
+                    width: 200,
+                    height: 200,
+                    child: Text('Mid Card'),
+                  ),
                 ),
               ),
               // Card(

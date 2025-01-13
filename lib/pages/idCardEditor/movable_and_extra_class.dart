@@ -9,10 +9,14 @@ class Movable {
   double top = 0;
   double left = 0;
   String name;
-  Movable(this.name);
+  String? value;
+  Movable(this.name) {
+    value = name;
+  }
   Map toMap() {
     return {
       'name': name,
+      'value': name,
       'height': height,
       'width': width,
       'top': top,
@@ -25,6 +29,7 @@ class Movable {
     width = json['width'];
     top = json['top'];
     left = json['left'];
+    value = json['value'];
   }
 }
 
@@ -128,14 +133,14 @@ class MyText extends MyAutoText {
   @override
   Map toMap() {
     return {
-      'value': textEditingController.text.trim(),
+      'text': textEditingController.text.trim(),
       ...super.toMap(),
     };
   }
 
   @override
   initialize(Map json) {
-    textEditingController.text = json['value'];
+    textEditingController.text = json['text'].toString();
     super.initialize(json);
   }
 

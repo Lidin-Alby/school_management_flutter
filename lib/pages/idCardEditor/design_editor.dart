@@ -101,9 +101,6 @@ class _DesignEditorState extends State<DesignEditor> {
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
           actions: [
-            // TextButton(
-            //     onPressed: () => generatePdf(design.frontBackgroundImage!),
-            //     child: Text('data')),
             IconButton(
               onPressed: () => showDialog(
                 context: context,

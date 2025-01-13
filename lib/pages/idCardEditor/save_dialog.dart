@@ -130,7 +130,7 @@ class _SaveDialogState extends State<SaveDialog> {
                     value: progress,
                   ),
                   Text(
-                    '${progress.toStringAsFixed(1)}%',
+                    '${(progress * 100).toStringAsFixed(1)}%',
                     style: TextStyle(fontSize: 12),
                   )
                 ],

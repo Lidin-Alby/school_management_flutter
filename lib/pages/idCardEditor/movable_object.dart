@@ -75,7 +75,7 @@ class _MovableObjectState extends State<MovableObject> {
         },
         child: element.isQR
             ? QrImageView(
-                data: element.name,
+                data: element.value!,
                 backgroundColor: Colors.white,
                 padding: EdgeInsets.zero,
               )
@@ -84,7 +84,7 @@ class _MovableObjectState extends State<MovableObject> {
                     ? EdgeInsets.zero
                     : EdgeInsets.only(top: 1, left: 1),
                 child: AutoSizeText(
-                  element.name,
+                  element.value!,
                   textAlign: element.textAlign,
                   minFontSize: 5,
                   style: TextStyle(

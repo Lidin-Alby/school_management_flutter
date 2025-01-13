@@ -54,7 +54,7 @@ class Design {
     List<Movable> backElements = [];
 
     for (Map json in frontJson) {
-      if (json.containsKey('value')) {
+      if (json.containsKey('text')) {
         frontElements.add(MyText.fromMap(json));
       } else if (json.containsKey('fontSize')) {
         frontElements.add(MyAutoText.fromMap(json));
@@ -63,7 +63,7 @@ class Design {
       }
     }
     for (Map json in backJson) {
-      if (json.containsKey('value')) {
+      if (json.containsKey('text')) {
         backElements.add(MyText.fromMap(json));
       } else if (json.containsKey('fontSize')) {
         backElements.add(MyAutoText.fromMap(json));
