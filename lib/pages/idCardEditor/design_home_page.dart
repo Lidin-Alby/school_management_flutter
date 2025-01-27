@@ -18,6 +18,7 @@ class DesignHomePage extends StatefulWidget {
 
 class _DesignHomePageState extends State<DesignHomePage> {
   late Future _getDesigns;
+  int? selected;
 
   getDesigns() async {
     final url = Uri.parse('$ipv4/getDesigns');
@@ -25,6 +26,16 @@ class _DesignHomePageState extends State<DesignHomePage> {
     List data = jsonDecode(res.body);
 
     return data;
+  }
+
+  deleteDesign(String designName) async {
+    final url = Uri.parse('$ipv4/deleteDesign');
+    final res = await http.delete(url, body: {'designName': designName});
+    if (res.body == 'true') {
+      setState(() {
+        _getDesigns = getDesigns();
+      });
+    }
   }
 
   @override
@@ -65,6 +76,7 @@ class _DesignHomePageState extends State<DesignHomePage> {
                               frontElements: [],
                               backElements: [],
                               backgroundImageHeight: 0),
+                          savedDesigns: designs,
                         ),
                       )),
                       label: Text('Create'),
@@ -82,21 +94,51 @@ class _DesignHomePageState extends State<DesignHomePage> {
                           padding: const EdgeInsets.only(top: 30),
                           child: Wrap(
                             children: [
-                              for (String name in designs)
+                              for (int i = 0; i < designs.length; i++)
                                 Card.filled(
                                   child: InkWell(
+                                    onLongPress: () {
+                                      setState(() {
+                                        selected = i;
+                                      });
+                                    },
                                     onTap: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            FetchDesign(designName: name),
-                                      ));
+                                      if (selected != null) {
+                                        setState(() {
+                                          selected = null;
+                                        });
+                                      } else {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) => FetchDesign(
+                                              designName: designs[i],
+                                              savedDesigns: designs,
+                                            ),
+                                          ),
+                                        );
+                                      }
                                     },
                                     child: SizedBox(
                                       width: 150,
                                       height: 100,
-                                      child: Center(
-                                        child: Text(name),
+                                      child: Column(
+                                        mainAxisAlignment: i == selected
+                                            ? MainAxisAlignment.start
+                                            : MainAxisAlignment.center,
+                                        children: [
+                                          if (i == selected)
+                                            Align(
+                                              alignment: Alignment.topRight,
+                                              child: IconButton(
+                                                color: Colors.red,
+                                                iconSize: 15,
+                                                onPressed: () =>
+                                                    deleteDesign(designs[i]),
+                                                icon: Icon(Icons.delete),
+                                              ),
+                                            ),
+                                          Text(designs[i]),
+                                        ],
                                       ),
                                     ),
                                   ),

@@ -84,7 +84,7 @@ class _MovableObjectState extends State<MovableObject> {
                     ? EdgeInsets.zero
                     : EdgeInsets.only(top: 1, left: 1),
                 child: AutoSizeText(
-                  element.value!,
+                  element.value.toString(),
                   textAlign: element.textAlign,
                   minFontSize: 5,
                   style: TextStyle(

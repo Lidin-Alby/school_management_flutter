@@ -16,6 +16,7 @@ Future getDesignData(String d) async {
   final backImageRes = await http.get(backImageurl);
   final designDetailsRes = await http.get(designDetailsUrl);
   Map designDetails = jsonDecode(designDetailsRes.body);
+
   final design = Design.fromMap(
     designDetails,
     frontImageRes.bodyBytes,

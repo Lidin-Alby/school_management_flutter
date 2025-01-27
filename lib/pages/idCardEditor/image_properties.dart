@@ -81,6 +81,49 @@ class ImageProperties extends StatelessWidget {
             ),
           ],
         ),
+        Row(
+          // spacing: 5,
+          // crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text('top: '),
+            SizedBox(
+              width: 45,
+              child: TextField(
+                style: TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  isDense: true,
+                ),
+                controller: TextEditingController(
+                  text: selectedObj.top.toStringAsFixed(2),
+                ),
+                onSubmitted: (value) {
+                  // setState(() {
+                  selectedObj.top = double.parse(value);
+                  // });
+                  onChange(selectedObj);
+                },
+              ),
+            ),
+            Spacer(),
+            Text('left: '),
+            SizedBox(
+              width: 45,
+              child: TextField(
+                style: TextStyle(fontSize: 13),
+                decoration: InputDecoration(isDense: true),
+                controller: TextEditingController(
+                  text: selectedObj.left.toStringAsFixed(2),
+                ),
+                onSubmitted: (value) {
+                  // setState(() {
+                  selectedObj.left = double.parse(value);
+                  // });
+                  onChange(selectedObj);
+                },
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

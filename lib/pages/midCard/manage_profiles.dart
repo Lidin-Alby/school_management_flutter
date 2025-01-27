@@ -10,11 +10,10 @@ import 'package:http/browser_client.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:school_management/pages/midCard/admin__student_edit.dart';
-import 'dart:io';
+
 import 'dart:html' as html;
-import 'dart:js' as js;
 
 import '../../ip_address.dart';
 // import '../../widgets/dropdown_widget.dart';

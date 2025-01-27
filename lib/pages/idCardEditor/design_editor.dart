@@ -10,19 +10,21 @@ import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
-import 'Save_dialog.dart';
 import 'design_class.dart';
 import 'image_capsule.dart';
+
 import 'image_properties.dart';
 import 'movable_and_extra_class.dart';
-
+import 'save_dialog.dart';
 import 'text_properties.dart';
 
 class DeleteIntent extends Intent {}
 
 class DesignEditor extends StatefulWidget {
-  const DesignEditor({super.key, required this.design});
+  const DesignEditor(
+      {super.key, required this.design, required this.savedDesigns});
   final Design design;
+  final List savedDesigns;
 
   @override
   State<DesignEditor> createState() => _DesignEditorState();
@@ -106,6 +108,7 @@ class _DesignEditorState extends State<DesignEditor> {
                 context: context,
                 builder: (context) => SaveDialog(
                   design: design,
+                  savedDesigns: widget.savedDesigns,
                 ),
               ),
               icon: Icon(Icons.save_rounded),
@@ -166,8 +169,15 @@ class _DesignEditorState extends State<DesignEditor> {
                                           child: Text('At Back'),
                                           onTap: () {
                                             setState(() {
-                                              design.backElements.add(
-                                                  MyAutoText(fields[index]));
+                                              if (fields[index] ==
+                                                  'profilePic') {
+                                                design.backElements.add(
+                                                    MyImage(fields[index]));
+                                              } else {
+                                                design.backElements.add(
+                                                  MyAutoText(fields[index]),
+                                                );
+                                              }
                                             });
                                           },
                                         )

@@ -11,7 +11,7 @@ import 'package:school_management/pages/midCard/call_api_settings.dart';
 
 import '../../ip_address.dart';
 import 'add_menu.dart';
-import 'attendance_mid.dart';
+
 import 'mid_tile_widget.dart';
 import 'ready_print.dart';
 import 'unchecked_data_page.dart';

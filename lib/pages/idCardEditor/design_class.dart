@@ -50,6 +50,7 @@ class Design {
       Uint8List? backBackgroundImage) {
     List frontJson = jsonDecode(json['frontElements']);
     List backJson = jsonDecode(json['backElements']);
+
     List<Movable> frontElements = [];
     List<Movable> backElements = [];
 
@@ -68,7 +69,7 @@ class Design {
       } else if (json.containsKey('fontSize')) {
         backElements.add(MyAutoText.fromMap(json));
       } else {
-        frontElements.add(MyImage.fromMap(json));
+        backElements.add(MyImage.fromMap(json));
       }
     }
     final de = Design(
@@ -81,7 +82,6 @@ class Design {
       backElements: backElements,
       backgroundImageHeight: double.parse(json['backgroundImageHeight']),
     );
-    print(de.frontElements[0].name);
 
     return de;
   }

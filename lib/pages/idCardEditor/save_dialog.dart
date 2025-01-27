@@ -1,15 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:school_management/ip_address.dart';
 
+import '../../ip_address.dart';
 import 'design_class.dart';
 // import 'package:http/http.dart' as http;
 import 'dart:html' as html;
 
 class SaveDialog extends StatefulWidget {
-  const SaveDialog({super.key, required this.design});
+  const SaveDialog(
+      {super.key, required this.design, required this.savedDesigns});
   final Design design;
+  final List savedDesigns;
 
   @override
   State<SaveDialog> createState() => _SaveDialogState();
@@ -94,6 +96,12 @@ class _SaveDialogState extends State<SaveDialog> {
   }
 
   @override
+  void initState() {
+    designNameController.text = widget.design.designName;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Save Design'),
@@ -103,6 +111,10 @@ class _SaveDialogState extends State<SaveDialog> {
           validator: (value) {
             if (value!.trim() == '') {
               return 'This field is required';
+            }
+            if (widget.savedDesigns.contains(value.trim()) &&
+                value.trim() != widget.design.designName) {
+              return 'This design name already exists';
             }
             return null;
           },
