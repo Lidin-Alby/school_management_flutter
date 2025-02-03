@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
-
 import 'pdf_download_dialog.dart';
 import 'print_history.dart';
 import 'print_settings_class.dart';
@@ -20,33 +19,79 @@ class PrintHomePage extends StatefulWidget {
 }
 
 class _PrintHomePageState extends State<PrintHomePage> {
-  late Future _getStudents;
+  late Future _getPrintTypes;
+  Map? selectedType;
+  int _currentPage = 1;
 
   // List assignedStudents = [];
   // List unassignedStudents = [];
   List selectedStudnts = [];
+  List students = [];
+  bool isLoading = false;
+  final ScrollController _scrollController = ScrollController();
 
   Set wantedDesigns = {};
 
-  int? selectedIndex;
+  // int? selectedIndex;
 
-  Future<List> getAllSchools() async {
-    var url = Uri.parse('$ipv4/getAllMidSchools');
+  // Future<List> getAllSchools() async {
+  //   var url = Uri.parse('$ipv4/getAllMidSchools');
 
-    var res = await http.get(url);
+  //   var res = await http.get(url);
 
-    List schools = jsonDecode(res.body);
-    return schools;
-  }
+  //   List schools = jsonDecode(res.body);
+  //   return schools;
+  // }
 
-  getStudents() async {
-    var url = Uri.parse('$ipv4/getReadyStudents');
+  getPrintTypes() async {
+    var url = Uri.parse('$ipv4/getPrintTypes');
 
     var res = await http.get(url);
 
     List data = jsonDecode(res.body);
 
+    data.removeWhere(
+      (element) => element.isEmpty,
+    );
+
+    if (data.isNotEmpty) {
+      selectedType = data.first;
+    }
+    getStudents();
+
     return data;
+  }
+
+  getStudents() async {
+    setState(() {
+      isLoading = true;
+    });
+    Uri url;
+    List newData = [];
+    if (selectedType != null) {
+      String ph = selectedType!['pageHeight'].toString();
+      String pw = selectedType!['pageWidth'].toString();
+      String mh = selectedType!['marginHorizontal'].toString();
+      String mv = selectedType!['marginVertical'].toString();
+      String pdh = selectedType!['paddingHorizontal'].toString();
+      String pdv = selectedType!['paddingVertical'].toString();
+      String ch = selectedType!['cardHeight'].toString();
+      String cw = selectedType!['cardWidth'].toString();
+
+      url = Uri.parse(
+          '$ipv4/getReadyStudents?ph=$ph&pw=$pw&mh=$mh&mv=$mv&pdh=$pdh&pdv=$pdv&ch=$ch&cw=$cw&page=$_currentPage&limit=50');
+    } else {
+      url = Uri.parse(
+          '$ipv4/getReadyStudents?ph=nill&page=$_currentPage&limit=50');
+    }
+    var res = await http.get(url);
+    newData = jsonDecode(res.body);
+    // if(newData.isEmpty){}
+    _currentPage++;
+    setState(() {
+      students.addAll(newData);
+      isLoading = false;
+    });
   }
 
   // getDesigns() async {
@@ -61,7 +106,15 @@ class _PrintHomePageState extends State<PrintHomePage> {
 
   @override
   void initState() {
-    _getStudents = getStudents();
+    _scrollController.addListener(
+      () {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          getStudents();
+        }
+      },
+    );
+    _getPrintTypes = getPrintTypes();
 
     super.initState();
   }
@@ -76,201 +129,189 @@ class _PrintHomePageState extends State<PrintHomePage> {
         ),
         body: TabBarView(children: [
           FutureBuilder(
-            future: _getStudents,
+            future: _getPrintTypes,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List unassignedStudents = [];
-                List assignedStudents = [];
-                for (Map i in snapshot.data) {
-                  if (!i.containsKey('pageHeight')) {
-                    unassignedStudents += i['students'];
-                  } else {
-                    assignedStudents.add(i);
-                  }
-                }
-                return Align(
-                  alignment: Alignment.topCenter,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 30,
+                List printTypes = snapshot.data;
+                return Column(
+                  children: [
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Row(
+                        children: [
+                          for (int type = 0; type < printTypes.length; type++)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: FilterChip(
+                                label: Text('Type ${type + 1}'),
+                                selected: selectedType == printTypes[type],
+                                onSelected: (value) {
+                                  setState(() {
+                                    selectedType = printTypes[type];
+                                    selectedStudnts = [];
+                                    students = [];
+                                    _currentPage = 1;
+                                    getStudents();
+                                  });
+                                },
+                              ),
+                            ),
+                          FilterChip(
+                            label: Text('Unassigned'),
+                            selected: selectedType == null,
+                            onSelected: (value) {
+                              setState(() {
+                                selectedType = null;
+                                selectedStudnts = [];
+                                students = [];
+                                _currentPage = 1;
+                                getStudents();
+                              });
+                            },
+                          )
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    FilledButton(
+                      onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) {
+                            var data = PrintSetting.fromMap(selectedType!);
+
+                            return PdfDownloadDialog(
+                              selectedStudnts: selectedStudnts,
+                              wantedDesigns: wantedDesigns,
+                              printSetting: data,
+                              callback: () {
+                                setState(() {
+                                  getStudents();
+                                  selectedStudnts = [];
+                                });
+                              },
+                            );
+                          }),
+                      child: Text('Next'),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    if (selectedType != null)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                              '${selectedStudnts.length} of ${students.length} students selected'),
                         ),
-                        if (selectedStudnts.isNotEmpty)
-                          FilledButton(
-                              onPressed: () => showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    var data = PrintSetting.fromMap(
-                                        assignedStudents[selectedIndex!]);
+                      ),
+                    if (selectedType != null)
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: selectedStudnts.length == students.length &&
+                                selectedStudnts.isNotEmpty,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value!) {
+                                  selectedStudnts = students.toList();
 
-                                    return PdfDownloadDialog(
-                                      selectedStudnts: selectedStudnts,
-                                      wantedDesigns: wantedDesigns,
-                                      printSetting: data,
-                                      callback: () {
-                                        setState(() {
-                                          _getStudents = getStudents();
-                                          selectedStudnts = [];
-                                        });
-                                      },
-                                    );
-                                  }),
-                              child: Text('Next')),
-                        ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: assignedStudents.length,
-                            itemBuilder: (context, index) {
-                              List students =
-                                  assignedStudents[index]['students'];
+                                  wantedDesigns = selectedStudnts
+                                      .map(
+                                        (e) => e['designName'],
+                                      )
+                                      .toSet();
+                                } else {
+                                  selectedStudnts = [];
 
-                              return Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Checkbox(
-                                        value: selectedStudnts.length ==
-                                                students.length &&
-                                            selectedIndex == index,
-                                        onChanged: selectedIndex == index ||
-                                                selectedIndex == null
-                                            ? (value) {
-                                                setState(() {
-                                                  if (value!) {
-                                                    selectedIndex = index;
-                                                    selectedStudnts =
-                                                        students.toList();
-
-                                                    wantedDesigns =
-                                                        selectedStudnts
-                                                            .map(
-                                                              (e) => e[
-                                                                  'designName'],
-                                                            )
-                                                            .toSet();
-                                                  } else {
-                                                    selectedStudnts = [];
-
-                                                    wantedDesigns = {};
-                                                    if (selectedStudnts
-                                                        .isEmpty) {
-                                                      selectedIndex = null;
-                                                    }
-                                                  }
-                                                });
-                                              }
-                                            : null,
-                                      ),
-                                      const Expanded(
-                                        child: Divider(
-                                          thickness: 2,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    shrinkWrap: true,
-                                    itemCount: students.length,
-                                    itemBuilder: (context, i) => Row(
-                                      children: [
-                                        SizedBox(
-                                          width: 35,
-                                        ),
-                                        Checkbox(
-                                          value: selectedStudnts
-                                              .contains(students[i]),
-                                          onChanged: selectedIndex == index ||
-                                                  selectedIndex == null
-                                              ? (value) {
-                                                  selectedIndex = index;
-                                                  if (value!) {
-                                                    setState(() {
-                                                      selectedStudnts
-                                                          .add(students[i]);
-                                                      wantedDesigns.add(
-                                                          students[i]
-                                                              ['designName']);
-                                                    });
-                                                  } else {
-                                                    setState(() {
-                                                      selectedStudnts
-                                                          .remove(students[i]);
-
-                                                      // wantedDesigns.remove(
-                                                      //     students[i]
-                                                      //         ['designName']);
-                                                      if (selectedStudnts
-                                                          .isEmpty) {
-                                                        selectedIndex = null;
-                                                      }
-                                                    });
-                                                  }
-                                                }
-                                              : null,
-                                        ),
-                                        Expanded(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 8, horizontal: 20),
-                                            child: ListTile(
-                                              tileColor: Colors.grey[300],
-                                              leading: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Text(
-                                                    '${students[i]['admNo']} - ${students[i]['firstName']}'
-                                                        .toString(),
-                                                  ),
-                                                  Text(
-                                                    students[i]['schoolCode']
-                                                        .toString(),
-                                                  ),
-                                                  Text(
-                                                    students[i]['designName']
-                                                        .toString(),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }),
-                        Text(
-                          'Unassigned Students',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: unassignedStudents.length,
-                          itemBuilder: (context, index) => Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 20),
-                            child: ListTile(
-                              tileColor: Colors.grey[300],
-                              title:
-                                  Text(unassignedStudents[index]['firstName']),
-                              subtitle: Text(unassignedStudents[index]
-                                      ['schoolCode']
-                                  .toString()),
+                                  wantedDesigns = {};
+                                }
+                              });
+                            },
+                          ),
+                          const Expanded(
+                            child: Divider(
+                              thickness: 2,
+                              color: Colors.black,
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
+                        ],
+                      ),
+                    Expanded(
+                      child: ListView.builder(
+                        controller: _scrollController,
+                        itemCount: students.length + (isLoading ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (index < students.length) {
+                            return Row(
+                              children: [
+                                SizedBox(
+                                  width: 35,
+                                ),
+                                if (selectedType != null)
+                                  Checkbox(
+                                    value: selectedStudnts
+                                        .contains(students[index]),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        if (value!) {
+                                          selectedStudnts.add(students[index]);
+                                          wantedDesigns.add(
+                                              students[index]['designName']);
+                                        } else {
+                                          selectedStudnts
+                                              .remove(students[index]);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 20),
+                                    child: Material(
+                                      child: ListTile(
+                                        tileColor: Colors.grey[300],
+                                        leading: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              '${students[index]['admNo']} - ${students[index]['firstName']}'
+                                                  .toString(),
+                                            ),
+                                            Text(
+                                              students[index]['schoolCode']
+                                                  .toString(),
+                                            ),
+                                            Text(
+                                              students[index]['designName']
+                                                  .toString(),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+                        },
+                      ),
+                    )
+                  ],
                 );
               } else {
                 return Center(child: CircularProgressIndicator());
@@ -280,7 +321,7 @@ class _PrintHomePageState extends State<PrintHomePage> {
           PrintHistory(
             refresh: () {
               setState(() {
-                _getStudents = getStudents();
+                _getPrintTypes = getPrintTypes();
               });
             },
           )

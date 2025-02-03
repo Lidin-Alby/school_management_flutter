@@ -34,6 +34,7 @@ class _DesignHomePageState extends State<DesignHomePage> {
     if (res.body == 'true') {
       setState(() {
         _getDesigns = getDesigns();
+        selected = null;
       });
     }
   }
@@ -62,26 +63,39 @@ class _DesignHomePageState extends State<DesignHomePage> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: FilledButton.icon(
-                      onPressed: () =>
-                          Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => DesignEditor(
-                          design: Design(
-                              designName: '',
-                              frontImageName: null,
-                              frontBackgroundImage: null,
-                              backImageName: '',
-                              frontElements: [],
-                              backElements: [],
-                              backgroundImageHeight: 0),
-                          savedDesigns: designs,
-                        ),
-                      )),
-                      label: Text('Create'),
-                      icon: Icon(Icons.add_rounded),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: () =>
+                            Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => DesignEditor(
+                            design: Design(
+                                designName: '',
+                                frontImageName: null,
+                                frontBackgroundImage: null,
+                                backImageName: '',
+                                frontElements: [],
+                                backElements: [],
+                                backgroundImageHeight: 0),
+                            savedDesigns: designs,
+                          ),
+                        )),
+                        label: Text('Create'),
+                        icon: Icon(Icons.add_rounded),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      IconButton.filled(
+                        onPressed: () {
+                          setState(() {
+                            _getDesigns = getDesigns();
+                          });
+                        },
+                        icon: Icon(Icons.refresh_rounded),
+                      )
+                    ],
                   ),
                   designs.isEmpty
                       ? SizedBox(

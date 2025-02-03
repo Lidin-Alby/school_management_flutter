@@ -8,6 +8,10 @@ class Movable {
   double width = 100;
   double top = 0;
   double left = 0;
+  double topLeft = 0;
+  double topRight = 0;
+  double bottomLeft = 0;
+  double bottomRight = 0;
   String name;
   String? value;
   Movable(this.name) {
@@ -20,7 +24,11 @@ class Movable {
       'height': height,
       'width': width,
       'top': top,
-      'left': left
+      'left': left,
+      'topLeft': topLeft,
+      'topRight': topRight,
+      'bottomLeft': bottomLeft,
+      'bottomRight': bottomRight
     };
   }
 
@@ -29,6 +37,10 @@ class Movable {
     width = json['width'];
     top = json['top'];
     left = json['left'];
+    topLeft = json['topLeft'] ?? 0;
+    topRight = json['topRight'] ?? 0;
+    bottomLeft = json['bottomLeft'] ?? 0;
+    bottomRight = json['bottomRight'] ?? 0;
     value = json['value'];
   }
 }
@@ -39,13 +51,19 @@ class MyImage extends Movable {
   @override
   double height = 100;
   Uint8List? imageBytes;
-  late Movable movable;
+  bool circle = false;
 
   Image getImage() {
     if (imageBytes == null) {
-      return Image.asset('assets/image_asset.jpg');
+      return Image.asset(
+        'assets/image_asset.jpg',
+        fit: BoxFit.cover,
+      );
     } else {
-      return Image.memory(imageBytes!);
+      return Image.memory(
+        imageBytes!,
+        fit: BoxFit.cover,
+      );
     }
   }
 

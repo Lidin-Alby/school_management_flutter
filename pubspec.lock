@@ -230,6 +230,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  flutter_easy_animations:
+    dependency: transitive
+    description:
+      name: flutter_easy_animations
+      sha256: "86cea94c1d1b9e3d7dcbd94fd7e9d772ae6cd7c54ad4f0d9681ca6cd25bd4b2f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -246,6 +254,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.22"
+  flutter_svg:
+    dependency: transitive
+    description:
+      name: flutter_svg
+      sha256: c200fd79c918a40c5cd50ea0877fa13f81bdaf6f0a5d3dbcc2a13e3285d6aa1b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.17"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -256,6 +272,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  gap:
+    dependency: transitive
+    description:
+      name: gap
+      sha256: f19387d4e32f849394758b91377f9153a1b41d79513ef7668c088c77dbc6955d
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.1"
   go_router:
     dependency: "direct main"
     description:
@@ -725,6 +749,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  vector_graphics:
+    dependency: transitive
+    description:
+      name: vector_graphics
+      sha256: a1870d398158844fe5db12441611ed9a2222ff4340258b539eaf3590c1b4bd7e
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.17"
+  vector_graphics_codec:
+    dependency: transitive
+    description:
+      name: vector_graphics_codec
+      sha256: "99fd9fbd34d9f9a32efd7b6a6aae14125d8237b10403b422a6a6dfeac2806146"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.13"
+  vector_graphics_compiler:
+    dependency: transitive
+    description:
+      name: vector_graphics_compiler
+      sha256: "1b4b9e706a10294258727674a340ae0d6e64a7231980f9f9a3d12e4b42407aad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.16"
   vector_math:
     dependency: transitive
     description:
@@ -749,6 +797,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  widgets_easier:
+    dependency: "direct main"
+    description:
+      name: widgets_easier
+      sha256: "763e711abad9245a976c8d4fb4e784ad518f220a00c0dc72469dc9bffb1ef950"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.10"
   win32:
     dependency: transitive
     description:

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
+
 import 'print_settings_class.dart';
 
 class PrintSettings extends StatefulWidget {
@@ -430,80 +431,6 @@ class _PrintSettingsState extends State<PrintSettings> {
                     }
                   },
                 )
-              // FutureBuilder(
-              //   future: _getStudents,
-              //   builder: (context, snapshot) {
-              //     if (snapshot.hasData) {
-              //       students = snapshot.data;
-              //       print(students);
-
-              //       return Expanded(
-              //         child: ListView.builder(
-              //           itemCount: students.length,
-              //           itemBuilder: (context, index) => Padding(
-              //             padding: const EdgeInsets.symmetric(
-              //                 horizontal: 20, vertical: 8),
-              //             child: ListTile(
-              //               tileColor: Colors.grey[300],
-              //               leading: SizedBox(
-              //                 width: 150,
-              //                 child: Text(students[index]['fullName']),
-              //               ),
-              //               title: studentProgress.isNotEmpty
-              //                   ? Column(
-              //                       children: [
-              //                         for (Map progressMap
-              //                             in studentProgress[index])
-              //                           progressMap['progress'] is double
-              //                               ? Column(
-              //                                   crossAxisAlignment:
-              //                                       CrossAxisAlignment.end,
-              //                                   children: [
-              //                                     LinearProgressIndicator(
-              //                                       value: progressMap[
-              //                                           'progress'],
-              //                                     ),
-              //                                     Row(
-              //                                       mainAxisAlignment:
-              //                                           MainAxisAlignment
-              //                                               .spaceBetween,
-              //                                       children: [
-              //                                         Text(
-              //                                           progressMap[
-              //                                               'fieldName'],
-              //                                           style: TextStyle(
-              //                                               fontSize: 12),
-              //                                         ),
-              //                                         Text(
-              //                                           '${(progressMap['progress'] * 100).toStringAsFixed(1)}%',
-              //                                           style: TextStyle(
-              //                                               fontSize: 12),
-              //                                         ),
-              //                                       ],
-              //                                     )
-              //                                   ],
-              //                                 )
-              //                               : Text(progressMap['progress']),
-              //                       ],
-              //                     )
-              //                   : null,
-              //               trailing: screenshotAdded.isNotEmpty
-              //                   ? SizedBox(
-              //                       height: 20,
-              //                       width: 20,
-              //                       child: screenshotAdded[index]
-              //                           ? Icon(Icons.check_circle_outline)
-              //                           : CircularProgressIndicator())
-              //                   : null,
-              //             ),
-              //           ),
-              //         ),
-              //       );
-              //     } else {
-              //       return CircularProgressIndicator();
-              //     }
-              //   },
-              // )
             ],
           );
         } else {

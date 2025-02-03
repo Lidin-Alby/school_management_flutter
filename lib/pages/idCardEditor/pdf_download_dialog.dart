@@ -44,6 +44,7 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
   List screenshotAdded = [];
   List students = [];
   List studentProgress = [];
+  int page = 1;
 
   getDataDesign() async {
     wantedDesigns = widget.wantedDesigns.toSet();
@@ -70,7 +71,8 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
   }
 
   startDataCollection() async {
-    List<pw.Image> ims = [];
+    List<pw.Image> frontims = [];
+    List<pw.Image> backims = [];
 
     ScreenshotController screenshotController = ScreenshotController();
     for (int i = 0; i < students.length; i++) {
@@ -131,6 +133,7 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
             backgroundImage: design.frontBackgroundImage,
             backgroundImageHeight: design.backgroundImageHeight,
             elements: design.frontElements,
+            showGuidlines: false,
             selected: null,
             onSelected: (p0) {},
           ));
@@ -140,21 +143,22 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
             backgroundImage: design.backBackgroundImage,
             backgroundImageHeight: design.backgroundImageHeight,
             elements: design.backElements,
+            showGuidlines: false,
             selected: null,
             onSelected: (p0) {},
           ));
-      ims.add(
+      frontims.add(
         pw.Image(
           pw.MemoryImage(
             front,
           ),
-          height: 3.34 * 72,
-          width: 2.12 * 72,
+          height: widget.printSetting.cardHeight! * 72,
+          width: widget.printSetting.cardWidth! * 72,
           fit: pw.BoxFit.fill,
         ),
       );
 
-      ims.add(
+      backims.add(
         pw.Image(
           pw.MemoryImage(
             back,
@@ -166,38 +170,63 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
       );
 
       setState(() {
-        int len = ims.length;
+        int len = frontims.length;
         if (design.backBackgroundImage != null) {
+          len += backims.length;
           len = len ~/ 2;
         }
         screenshotAdded[len - 1] = true;
       });
     }
 
-    generatePdf(ims);
+    generatePdf(frontims, backims);
   }
 
-  Future generatePdf(List images) async {
+  Future generatePdf(List frontImages, List backImages) async {
     final pdf = pw.Document();
 
-    pdf.addPage(pw.MultiPage(
-        pageFormat: PdfPageFormat(
-          widget.printSetting.pageWidth * 72,
-          widget.printSetting.pageHeight * 72,
-          marginBottom: widget.printSetting.marginVertical,
-          marginTop: widget.printSetting.marginVertical,
-          marginLeft: widget.printSetting.marginHorizontal,
-          marginRight: widget.printSetting.marginHorizontal,
-        ),
-        //multiply by 72
-        build: (context) {
-          return [
-            pw.Wrap(
-                spacing: widget.printSetting.paddingHorizontal!,
-                runSpacing: widget.printSetting.paddingVertical!,
-                children: [for (var i in images) i])
-          ];
-        }));
+    pdf.addPage(
+      pw.MultiPage(
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          pageFormat: PdfPageFormat(
+            widget.printSetting.pageWidth * 72,
+            widget.printSetting.pageHeight * 72,
+            marginBottom: widget.printSetting.marginVertical,
+            marginTop: widget.printSetting.marginVertical,
+            marginLeft: widget.printSetting.marginHorizontal,
+            marginRight: widget.printSetting.marginHorizontal,
+          ),
+          //multiply by 72
+          build: (context) {
+            return [
+              pw.Wrap(
+                  spacing: widget.printSetting.paddingHorizontal!,
+                  runSpacing: widget.printSetting.paddingVertical!,
+                  children: [for (var i in frontImages) i])
+            ];
+          }),
+    );
+    pdf.addPage(
+      pw.MultiPage(
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          pageFormat: PdfPageFormat(
+            widget.printSetting.pageWidth * 72,
+            widget.printSetting.pageHeight * 72,
+            marginBottom: widget.printSetting.marginVertical,
+            marginTop: widget.printSetting.marginVertical,
+            marginLeft: widget.printSetting.marginHorizontal,
+            marginRight: widget.printSetting.marginHorizontal,
+          ),
+          //multiply by 72
+          build: (context) {
+            return [
+              pw.Wrap(
+                  spacing: widget.printSetting.paddingHorizontal!,
+                  runSpacing: widget.printSetting.paddingVertical!,
+                  children: [for (var i in backImages) i])
+            ];
+          }),
+    );
 
     final file = await pdf.save();
 
@@ -284,72 +313,75 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
                     itemBuilder: (context, i) => Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 8, horizontal: 20),
-                      child: ListTile(
-                        minVerticalPadding: 30,
-                        tileColor: Colors.grey[300],
-                        leading: SizedBox(
-                          width: 200,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '${students[i]['admNo']} - ${students[i]['firstName']}'
-                                    .toString(),
-                              ),
-                              Text(
-                                students[i]['schoolCode'].toString(),
-                              ),
-                              Text(
-                                students[i]['designName'].toString(),
-                              )
-                            ],
+                      child: Material(
+                        child: ListTile(
+                          minVerticalPadding: 30,
+                          tileColor: Colors.grey[300],
+                          leading: SizedBox(
+                            width: 200,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  '${students[i]['admNo']} - ${students[i]['firstName']}'
+                                      .toString(),
+                                ),
+                                Text(
+                                  students[i]['schoolCode'].toString(),
+                                ),
+                                Text(
+                                  students[i]['designName'].toString(),
+                                )
+                              ],
+                            ),
                           ),
+                          title: studentProgress.isNotEmpty
+                              ? Column(
+                                  children: [
+                                    for (Map progressMap in studentProgress[i])
+                                      progressMap['progress'] is double
+                                          ? Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                LinearProgressIndicator(
+                                                  value:
+                                                      progressMap['progress'],
+                                                ),
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      progressMap['fieldName'],
+                                                      style: TextStyle(
+                                                          fontSize: 12),
+                                                    ),
+                                                    Text(
+                                                      '${(progressMap['progress'] * 100).toStringAsFixed(1)}%',
+                                                      style: TextStyle(
+                                                          fontSize: 12),
+                                                    ),
+                                                  ],
+                                                )
+                                              ],
+                                            )
+                                          : Text(progressMap['progress']),
+                                  ],
+                                )
+                              : null,
+                          trailing: screenshotAdded.isNotEmpty
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: screenshotAdded[i]
+                                      ? Icon(Icons.check_circle_outline)
+                                      : CircularProgressIndicator(),
+                                )
+                              : null,
                         ),
-                        title: studentProgress.isNotEmpty
-                            ? Column(
-                                children: [
-                                  for (Map progressMap in studentProgress[i])
-                                    progressMap['progress'] is double
-                                        ? Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              LinearProgressIndicator(
-                                                value: progressMap['progress'],
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    progressMap['fieldName'],
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                  Text(
-                                                    '${(progressMap['progress'] * 100).toStringAsFixed(1)}%',
-                                                    style:
-                                                        TextStyle(fontSize: 12),
-                                                  ),
-                                                ],
-                                              )
-                                            ],
-                                          )
-                                        : Text(progressMap['progress']),
-                                ],
-                              )
-                            : null,
-                        trailing: screenshotAdded.isNotEmpty
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: screenshotAdded[i]
-                                    ? Icon(Icons.check_circle_outline)
-                                    : CircularProgressIndicator(),
-                              )
-                            : null,
                       ),
                     ),
                   ),

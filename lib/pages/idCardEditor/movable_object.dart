@@ -1,7 +1,9 @@
 import 'package:auto_size_text/auto_size_text.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:widgets_easier/widgets_easier.dart';
 
 import 'movable_and_extra_class.dart';
 
@@ -10,9 +12,11 @@ class MovableObject extends StatefulWidget {
       {super.key,
       required this.element,
       required this.onSelected,
+      required this.showGuidlines,
       required this.selected});
   final Movable element;
   final Movable? selected;
+  final bool showGuidlines;
   final Function(Movable?) onSelected;
 
   @override
@@ -22,6 +26,7 @@ class MovableObject extends StatefulWidget {
 class _MovableObjectState extends State<MovableObject> {
   late Movable element;
   Movable? selectedObj;
+  late BorderRadius myRadius;
   @override
   void initState() {
     element = widget.element;
@@ -32,7 +37,7 @@ class _MovableObjectState extends State<MovableObject> {
   Widget getElement(Movable element) {
     if (element is MyText) {
       return Padding(
-        padding: selectedObj == element
+        padding: selectedObj == element || widget.showGuidlines
             ? EdgeInsets.zero
             : EdgeInsets.only(top: 1, left: 1),
         child: TextField(
@@ -80,7 +85,7 @@ class _MovableObjectState extends State<MovableObject> {
                 padding: EdgeInsets.zero,
               )
             : Padding(
-                padding: selectedObj == element
+                padding: selectedObj == element || widget.showGuidlines
                     ? EdgeInsets.zero
                     : EdgeInsets.only(top: 1, left: 1),
                 child: AutoSizeText(
@@ -99,13 +104,28 @@ class _MovableObjectState extends State<MovableObject> {
       );
     } else if (element is MyImage) {
       return GestureDetector(
-          onTap: () {
-            setState(() {
-              selectedObj = element;
-            });
-            widget.onSelected(selectedObj);
-          },
-          child: element.getImage());
+        onTap: () {
+          setState(() {
+            selectedObj = element;
+          });
+          widget.onSelected(selectedObj);
+        },
+        child: Container(
+          decoration: selectedObj == element && widget.showGuidlines
+              ? ShapeDecoration(
+                  shape: DashedBorder(
+                    borderRadius: myRadius,
+                    dashSpacing: 2.5,
+                    dashSize: 8,
+                  ),
+                )
+              : null,
+          child: ClipRRect(
+            borderRadius: myRadius,
+            child: element.getImage(),
+          ),
+        ),
+      );
     } else {
       return Text('Error');
     }
@@ -113,6 +133,12 @@ class _MovableObjectState extends State<MovableObject> {
 
   @override
   Widget build(BuildContext context) {
+    myRadius = BorderRadius.only(
+      topLeft: Radius.circular(element.topLeft),
+      topRight: Radius.circular(element.topRight),
+      bottomLeft: Radius.circular(element.bottomLeft),
+      bottomRight: Radius.circular(element.bottomRight),
+    );
     selectedObj = widget.selected;
     return Positioned(
       top: element.top,
@@ -127,11 +153,17 @@ class _MovableObjectState extends State<MovableObject> {
               Container(
                 width: element.width,
                 height: element.height,
-                decoration: selectedObj == element
-                    ? BoxDecoration(
-                        border: Border.all(),
-                      )
-                    : null,
+                decoration: ShapeDecoration(
+                  shape: selectedObj == element
+                      ? SolidBorder()
+                      : widget.showGuidlines
+                          ? DashedBorder(
+                              borderRadius: myRadius,
+                              dashSpacing: 2.5,
+                              dashSize: 8,
+                            )
+                          : Border(),
+                ),
                 child: getElement(element),
               ),
               if (selectedObj == element)

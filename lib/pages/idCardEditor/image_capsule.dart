@@ -13,12 +13,14 @@ class ImageCapsule extends StatelessWidget {
       required this.backgroundImageHeight,
       required this.elements,
       required this.selected,
+      required this.showGuidlines,
       required this.onSelected});
   final Uint8List? backgroundImage;
   // final double backgroundImageWidth;
   final double backgroundImageHeight;
   final List<Movable> elements;
   final Movable? selected;
+  final bool showGuidlines;
   final Function(Movable?) onSelected;
 
   @override
@@ -36,6 +38,7 @@ class ImageCapsule extends StatelessWidget {
             MovableObject(
               element: element,
               selected: selected,
+              showGuidlines: showGuidlines,
               onSelected: (p0) {
                 onSelected(p0);
               },

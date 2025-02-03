@@ -37,6 +37,7 @@ class _DesignEditorState extends State<DesignEditor> {
 
   late Future _getFieldNames;
   bool isBack = false;
+  bool showGuidlines = true;
 
   @override
   void initState() {
@@ -316,6 +317,16 @@ class _DesignEditorState extends State<DesignEditor> {
                                       },
                                     ),
                                   ),
+                                  Spacer(),
+                                  Text('Guidelines'),
+                                  Switch(
+                                    value: showGuidlines,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        showGuidlines = value;
+                                      });
+                                    },
+                                  )
                                 ],
                               ),
                             ),
@@ -360,6 +371,8 @@ class _DesignEditorState extends State<DesignEditor> {
                                                         .backgroundImageHeight,
                                                     elements:
                                                         design.frontElements,
+                                                    showGuidlines:
+                                                        showGuidlines,
                                                     selected: selectedObj,
                                                     onSelected: (p0) {
                                                       setState(() {
@@ -416,6 +429,8 @@ class _DesignEditorState extends State<DesignEditor> {
                                                           .backgroundImageHeight,
                                                       elements:
                                                           design.backElements,
+                                                      showGuidlines:
+                                                          showGuidlines,
                                                       selected: selectedObj,
                                                       onSelected: (p0) {
                                                         setState(() {
