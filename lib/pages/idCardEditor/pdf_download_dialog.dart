@@ -70,7 +70,113 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
     return res.bodyBytes;
   }
 
+  sideByside() async {
+    List<pw.Image> ims = [];
+    ScreenshotController screenshotController = ScreenshotController();
+    for (int i = 0; i < students.length; i++) {
+      design = wantedDesignsData[students[i]['designName']]!;
+      int j = 0;
+      for (var ele in design.frontElements) {
+        if (ele is MyImage) {
+          studentProgress[i].add({'fieldName': ele.name, 'progress': 0.0});
+
+          var res =
+              await getImage(students[i]['schoolCode'], students[i][ele.value]);
+
+          if (res is Uint8List) {
+            setState(() {
+              studentProgress[i][j]['progress'] = 1.0;
+            });
+
+            ele.imageBytes = res;
+          } else {
+            setState(() {
+              studentProgress[i][j]['progress'] = res;
+            });
+            ele.imageBytes = null;
+          }
+          j++;
+        } else {
+          ele.value = students[i][ele.name];
+        }
+      }
+      for (var ele in design.backElements) {
+        if (ele is MyImage) {
+          studentProgress[i].add({'fieldName': ele.name, 'progress': 0.0});
+
+          var res =
+              await getImage(students[i]['schoolCode'], students[i][ele.value]);
+
+          if (res is Uint8List) {
+            setState(() {
+              studentProgress[i][j]['progress'] = 1.0;
+            });
+
+            ele.imageBytes = res;
+          } else {
+            setState(() {
+              studentProgress[i][j]['progress'] = res;
+            });
+            ele.imageBytes = null;
+          }
+          j++;
+        } else {
+          ele.value = students[i][ele.name];
+        }
+      }
+      Uint8List? im = await screenshotController.captureFromWidget(ImageCapsule(
+        backgroundImage: design.frontBackgroundImage,
+        backgroundImageHeight: design.backgroundImageHeight,
+        elements: design.frontElements,
+        selected: null,
+        showGuidlines: false,
+        onSelected: (p0) {},
+      ));
+      ims.add(
+        pw.Image(
+          pw.MemoryImage(
+            im,
+          ),
+          height: 3.34 * 72,
+          width: 2.12 * 72,
+          fit: pw.BoxFit.fill,
+        ),
+      );
+      setState(() {
+        int len = ims.length;
+        if (design.backBackgroundImage != null) {
+          len = len ~/ 2;
+        }
+        screenshotAdded[len - 1] = true;
+      });
+    }
+    generatePdfSidebySide(ims);
+  }
+
+  Future generatePdfSidebySide(List images) async {
+    final pdf = pw.Document();
+    pdf.addPage(pw.MultiPage(
+      build: (context) => [
+        pw.Wrap(children: [for (var i in images) i])
+      ],
+    ));
+    final file = await pdf.save();
+    // return file;
+    FileSaver.instance.saveFile(
+        name: 'my_file', bytes: file, mimeType: MimeType.pdf, ext: 'pdf');
+  }
+
   startDataCollection() async {
+    double availableHeight = widget.printSetting.pageHeight * 72 -
+        widget.printSetting.marginVertical;
+    double availableWidth = widget.printSetting.pageWidth * 72 -
+        widget.printSetting.marginHorizontal;
+    int rowCount =
+        (availableWidth / (widget.printSetting.cardWidth! * 72)).floor();
+    int colCount =
+        (availableHeight / (widget.printSetting.cardHeight! * 72)).floor();
+    int cardCount = rowCount * colCount;
+
     List<pw.Image> frontims = [];
     List<pw.Image> backims = [];
 
@@ -179,60 +285,82 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
       });
     }
 
-    generatePdf(frontims, backims);
+    generatePdf(frontims, backims, cardCount);
   }
 
-  Future generatePdf(List frontImages, List backImages) async {
+  Future generatePdf(List frontImages, List backImages, int cardCount) async {
     final pdf = pw.Document();
 
-    pdf.addPage(
-      pw.MultiPage(
-          crossAxisAlignment: pw.CrossAxisAlignment.center,
-          pageFormat: PdfPageFormat(
-            widget.printSetting.pageWidth * 72,
-            widget.printSetting.pageHeight * 72,
-            marginBottom: widget.printSetting.marginVertical,
-            marginTop: widget.printSetting.marginVertical,
-            marginLeft: widget.printSetting.marginHorizontal,
-            marginRight: widget.printSetting.marginHorizontal,
-          ),
-          //multiply by 72
-          build: (context) {
-            return [
-              pw.Wrap(
-                  spacing: widget.printSetting.paddingHorizontal!,
-                  runSpacing: widget.printSetting.paddingVertical!,
-                  children: [for (var i in frontImages) i])
-            ];
-          }),
-    );
-    pdf.addPage(
-      pw.MultiPage(
-          crossAxisAlignment: pw.CrossAxisAlignment.center,
-          pageFormat: PdfPageFormat(
-            widget.printSetting.pageWidth * 72,
-            widget.printSetting.pageHeight * 72,
-            marginBottom: widget.printSetting.marginVertical,
-            marginTop: widget.printSetting.marginVertical,
-            marginLeft: widget.printSetting.marginHorizontal,
-            marginRight: widget.printSetting.marginHorizontal,
-          ),
-          //multiply by 72
-          build: (context) {
-            return [
-              pw.Wrap(
-                  spacing: widget.printSetting.paddingHorizontal!,
-                  runSpacing: widget.printSetting.paddingVertical!,
-                  children: [for (var i in backImages) i])
-            ];
-          }),
-    );
+    for (int count = 0; count < (frontImages.length / cardCount); count++) {
+      int length = cardCount * (count + 1);
+
+      pdf.addPage(
+        pw.MultiPage(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            pageFormat: PdfPageFormat(
+              widget.printSetting.pageWidth * 72,
+              widget.printSetting.pageHeight * 72,
+              marginBottom: widget.printSetting.marginVertical,
+              marginTop: widget.printSetting.marginVertical,
+              marginLeft: widget.printSetting.marginHorizontal,
+              marginRight: widget.printSetting.marginHorizontal,
+            ),
+            //multiply by 72
+            build: (context) {
+              return [
+                pw.Wrap(
+                    spacing: widget.printSetting.paddingHorizontal!,
+                    runSpacing: widget.printSetting.paddingVertical!,
+                    children: [
+                      for (int i = count * cardCount;
+                          i <
+                              (length > frontImages.length
+                                  ? frontImages.length
+                                  : length);
+                          i++)
+                        frontImages[i]
+                    ])
+              ];
+            }),
+      );
+      pdf.addPage(
+        pw.MultiPage(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            textDirection: pw.TextDirection.rtl,
+            pageFormat: PdfPageFormat(
+              widget.printSetting.pageWidth * 72,
+              widget.printSetting.pageHeight * 72,
+              marginBottom: widget.printSetting.marginVertical,
+              marginTop: widget.printSetting.marginVertical,
+              marginLeft: widget.printSetting.marginHorizontal,
+              marginRight: widget.printSetting.marginHorizontal,
+            ),
+            //multiply by 72
+            build: (context) {
+              return [
+                pw.Wrap(
+                    spacing: widget.printSetting.paddingHorizontal!,
+                    runSpacing: widget.printSetting.paddingVertical!,
+                    children: [
+                      for (int i = count * cardCount;
+                          i <
+                              (length > frontImages.length
+                                  ? frontImages.length
+                                  : length);
+                          i++)
+                        backImages[i]
+                    ])
+              ];
+            }),
+      );
+      // cardCount = cardCount * currentCount;
+    }
 
     final file = await pdf.save();
 
     FileSaver.instance.saveFile(
         name: 'my_file', bytes: file, mimeType: MimeType.pdf, ext: 'pdf');
-    printedInfo(students);
+    // printedInfo(students);
   }
 
   printedInfo(List selectedStudents) async {
@@ -305,7 +433,21 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
                     setState(() {});
                     startDataCollection();
                   },
-                  child: Text('Download PDF'),
+                  child: Text('Page-to-Page PDF'),
+                ),
+                FilledButton(
+                  onPressed: () {
+                    screenshotAdded = List.generate(
+                      widget.selectedStudnts.length,
+                      (index) => false,
+                    );
+                    studentProgress =
+                        List.generate(students.length, (index) => []);
+
+                    setState(() {});
+                    sideByside();
+                  },
+                  child: Text('Side-to-Side PDF'),
                 ),
                 Expanded(
                   child: ListView.builder(

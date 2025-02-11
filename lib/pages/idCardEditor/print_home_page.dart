@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
+
 import 'pdf_download_dialog.dart';
 import 'print_history.dart';
 import 'print_settings_class.dart';
@@ -124,8 +125,18 @@ class _PrintHomePageState extends State<PrintHomePage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          bottom: TabBar(tabs: [Text('Ready'), Text('History')]),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(100),
+          child: Container(
+            color: Colors.indigo,
+            child: const TabBar(
+                labelColor: Colors.white,
+                indicatorColor: Colors.white,
+                unselectedLabelColor: Colors.white,
+                padding: EdgeInsets.only(top: 50),
+                labelPadding: EdgeInsets.only(bottom: 10),
+                tabs: [Text('Ready'), Text('History')]),
+          ),
         ),
         body: TabBarView(children: [
           FutureBuilder(
@@ -177,30 +188,31 @@ class _PrintHomePageState extends State<PrintHomePage> {
                       ),
                     ),
                     SizedBox(
-                      height: 20,
+                      height: 10,
                     ),
-                    FilledButton(
-                      onPressed: () => showDialog(
-                          context: context,
-                          builder: (context) {
-                            var data = PrintSetting.fromMap(selectedType!);
+                    if (selectedStudnts.isNotEmpty)
+                      FilledButton(
+                        onPressed: () => showDialog(
+                            context: context,
+                            builder: (context) {
+                              var data = PrintSetting.fromMap(selectedType!);
 
-                            return PdfDownloadDialog(
-                              selectedStudnts: selectedStudnts,
-                              wantedDesigns: wantedDesigns,
-                              printSetting: data,
-                              callback: () {
-                                setState(() {
-                                  getStudents();
-                                  selectedStudnts = [];
-                                });
-                              },
-                            );
-                          }),
-                      child: Text('Next'),
-                    ),
+                              return PdfDownloadDialog(
+                                selectedStudnts: selectedStudnts,
+                                wantedDesigns: wantedDesigns,
+                                printSetting: data,
+                                callback: () {
+                                  setState(() {
+                                    getStudents();
+                                    selectedStudnts = [];
+                                  });
+                                },
+                              );
+                            }),
+                        child: Text('Next'),
+                      ),
                     SizedBox(
-                      height: 20,
+                      height: 5,
                     ),
                     if (selectedType != null)
                       Padding(
@@ -313,6 +325,59 @@ class _PrintHomePageState extends State<PrintHomePage> {
                     )
                   ],
                 );
+                // Align(
+                //   alignment: Alignment.topCenter,
+                //   child: SingleChildScrollView(
+                //     child: Column(
+                //       children: [
+                //         SizedBox(
+                //           height: 30,
+                //         ),
+                //         if (selectedStudnts.isNotEmpty)
+
+                //         ListView.builder(
+                //             physics: NeverScrollableScrollPhysics(),
+                //             shrinkWrap: true,
+                //             itemCount: assignedStudents.length,
+                //             itemBuilder: (context, index) {
+                //               List students =
+                //                   assignedStudents[index]['students'];
+
+                //               return Column(
+                //                 children: [
+
+                //                   ListView.builder(
+                //                     physics: NeverScrollableScrollPhysics(),
+                //                     shrinkWrap: true,
+                //                     itemCount: 40,
+                //                     itemBuilder: (context, i) =>
+
+                //         Text(
+                //           'Unassigned Students',
+                //           style: TextStyle(
+                //               fontSize: 20, fontWeight: FontWeight.bold),
+                //         ),
+                //         // ListView.builder(
+                //         //   shrinkWrap: true,
+                //         //   physics: NeverScrollableScrollPhysics(),
+                //         //   itemCount: unassignedStudents.length,
+                //         //   itemBuilder: (context, index) => Padding(
+                //         //     padding: const EdgeInsets.symmetric(
+                //         //         vertical: 8, horizontal: 20),
+                //         //     child: ListTile(
+                //         //       tileColor: Colors.grey[300],
+                //         //       title:
+                //         //           Text(unassignedStudents[index]['firstName']),
+                //         //       subtitle: Text(unassignedStudents[index]
+                //         //               ['schoolCode']
+                //         //           .toString()),
+                //         //     ),
+                //         //   ),
+                //         // )
+                //       ],
+                //     ),
+                //   ),
+                // );
               } else {
                 return Center(child: CircularProgressIndicator());
               }

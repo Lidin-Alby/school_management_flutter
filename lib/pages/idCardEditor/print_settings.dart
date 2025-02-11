@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../../ip_address.dart';
-
 import 'print_settings_class.dart';
 
 class PrintSettings extends StatefulWidget {
@@ -250,8 +249,8 @@ class _PrintSettingsState extends State<PrintSettings> {
                                       children: [
                                         SizedBox(
                                             width: 150,
-                                            child:
-                                                Text('Margin Horizontal:  ')),
+                                            child: Text(
+                                                'Page Margin Horizontal:  ')),
                                         SizedBox(
                                           width: 50,
                                           child: TextField(
@@ -278,7 +277,7 @@ class _PrintSettingsState extends State<PrintSettings> {
                                   ),
                                   SizedBox(
                                       width: 150,
-                                      child: Text('Margin Vertical:  ')),
+                                      child: Text('Page Margin Vertical:  ')),
                                   SizedBox(
                                     width: 50,
                                     child: TextField(
@@ -311,8 +310,8 @@ class _PrintSettingsState extends State<PrintSettings> {
                                       children: [
                                         SizedBox(
                                             width: 150,
-                                            child:
-                                                Text('Padding Horzontal:  ')),
+                                            child: Text(
+                                                'Card Margin Horzontal:  ')),
                                         SizedBox(
                                           width: 50,
                                           child: TextField(
@@ -339,7 +338,7 @@ class _PrintSettingsState extends State<PrintSettings> {
                                   ),
                                   SizedBox(
                                       width: 150,
-                                      child: Text('Padding Vertical:  ')),
+                                      child: Text('Card Margin Vertical:  ')),
                                   SizedBox(
                                     width: 50,
                                     child: TextField(

@@ -199,7 +199,7 @@ class _PrintHistoryState extends State<PrintHistory> {
                                   ],
                                 ),
                               ),
-                              child: Text('Not Ready'),
+                              child: Text('Incorrect data (Not Ready)'),
                             ),
                             SizedBox(
                               width: 10,
@@ -209,7 +209,7 @@ class _PrintHistoryState extends State<PrintHistory> {
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   title: Text(
-                                      'Not Print, ${students[index]['firstName']}'),
+                                      'Print Again, ${students[index]['firstName']}'),
                                   content: Text(
                                       'The data will be moved out and will be set as not printed.'),
                                   actions: [
@@ -226,7 +226,7 @@ class _PrintHistoryState extends State<PrintHistory> {
                                   ],
                                 ),
                               ),
-                              child: Text('Not Print'),
+                              child: Text('Print Again'),
                             )
                           ],
                         ),
