@@ -297,7 +297,7 @@ class _PrintHomePageState extends State<PrintHomePage> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              '${students[index]['admNo']} - ${students[index]['firstName']}'
+                                              '${students[index]['admNo'] ?? students[index]['mob']} - ${students[index]['firstName']}'
                                                   .toString(),
                                             ),
                                             Text(

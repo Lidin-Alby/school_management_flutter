@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 
@@ -124,24 +123,48 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
           ele.value = students[i][ele.name];
         }
       }
-      Uint8List? im = await screenshotController.captureFromWidget(ImageCapsule(
-        backgroundImage: design.frontBackgroundImage,
-        backgroundImageHeight: design.backgroundImageHeight,
-        elements: design.frontElements,
-        selected: null,
-        showGuidlines: false,
-        onSelected: (p0) {},
-      ));
+      Uint8List? front = await screenshotController.captureFromWidget(
+          pixelRatio: 2.5,
+          ImageCapsule(
+            backgroundImage: design.frontBackgroundImage,
+            backgroundImageHeight: design.backgroundImageHeight,
+            elements: design.frontElements,
+            showGuidlines: false,
+            selected: null,
+            onSelected: (p0) {},
+          ));
+      Uint8List? back = await screenshotController.captureFromWidget(
+          pixelRatio: 2.5,
+          ImageCapsule(
+            backgroundImage: design.backBackgroundImage,
+            backgroundImageHeight: design.backgroundImageHeight,
+            elements: design.backElements,
+            showGuidlines: false,
+            selected: null,
+            onSelected: (p0) {},
+          ));
       ims.add(
         pw.Image(
           pw.MemoryImage(
-            im,
+            front,
           ),
-          height: 3.34 * 72,
-          width: 2.12 * 72,
+          height: widget.printSetting.cardHeight! * 72,
+          width: widget.printSetting.cardWidth! * 72,
           fit: pw.BoxFit.fill,
         ),
       );
+
+      ims.add(
+        pw.Image(
+          pw.MemoryImage(
+            back,
+          ),
+          height: widget.printSetting.cardHeight! * 72,
+          width: widget.printSetting.cardWidth! * 72,
+          fit: pw.BoxFit.fill,
+        ),
+      );
+
       setState(() {
         int len = ims.length;
         if (design.backBackgroundImage != null) {
@@ -156,8 +179,20 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
   Future generatePdfSidebySide(List images) async {
     final pdf = pw.Document();
     pdf.addPage(pw.MultiPage(
+      crossAxisAlignment: pw.CrossAxisAlignment.center,
+      pageFormat: PdfPageFormat(
+        widget.printSetting.pageWidth * 72,
+        widget.printSetting.pageHeight * 72,
+        marginBottom: widget.printSetting.marginVertical,
+        marginTop: widget.printSetting.marginVertical,
+        marginLeft: widget.printSetting.marginHorizontal,
+        marginRight: widget.printSetting.marginHorizontal,
+      ),
       build: (context) => [
-        pw.Wrap(children: [for (var i in images) i])
+        pw.Wrap(
+            spacing: widget.printSetting.paddingHorizontal!,
+            runSpacing: widget.printSetting.paddingVertical!,
+            children: [for (var i in images) i])
       ],
     ));
     final file = await pdf.save();
@@ -433,7 +468,10 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
                     setState(() {});
                     startDataCollection();
                   },
-                  child: Text('Page-to-Page PDF'),
+                  child: Text('Duplex PDF'),
+                ),
+                SizedBox(
+                  height: 5,
                 ),
                 FilledButton(
                   onPressed: () {
@@ -447,7 +485,7 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
                     setState(() {});
                     sideByside();
                   },
-                  child: Text('Side-to-Side PDF'),
+                  child: Text('One Sided PDF'),
                 ),
                 Expanded(
                   child: ListView.builder(
