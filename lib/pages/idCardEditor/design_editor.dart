@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-// import 'package:google_fonts/google_fonts.dart';
 // import 'package:id_card_editor/fetch_design.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
@@ -38,6 +37,7 @@ class _DesignEditorState extends State<DesignEditor> {
   late Future _getFieldNames;
   bool isBack = false;
   bool showGuidlines = true;
+  List imagesFields = ['profilePic', 'schoolLogo', 'principalSign'];
 
   @override
   void initState() {
@@ -154,8 +154,8 @@ class _DesignEditorState extends State<DesignEditor> {
                                           child: Text('At Front'),
                                           onTap: () {
                                             setState(() {
-                                              if (fields[index] ==
-                                                  'profilePic') {
+                                              if (imagesFields
+                                                  .contains(fields[index])) {
                                                 design.frontElements.add(
                                                     MyImage(fields[index]));
                                               } else {
@@ -170,8 +170,8 @@ class _DesignEditorState extends State<DesignEditor> {
                                           child: Text('At Back'),
                                           onTap: () {
                                             setState(() {
-                                              if (fields[index] ==
-                                                  'profilePic') {
+                                              if (imagesFields
+                                                  .contains(fields[index])) {
                                                 design.backElements.add(
                                                     MyImage(fields[index]));
                                               } else {

@@ -3,8 +3,10 @@ import 'dart:typed_data';
 
 import 'package:file_saver/file_saver.dart';
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
+// import 'package:intl/intl.dart';
 
 import '../../ip_address.dart';
 import 'design_class.dart';
@@ -96,7 +98,7 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
           }
           j++;
         } else {
-          ele.value = students[i][ele.name];
+          ele.value = students[i][ele.name].toUpperCase();
         }
       }
       for (var ele in design.backElements) {
@@ -120,7 +122,7 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
           }
           j++;
         } else {
-          ele.value = students[i][ele.name];
+          ele.value = students[i][ele.name].toUpperCase();
         }
       }
       Uint8List? front = await screenshotController.captureFromWidget(
