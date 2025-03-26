@@ -15,6 +15,7 @@ class MidDashboard extends StatefulWidget {
 
 class _MidDashboardState extends State<MidDashboard> {
   late Future _getStats;
+
   @override
   void initState() {
     _getStats = getStats();

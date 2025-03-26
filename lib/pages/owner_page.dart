@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:school_management/pages/midCard/mid_home.dart';
+import 'package:school_management/pages/midCard/promotions.dart';
 import 'package:school_management/pages/school_management.dart';
 
 class OwnerPage extends StatefulWidget {
@@ -40,6 +41,19 @@ class _OwnerPageState extends State<OwnerPage> {
                     width: 200,
                     height: 200,
                     child: Text('Mid Card'),
+                  ),
+                ),
+              ),
+              Card(
+                child: InkWell(
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => Promotions(),
+                  )),
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: 200,
+                    height: 200,
+                    child: Text('Promotions'),
                   ),
                 ),
               ),
