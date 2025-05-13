@@ -32,7 +32,6 @@ class _MidHomeState extends State<MidHome> {
       'password': password.text.trim(),
       'fullName': agentName.text.trim()
     });
-    print(res.body);
     if (res.body == 'true') {
       setState(() {
         _getAgents = getAgents();
@@ -46,7 +45,6 @@ class _MidHomeState extends State<MidHome> {
   getAgents() async {
     var url = Uri.parse('$ipv4/getAgents');
     var res = await http.get(url);
-    print(res.body);
     var data = jsonDecode(res.body);
     return data;
   }
@@ -73,7 +71,7 @@ class _MidHomeState extends State<MidHome> {
                   _selectedIndex = value;
                 });
               },
-              destinations: [
+              destinations: const [
                 NavigationRailDestination(
                   icon: Icon(Icons.dashboard_rounded),
                   label: Text('Dashboard'),

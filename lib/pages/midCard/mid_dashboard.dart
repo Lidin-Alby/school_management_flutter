@@ -23,7 +23,7 @@ class _MidDashboardState extends State<MidDashboard> {
   }
 
   getStats() async {
-    var url = Uri.parse('$ipv4/getStats');
+    var url = Uri.parse('$ipv4/v2/getStats');
     var res = await http.get(url);
 
     return jsonDecode(res.body);
@@ -103,6 +103,19 @@ class _MidDashboardState extends State<MidDashboard> {
                           children: [
                             Text('Staff / Teachers'),
                             Text(stats['staffs'].toString())
+                          ],
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: SizedBox(
+                        width: 200,
+                        height: 100,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('Inactive'),
+                            Text(stats['inActiceCount'].toString())
                           ],
                         ),
                       ),
@@ -228,7 +241,6 @@ class _AllAgentsState extends State<AllAgents> {
   getAgents() async {
     var url = Uri.parse('$ipv4/getAgents');
     var res = await http.get(url);
-    print(res.body);
     return jsonDecode(res.body);
   }
 
@@ -348,7 +360,6 @@ class _AllLoginsState extends State<AllLogins> {
                               var res = await http.delete(url, body: {
                                 'userName': logins[index]['userName']
                               });
-                              print(res.body);
                               if (res.body == 'true') {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(

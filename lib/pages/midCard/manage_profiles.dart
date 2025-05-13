@@ -13,7 +13,9 @@ import 'package:intl/intl.dart';
 
 import 'package:school_management/pages/midCard/admin__student_edit.dart';
 
-import 'dart:html' as html;
+// import 'dart:html' as html;
+
+import 'package:web/web.dart' as html;
 
 import '../../ip_address.dart';
 // import '../../widgets/dropdown_widget.dart';
@@ -40,10 +42,10 @@ class _ManageProfilesState extends State<ManageProfiles> {
   getAllSchools() async {
     var client = BrowserClient()..withCredentials = true;
 
-    var url = Uri.parse('$ipv4/getAllMidSchools');
+    var url = Uri.parse('$ipv4/v2/getAllMidSchools');
     // var res = await http.get(url);
     var res = await client.get(url);
-    print(res.body);
+
     List schools = jsonDecode(res.body);
     return schools;
   }
@@ -53,13 +55,13 @@ class _ManageProfilesState extends State<ManageProfiles> {
         selectedUser != null &&
         selectedStatus != null) {
       var client = BrowserClient()..withCredentials = true;
-      var url = Uri.parse('$ipv4/getMidData');
+      var url = Uri.parse('$ipv4/v2/getMidData');
       var res = await client.post(url, body: {
         'selectedSchool': selectedSchool,
         'selectedUser': selectedUser,
         'selectedStatus': selectedStatus
       });
-      print(res.body);
+
       List data = jsonDecode(res.body);
       return data;
     }
@@ -85,7 +87,7 @@ class _ManageProfilesState extends State<ManageProfiles> {
   printingFunction(Map info) async {
     Navigator.pop(context);
     var client = BrowserClient()..withCredentials = true;
-    var url = Uri.parse('$ipv4/setPrintInfo');
+    var url = Uri.parse('$ipv4/v2/setPrintInfo');
     Map body = {
       'selectedUser': selectedUser,
       'selectedSchool': selectedSchool,
@@ -93,7 +95,6 @@ class _ManageProfilesState extends State<ManageProfiles> {
     };
     body.addAll(info);
     var res = await client.post(url, body: body);
-    print(res.body);
     if (res.body == 'true') {
       setState(() {
         _getData = getData();
@@ -239,11 +240,11 @@ class _ManageProfilesState extends State<ManageProfiles> {
                               value: selectedStatus,
                               isExpanded: true,
                               underline: Text(''),
-                              hint: Padding(
-                                padding: const EdgeInsets.only(left: 8),
+                              hint: const Padding(
+                                padding: EdgeInsets.only(left: 8),
                                 child: Text('Select Status'),
                               ),
-                              items: [
+                              items: const [
                                 DropdownMenuItem(
                                   child: Text('List'),
                                   value: 'list',
@@ -371,7 +372,8 @@ class _ManageProfilesState extends State<ManageProfiles> {
                                               ElevatedButton(
                                                   onPressed: () {
                                                     printingFunction({
-                                                      'ready': false.toString()
+                                                      'printStatus':
+                                                          null.toString()
                                                     });
                                                   },
                                                   child: Text('Confirm'))
@@ -416,7 +418,7 @@ class _ManageProfilesState extends State<ManageProfiles> {
                                               ElevatedButton(
                                                   onPressed: () =>
                                                       printingFunction({
-                                                        'ready': true.toString()
+                                                        'printStatus': "ready"
                                                       }),
                                                   child: Text('Confirm'))
                                             ],
@@ -460,8 +462,9 @@ class _ManageProfilesState extends State<ManageProfiles> {
                                               ElevatedButton(
                                                   onPressed: () =>
                                                       printingFunction({
-                                                        'printed':
-                                                            false.toString()
+                                                        'printStatus':
+                                                            'printing'
+                                                                .toString()
                                                       }),
                                                   child: Text('Confirm'))
                                             ],
@@ -507,8 +510,7 @@ class _ManageProfilesState extends State<ManageProfiles> {
                                               ElevatedButton(
                                                   onPressed: () =>
                                                       printingFunction({
-                                                        'printed':
-                                                            true.toString()
+                                                        'printStatus': 'printed'
                                                       }),
                                                   child: Text('Confirm'))
                                             ],
