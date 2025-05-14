@@ -3,6 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:widget_mask/widget_mask.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 
 import 'movable_and_extra_class.dart';
@@ -120,9 +121,11 @@ class _MovableObjectState extends State<MovableObject> {
                   ),
                 )
               : null,
-          child: ClipRRect(
-            borderRadius: myRadius,
-            child: element.getImage(),
+          child: WidgetMask(
+            blendMode: BlendMode.srcATop,
+            childSaveLayer: true,
+            mask: element.getImage(),
+            child: element.pngMaskImage,
           ),
         ),
       );

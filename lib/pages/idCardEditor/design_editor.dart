@@ -204,133 +204,130 @@ class _DesignEditorState extends State<DesignEditor> {
                         alignment: Alignment.topCenter,
                         child: Column(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  Text('Back Side'),
-                                  Switch(
-                                    value: isBack,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        isBack = !isBack;
-                                      });
-                                    },
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
+                            Row(
+                              children: [
+                                Text('Back Side'),
+                                Switch(
+                                  value: isBack,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      isBack = !isBack;
+                                    });
+                                  },
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                FilledButton(
+                                  onPressed: () async {
+                                    final picker = ImagePickerPlugin();
+                                    final frontBackgroundImage =
+                                        await picker.getImageFromSource(
+                                      source: ImageSource.gallery,
+                                    );
+                                    design.frontImageName =
+                                        frontBackgroundImage!.name;
+
+                                    final imgBytes = await frontBackgroundImage
+                                        .readAsBytes();
+                                    final decodedImage =
+                                        await decodeImageFromList(imgBytes);
+
+                                    // backgroundImageWidth =
+                                    //     decodedImage.width.toDouble();
+                                    design.backgroundImageHeight =
+                                        decodedImage.height.toDouble();
+
+                                    setState(() {
+                                      design.frontBackgroundImage = imgBytes;
+                                    });
+                                  },
+                                  child: Text('Front Bg Image'),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                if (isBack)
                                   FilledButton(
                                     onPressed: () async {
                                       final picker = ImagePickerPlugin();
-                                      final frontBackgroundImage =
+                                      final backBackgroundImage =
                                           await picker.getImageFromSource(
-                                        source: ImageSource.gallery,
-                                      );
-                                      design.frontImageName =
-                                          frontBackgroundImage!.name;
-
-                                      final imgBytes =
-                                          await frontBackgroundImage
-                                              .readAsBytes();
-                                      final decodedImage =
-                                          await decodeImageFromList(imgBytes);
+                                              source: ImageSource.gallery);
+                                      design.backImageName =
+                                          backBackgroundImage!.name;
+                                      final imgBytes = await backBackgroundImage
+                                          .readAsBytes();
 
                                       // backgroundImageWidth =
                                       //     decodedImage.width.toDouble();
-                                      design.backgroundImageHeight =
-                                          decodedImage.height.toDouble();
 
                                       setState(() {
-                                        design.frontBackgroundImage = imgBytes;
+                                        design.backBackgroundImage = imgBytes;
                                       });
                                     },
-                                    child: Text('Front Background Image'),
+                                    child: Text('Back Bg Image'),
                                   ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  if (isBack)
-                                    FilledButton(
-                                      onPressed: () async {
-                                        final picker = ImagePickerPlugin();
-                                        final backBackgroundImage =
-                                            await picker.getImageFromSource(
-                                                source: ImageSource.gallery);
-                                        design.backImageName =
-                                            backBackgroundImage!.name;
-                                        final imgBytes =
-                                            await backBackgroundImage
-                                                .readAsBytes();
-
-                                        // backgroundImageWidth =
-                                        //     decodedImage.width.toDouble();
-
-                                        setState(() {
-                                          design.backBackgroundImage = imgBytes;
-                                        });
-                                      },
-                                      child: Text('Back Background Image'),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                // Text('Width:'),
+                                // SizedBox(
+                                //   width: 5,
+                                // ),
+                                // SizedBox(
+                                //   width: 70,
+                                //   child: TextField(
+                                //     decoration:
+                                //         InputDecoration(isDense: true),
+                                //     controller: TextEditingController(
+                                //       text: backgroundImageWidth
+                                //           .toStringAsFixed(2),
+                                //     ),
+                                //     onSubmitted: (value) {
+                                //       setState(() {
+                                //         backgroundImageWidth =
+                                //             double.parse(value);
+                                //       });
+                                //     },
+                                //   ),
+                                // ),
+                                Text('Height:'),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                SizedBox(
+                                  width: 70,
+                                  child: TextField(
+                                    decoration: InputDecoration(isDense: true),
+                                    controller: TextEditingController(
+                                      text: design.backgroundImageHeight
+                                          .toStringAsFixed(2),
                                     ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  // Text('Width:'),
-                                  // SizedBox(
-                                  //   width: 5,
-                                  // ),
-                                  // SizedBox(
-                                  //   width: 70,
-                                  //   child: TextField(
-                                  //     decoration:
-                                  //         InputDecoration(isDense: true),
-                                  //     controller: TextEditingController(
-                                  //       text: backgroundImageWidth
-                                  //           .toStringAsFixed(2),
-                                  //     ),
-                                  //     onSubmitted: (value) {
-                                  //       setState(() {
-                                  //         backgroundImageWidth =
-                                  //             double.parse(value);
-                                  //       });
-                                  //     },
-                                  //   ),
-                                  // ),
-                                  Text('Height:'),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  SizedBox(
-                                    width: 70,
-                                    child: TextField(
-                                      decoration:
-                                          InputDecoration(isDense: true),
-                                      controller: TextEditingController(
-                                        text: design.backgroundImageHeight
-                                            .toStringAsFixed(2),
-                                      ),
-                                      onSubmitted: (value) {
-                                        setState(() {
-                                          design.backgroundImageHeight =
-                                              double.parse(value);
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  Text('Guidelines'),
-                                  Switch(
-                                    value: showGuidlines,
-                                    onChanged: (value) {
+                                    onSubmitted: (value) {
                                       setState(() {
-                                        showGuidlines = value;
+                                        design.backgroundImageHeight =
+                                            double.parse(value);
                                       });
                                     },
-                                  )
-                                ],
-                              ),
+                                  ),
+                                ),
+
+                                Spacer(),
+                                Text('Guidelines'),
+                                Switch(
+                                  value: showGuidlines,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      showGuidlines = value;
+                                    });
+                                  },
+                                )
+                              ],
                             ),
-                            Divider(),
+                            Divider(
+                              height: 0,
+                            ),
                             Column(
                               children: [
                                 LayoutBuilder(

@@ -51,7 +51,32 @@ class MyImage extends Movable {
   @override
   double height = 100;
   Uint8List? imageBytes;
-  bool circle = false;
+  Image pngMaskImage = Image.asset(
+    'assets/square.png',
+  );
+  // bool circle = false;
+
+  // Image getMask() {
+  //   if (pngBytes == null) {
+  //     Image.asset(
+  //       'assets/square.png',
+  //     );
+  //   } else {
+  //     return Image.memory(
+  //       pngBytes!,
+  //     );
+  //   }
+  // }
+
+  // Image getMask() {
+  //   if (pngBytes == null) {
+  //     return
+  //   } else {
+  //     return Image.memory(
+  //       pngBytes!,
+  //     );
+  //   }
+  // }
 
   Image getImage() {
     if (imageBytes == null) {
