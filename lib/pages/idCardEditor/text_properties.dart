@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'movable_and_extra_class.dart';
 
 class TextProperties extends StatelessWidget {
@@ -17,6 +17,95 @@ class TextProperties extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List fonts = [
+      // 'Bungee Tint',
+      'Bungee Spice',
+      'Honk',
+      'Bungee Shade',
+      'Monoton',
+      'Vast Shadow',
+      'Mogra',
+      'Roboto',
+      'DM Serif Text',
+      'Open Sans',
+      'Oswald',
+      'Bebas Neue',
+      'Noto Serif',
+      'Barlow Condensed',
+      'Mukta',
+      'Archivo',
+      'Teko',
+      'Hind',
+      'Fjalla One',
+      'Passion One',
+      'Domine',
+      'Spicy Rice', 'Staatliches', 'Salsa', 'Akshar', 'Aclonica', 'Boogaloo',
+      'Markazi Text', 'Palanquin', 'PT Serif', 'Luckiest Guy', 'Rye',
+      'Amarante',
+      'Smythe',
+      'Zen Tokyo Zoo',
+      'Ribeye Marrow',
+      'Metamorphous',
+      'Modern Antiqua',
+      'Skranji',
+      'Bungee Inline',
+      'Train One',
+      'Germania One',
+      'DynaPuff',
+      'Chewy',
+      'Boogaloo',
+      'Reggae One', 'Road Rage', 'Margarine', 'Yusei Magic', 'Rozha One',
+      'Noto Sans',
+      'Eczar',
+      'Noto Sans Gurmukhi',
+      'Noto Sans Tirhuta',
+      'Noto Sans Telugu',
+      'Noto Sans Tamil',
+      'Noto Sans Gujarati',
+      'Noto Sans Arabic', 'Noto Kufi Arabic', 'Noto Nastaliq Urdu',
+      'Noto Sans Kannada', 'Noto Sans Oriya', 'Noto Sans Malayalam',
+      'Noto Sans Gurmukhi',
+      'Noto Sans Bengali',
+      'Noto Sans Devanagari',
+      'Rethink Sans',
+      'Sofia Sans',
+      'Baloo Paaji 2',
+      'Vazirmatn',
+      'Bricolage Grotesque', //
+      // 'Afacad Flux',
+      'Kode Mono',
+      //  'Reddit Sans',
+      // 'Ubuntu Sans',
+      // 'Platypi',
+      'Protest Strike',
+      // 'Madimi One',
+      // 'Radio Canada Big',
+      // 'Edu Australia VIC WA NT Hand',
+      // 'New Amsterdam',
+      // 'Teachers',
+      // 'Playwrite Deutschland Grundschrift',
+      // 'Moderustic',
+      // 'Kalnia Glaze',
+      // 'Parkinsans',
+      // 'Matemasie',
+      'DM Serif Text',
+      'PT Serif Caption', 'Merriweather Sans', 'Volkhov', 'Libre Bodoni',
+      'Voces', 'Yanone Kaffeesatz',
+      // 'Zain',
+      'Barlow Semi Condensed', 'Agdasima',
+      // 'Sour Gummy',//
+      'Delius',
+      'Emilys Candy',
+      'Cherry Bomb One',
+      'Jua',
+      'Akaya Kanadaka',
+      'Bagel Fat One',
+      'Chicle',
+      'Bubblegum Sans',
+      'Titan One',
+      'Fugaz One',
+      'Rubik Moonrocks', 'Grandstander', 'Wendy One', 'Quando', 'Tourney'
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -179,6 +268,43 @@ class TextProperties extends StatelessWidget {
                 // });
                 onChange(selectedObj);
               },
+            )
+          ],
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Wrap(
+          spacing: 5,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text('Font: '),
+            SizedBox(
+              width: 150,
+              height: 40,
+              child: DropdownMenu(
+                label: Text(
+                  selectedObj.font,
+                  style: GoogleFonts.getFont(selectedObj.font),
+                ),
+                enableFilter: true,
+                dropdownMenuEntries: fonts
+                    .map(
+                      (e) => DropdownMenuEntry(
+                        labelWidget: Text(
+                          e,
+                          style: GoogleFonts.getFont(e),
+                        ),
+                        label: e,
+                        value: e,
+                      ),
+                    )
+                    .toList(),
+                onSelected: (value) {
+                  selectedObj.font = value.toString();
+                  onChange(selectedObj);
+                },
+              ),
             )
           ],
         ),

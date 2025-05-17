@@ -32,7 +32,6 @@ class DesignEditor extends StatefulWidget {
 class _DesignEditorState extends State<DesignEditor> {
   Movable? selectedObj;
   late Design design;
-  // List fonts = GoogleFonts.asMap().keys.toList().sublist(0, 200);
 
   late Future _getFieldNames;
   bool isBack = false;
@@ -63,7 +62,7 @@ class _DesignEditorState extends State<DesignEditor> {
       design.backElements.remove(element);
     }
     setState(() {
-      selectedObj = null;
+      // selectedObj = null;
     });
   }
 
@@ -157,11 +156,17 @@ class _DesignEditorState extends State<DesignEditor> {
                                               if (imagesFields
                                                   .contains(fields[index])) {
                                                 design.frontElements.add(
-                                                    MyImage(fields[index]));
+                                                    MyImage(fields[index],
+                                                        UniqueKey()));
                                               } else {
                                                 design.frontElements.add(
-                                                  MyAutoText(fields[index]),
+                                                  MyAutoText(fields[index],
+                                                      UniqueKey()),
                                                 );
+                                                for (var d
+                                                    in design.frontElements) {
+                                                  print(d.key);
+                                                }
                                               }
                                             });
                                           },
@@ -172,11 +177,13 @@ class _DesignEditorState extends State<DesignEditor> {
                                             setState(() {
                                               if (imagesFields
                                                   .contains(fields[index])) {
-                                                design.backElements.add(
-                                                    MyImage(fields[index]));
+                                                design.backElements.add(MyImage(
+                                                    fields[index],
+                                                    UniqueKey()));
                                               } else {
                                                 design.backElements.add(
-                                                  MyAutoText(fields[index]),
+                                                  MyAutoText(fields[index],
+                                                      UniqueKey()),
                                                 );
                                               }
                                             });
@@ -350,8 +357,8 @@ class _DesignEditorState extends State<DesignEditor> {
                                                           setState(() {
                                                             design.frontElements
                                                                 .add(MyText(
-                                                              "Text${design.frontElements.length + 1}",
-                                                            ));
+                                                                    "Text${design.frontElements.length + 1}",
+                                                                    UniqueKey()));
                                                           });
                                                         },
                                                         icon: Icon(Icons.add),
@@ -405,8 +412,8 @@ class _DesignEditorState extends State<DesignEditor> {
                                                               design
                                                                   .backElements
                                                                   .add(MyText(
-                                                                "Text${design.backElements.length + 1}",
-                                                              ));
+                                                                      "Text${design.backElements.length + 1}",
+                                                                      UniqueKey()));
                                                             });
                                                           },
                                                           icon: Icon(Icons.add),
@@ -504,9 +511,12 @@ class _DesignEditorState extends State<DesignEditor> {
                   width: 250,
                   color: Colors.grey,
                   child: selectedObj != null
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: getProperties(selectedObj!))
+                      ? SingleChildScrollView(
+                          child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: getProperties(selectedObj!)),
+                        )
                       : null,
                 )
               ],

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class Movable {
+  Key key;
   double height = 25;
   double width = 100;
   double top = 0;
@@ -14,7 +15,7 @@ class Movable {
   double bottomRight = 0;
   String name;
   String? value;
-  Movable(this.name) {
+  Movable(this.name, this.key) {
     value = name;
   }
   Map toMap() {
@@ -90,7 +91,7 @@ class MyImage extends Movable {
     }
   }
 
-  MyImage(super.name, {Map? json}) {
+  MyImage(super.name, super.key, {Map? json}) {
     if (json != null) {
       initialize(json);
     }
@@ -117,11 +118,12 @@ class MyImage extends Movable {
   //   return super.initialize(json);
   // }
   factory MyImage.fromMap(Map json) {
-    return MyImage(json['name'], json: json);
+    return MyImage(json['name'], UniqueKey(), json: json);
   }
 }
 
 class MyAutoText extends Movable {
+  String font = 'Roboto';
   double fontSize = 14;
   String stringCase = '';
   FontStyle fontStyle = FontStyle.normal;
@@ -131,7 +133,7 @@ class MyAutoText extends Movable {
   Color textcolor = Color(0xff000000);
   bool isQR = false;
 
-  MyAutoText(super.name, {Map? json}) {
+  MyAutoText(super.name, super.key, {Map? json}) {
     if (json != null) {
       initialize(json);
     }
@@ -140,6 +142,7 @@ class MyAutoText extends Movable {
   @override
   Map toMap() {
     return {
+      'font': font,
       'fontSize': fontSize,
       'stringCase': stringCase,
       'fontStyle': fontStyle.name,
@@ -154,6 +157,7 @@ class MyAutoText extends Movable {
 
   @override
   initialize(Map json) {
+    font = json['font'] ?? 'Roboto';
     fontSize = json['fontSize'];
     stringCase = json['stringCase'] ?? '';
     fontStyle = FontStyle.values.byName(json['fontStyle']);
@@ -169,13 +173,13 @@ class MyAutoText extends Movable {
   }
 
   factory MyAutoText.fromMap(Map json) {
-    return MyAutoText(json['name'], json: json);
+    return MyAutoText(json['name'], UniqueKey(), json: json);
   }
 }
 
 class MyText extends MyAutoText {
   TextEditingController textEditingController = TextEditingController();
-  MyText(super.name, {Map? json}) {
+  MyText(super.name, super.key, {Map? json}) {
     if (json != null) {
       initialize(json);
     }
@@ -195,6 +199,6 @@ class MyText extends MyAutoText {
   }
 
   factory MyText.fromMap(Map json) {
-    return MyText(json['name'], json: json);
+    return MyText(json['name'], UniqueKey(), json: json);
   }
 }

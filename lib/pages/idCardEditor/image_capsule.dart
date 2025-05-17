@@ -6,20 +6,22 @@ import 'movable_and_extra_class.dart';
 import 'movable_object.dart';
 
 class ImageCapsule extends StatelessWidget {
-  const ImageCapsule(
-      {super.key,
-      required this.backgroundImage,
-      // required this.backgroundImageWidth,
-      required this.backgroundImageHeight,
-      required this.elements,
-      required this.selected,
-      required this.showGuidlines,
-      required this.onSelected});
+  const ImageCapsule({
+    super.key,
+    required this.backgroundImage,
+    // required this.backgroundImageWidth,
+    required this.backgroundImageHeight,
+    required this.elements,
+    required this.selected,
+    required this.showGuidlines,
+    required this.onSelected,
+  });
   final Uint8List? backgroundImage;
   // final double backgroundImageWidth;
   final double backgroundImageHeight;
   final List<Movable> elements;
   final Movable? selected;
+
   final bool showGuidlines;
   final Function(Movable?) onSelected;
 
@@ -36,6 +38,7 @@ class ImageCapsule extends StatelessWidget {
           ),
           for (Movable element in elements)
             MovableObject(
+              key: element.key,
               element: element,
               selected: selected,
               showGuidlines: showGuidlines,

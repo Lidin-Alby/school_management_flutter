@@ -54,7 +54,9 @@ class Design {
     List<Movable> frontElements = [];
     List<Movable> backElements = [];
 
-    for (Map json in frontJson) {
+    for (int i = 0; i < frontJson.length; i++) {
+      Map json = frontJson[i];
+
       if (json.containsKey('text')) {
         frontElements.add(MyText.fromMap(json));
       } else if (json.containsKey('fontSize')) {

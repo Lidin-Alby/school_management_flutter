@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:school_management/ip_address.dart';
@@ -10,12 +11,13 @@ import 'package:widgets_easier/widgets_easier.dart';
 import 'movable_and_extra_class.dart';
 
 class MovableObject extends StatefulWidget {
-  const MovableObject(
-      {super.key,
-      required this.element,
-      required this.onSelected,
-      required this.showGuidlines,
-      required this.selected});
+  const MovableObject({
+    super.key,
+    required this.element,
+    required this.onSelected,
+    required this.showGuidlines,
+    required this.selected,
+  });
   final Movable element;
   final Movable? selected;
   final bool showGuidlines;
@@ -27,6 +29,7 @@ class MovableObject extends StatefulWidget {
 
 class _MovableObjectState extends State<MovableObject> {
   late Movable element;
+
   Movable? selectedObj;
   late BorderRadius myRadius;
   @override
@@ -63,7 +66,8 @@ class _MovableObjectState extends State<MovableObject> {
               hintText: 'Type Here',
               isCollapsed: true,
               border: InputBorder.none),
-          style: TextStyle(
+          style: GoogleFonts.getFont(
+            element.font,
             color: element.textcolor,
             fontSize: element.fontSize,
             fontStyle: element.fontStyle,
@@ -94,7 +98,8 @@ class _MovableObjectState extends State<MovableObject> {
                   element.value.toString(),
                   textAlign: element.textAlign,
                   minFontSize: 5,
-                  style: TextStyle(
+                  style: GoogleFonts.getFont(
+                    element.font,
                     color: element.textcolor,
                     fontSize: element.fontSize,
                     fontStyle: element.fontStyle,
