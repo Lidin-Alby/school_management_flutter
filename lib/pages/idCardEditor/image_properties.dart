@@ -24,7 +24,7 @@ class ImageProperties extends StatefulWidget {
 }
 
 class _ImagePropertiesState extends State<ImageProperties> {
-  List<String> inbuildPngList = ['square.png', 'circle.png'];
+  List<String> inbuildPngList = ['square.png'];
   List pngList = [];
   XFile? newPng;
   Uint8List? newPngBytes;
@@ -106,9 +106,7 @@ class _ImagePropertiesState extends State<ImageProperties> {
                     for (String i in inbuildPngList)
                       InkWell(
                         onTap: () {
-                          selectedObj.pngMaskImage = Image.asset(
-                            'assets/$i',
-                          );
+                          selectedObj.pngMaskImage = '';
                           widget.onChange(selectedObj);
                         },
                         child: Image.asset(
@@ -119,8 +117,7 @@ class _ImagePropertiesState extends State<ImageProperties> {
                     for (String i in pngList)
                       InkWell(
                           onTap: () {
-                            selectedObj.pngMaskImage = Image.network(
-                                height: 40, '$ipv4/getPngMask/$i');
+                            selectedObj.pngMaskImage = i;
                             widget.onChange(selectedObj);
                           },
                           child:

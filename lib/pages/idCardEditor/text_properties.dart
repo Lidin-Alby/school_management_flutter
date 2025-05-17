@@ -274,6 +274,43 @@ class TextProperties extends StatelessWidget {
             ),
           ],
         ),
+        SizedBox(
+          height: 10,
+        ),
+        Wrap(
+          spacing: 5,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Text('Text Capital: '),
+            ChoiceChip(
+              showCheckmark: false,
+              label: Text('-'),
+              selected: selectedObj.stringCase == '',
+              onSelected: (value) {
+                selectedObj.stringCase = '';
+                onChange(selectedObj);
+              },
+            ),
+            ChoiceChip(
+              showCheckmark: false,
+              label: Text('A'),
+              selected: selectedObj.stringCase == 'U',
+              onSelected: (value) {
+                selectedObj.stringCase = 'U';
+                onChange(selectedObj);
+              },
+            ),
+            ChoiceChip(
+              showCheckmark: false,
+              label: Text('a'),
+              selected: selectedObj.stringCase == 'L',
+              onSelected: (value) {
+                selectedObj.stringCase = 'L';
+                onChange(selectedObj);
+              },
+            ),
+          ],
+        ),
         // DropdownMenu(
         //   dropdownMenuEntries: fonts
         //       .map(

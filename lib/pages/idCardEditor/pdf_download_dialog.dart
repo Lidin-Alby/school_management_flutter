@@ -98,7 +98,16 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
           }
           j++;
         } else {
-          ele.value = students[i][ele.name].toUpperCase();
+          switch ((ele as MyAutoText).stringCase) {
+            case 'U':
+              ele.value = students[i][ele.name].toUpperCase();
+              break;
+            case 'L':
+              ele.value = students[i][ele.name].toLowerCase();
+              break;
+            default:
+              ele.value = students[i][ele.name];
+          }
         }
       }
       for (var ele in design.backElements) {
@@ -122,7 +131,16 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
           }
           j++;
         } else {
-          ele.value = students[i][ele.name].toUpperCase();
+          switch ((ele as MyAutoText).stringCase) {
+            case 'U':
+              ele.value = students[i][ele.name].toUpperCase();
+              break;
+            case 'L':
+              ele.value = students[i][ele.name].toLowerCase();
+              break;
+            default:
+              ele.value = students[i][ele.name];
+          }
         }
       }
       Uint8List? front = await screenshotController.captureFromWidget(
@@ -242,7 +260,16 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
           }
           j++;
         } else {
-          ele.value = students[i][ele.name];
+          switch ((ele as MyAutoText).stringCase) {
+            case 'U':
+              ele.value = students[i][ele.name].toUpperCase();
+              break;
+            case 'L':
+              ele.value = students[i][ele.name].toLowerCase();
+              break;
+            default:
+              ele.value = students[i][ele.name];
+          }
         }
       }
       for (var ele in design.backElements) {
@@ -266,7 +293,16 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
           }
           j++;
         } else {
-          ele.value = students[i][ele.name];
+          switch ((ele as MyAutoText).stringCase) {
+            case 'U':
+              ele.value = students[i][ele.name].toUpperCase();
+              break;
+            case 'L':
+              ele.value = students[i][ele.name].toLowerCase();
+              break;
+            default:
+              ele.value = students[i][ele.name];
+          }
         }
       }
 
@@ -397,7 +433,7 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
 
     FileSaver.instance.saveFile(
         name: 'my_file', bytes: file, mimeType: MimeType.pdf, ext: 'pdf');
-    // printedInfo(students);
+    printedInfo(students);
   }
 
   printedInfo(List selectedStudents) async {

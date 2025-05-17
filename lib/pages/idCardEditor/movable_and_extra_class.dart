@@ -51,9 +51,7 @@ class MyImage extends Movable {
   @override
   double height = 100;
   Uint8List? imageBytes;
-  Image pngMaskImage = Image.asset(
-    'assets/square.png',
-  );
+  String? pngMaskImage;
   // bool circle = false;
 
   // Image getMask() {
@@ -94,8 +92,13 @@ class MyImage extends Movable {
 
   MyImage(super.name, {Map? json}) {
     if (json != null) {
-      super.initialize(json);
+      initialize(json);
     }
+  }
+  @override
+  initialize(Map json) {
+    pngMaskImage = json['pngMaskImage'] ?? '';
+    super.initialize(json);
   }
 
   @override
@@ -103,6 +106,7 @@ class MyImage extends Movable {
     return {
       'width': width,
       'height': height,
+      'pngMaskImage': pngMaskImage ?? '',
       ...super.toMap(),
     };
   }
@@ -119,6 +123,7 @@ class MyImage extends Movable {
 
 class MyAutoText extends Movable {
   double fontSize = 14;
+  String stringCase = '';
   FontStyle fontStyle = FontStyle.normal;
   TextAlign textAlign = TextAlign.left;
   FontWeight fontWeight = FontWeight.normal;
@@ -136,6 +141,7 @@ class MyAutoText extends Movable {
   Map toMap() {
     return {
       'fontSize': fontSize,
+      'stringCase': stringCase,
       'fontStyle': fontStyle.name,
       'textAlign': textAlign.name,
       'fontWeight': fontWeight.value,
@@ -149,6 +155,7 @@ class MyAutoText extends Movable {
   @override
   initialize(Map json) {
     fontSize = json['fontSize'];
+    stringCase = json['stringCase'] ?? '';
     fontStyle = FontStyle.values.byName(json['fontStyle']);
     textAlign = TextAlign.values.byName(json['textAlign']);
     fontWeight =

@@ -228,7 +228,6 @@ class _AllAgentsState extends State<AllAgents> {
   getAgents() async {
     var url = Uri.parse('$ipv4/getAgents');
     var res = await http.get(url);
-    print(res.body);
     return jsonDecode(res.body);
   }
 
@@ -348,7 +347,6 @@ class _AllLoginsState extends State<AllLogins> {
                               var res = await http.delete(url, body: {
                                 'userName': logins[index]['userName']
                               });
-                              print(res.body);
                               if (res.body == 'true') {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(

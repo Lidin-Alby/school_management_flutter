@@ -3,6 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:school_management/ip_address.dart';
 import 'package:widget_mask/widget_mask.dart';
 import 'package:widgets_easier/widgets_easier.dart';
 
@@ -125,7 +126,11 @@ class _MovableObjectState extends State<MovableObject> {
             blendMode: BlendMode.srcATop,
             childSaveLayer: true,
             mask: element.getImage(),
-            child: element.pngMaskImage,
+            child: element.pngMaskImage == ''
+                ? Image.asset(
+                    'assets/square.png',
+                  )
+                : Image.network('$ipv4/getPngMask/${element.pngMaskImage}'),
           ),
         ),
       );
