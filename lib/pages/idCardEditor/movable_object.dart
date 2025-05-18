@@ -52,12 +52,12 @@ class _MovableObjectState extends State<MovableObject> {
             });
             widget.onSelected(selectedObj);
           },
-          onTapOutside: (event) {
-            setState(() {
-              selectedObj = null;
-            });
-            widget.onSelected(null);
-          },
+          // onTapOutside: (event) {
+          //   setState(() {
+          //     selectedObj = null;
+          //   });
+          //   widget.onSelected(null);
+          // },
           controller: element.textEditingController,
           maxLines: null,
           textAlign: element.textAlign,
@@ -127,15 +127,35 @@ class _MovableObjectState extends State<MovableObject> {
                   ),
                 )
               : null,
-          child: WidgetMask(
-            blendMode: BlendMode.srcATop,
-            childSaveLayer: true,
-            mask: element.getImage(),
-            child: element.pngMaskImage == ''
-                ? Image.asset(
-                    'assets/square.png',
-                  )
-                : Image.network('$ipv4/getPngMask/${element.pngMaskImage}'),
+          child: Stack(
+            children: [
+              Transform.scale(
+                scale: element.borderWidth,
+                child: ColorFiltered(
+                  colorFilter: ColorFilter.mode(
+                    element.borderColor,
+                    BlendMode.srcIn,
+                  ),
+                  child: element.pngMaskImage == ''
+                      ? Image.asset(
+                          'assets/square.png',
+                        )
+                      : Image.network(
+                          '$ipv4/getPngMask/${element.pngMaskImage}',
+                        ),
+                ),
+              ),
+              WidgetMask(
+                blendMode: BlendMode.srcATop,
+                childSaveLayer: true,
+                mask: element.getImage(),
+                child: element.pngMaskImage == ''
+                    ? Image.asset(
+                        'assets/square.png',
+                      )
+                    : Image.network('$ipv4/getPngMask/${element.pngMaskImage}'),
+              ),
+            ],
           ),
         ),
       );

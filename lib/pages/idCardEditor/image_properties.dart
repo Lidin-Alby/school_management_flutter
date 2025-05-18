@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:http/http.dart' as http;
@@ -242,6 +243,45 @@ class _ImagePropertiesState extends State<ImageProperties> {
               ),
             ),
           ],
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Row(
+          children: [
+            Text('Border Width: '),
+            SizedBox(
+              width: 45,
+              child: TextField(
+                style: TextStyle(fontSize: 13),
+                decoration: InputDecoration(isDense: true),
+                controller: TextEditingController(
+                  text: selectedObj.borderWidth.toStringAsFixed(2),
+                ),
+                onSubmitted: (value) {
+                  // setState(() {
+                  selectedObj.borderWidth = double.parse(value);
+
+                  // });
+                  widget.onChange(selectedObj);
+                },
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        ColorPicker(
+          colorPickerWidth: 200,
+          portraitOnly: true,
+          pickerColor: selectedObj.borderColor,
+          onColorChanged: (value) {
+            // setState(() {
+            selectedObj.borderColor = value;
+            // });
+            widget.onChange(selectedObj);
+          },
         ),
         SizedBox(
           height: 15,

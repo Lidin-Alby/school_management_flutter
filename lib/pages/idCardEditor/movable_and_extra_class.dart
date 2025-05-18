@@ -53,6 +53,9 @@ class MyImage extends Movable {
   double height = 100;
   Uint8List? imageBytes;
   String? pngMaskImage;
+  Color borderColor = Color(0xff000000);
+  double borderWidth = 1;
+
   // bool circle = false;
 
   // Image getMask() {
@@ -99,6 +102,8 @@ class MyImage extends Movable {
   @override
   initialize(Map json) {
     pngMaskImage = json['pngMaskImage'] ?? '';
+    borderColor = json['borderColor'] ?? borderColor;
+    borderWidth = json['borderWidth'] ?? borderWidth;
     super.initialize(json);
   }
 
@@ -108,6 +113,8 @@ class MyImage extends Movable {
       'width': width,
       'height': height,
       'pngMaskImage': pngMaskImage ?? '',
+      'borderColor': borderColor,
+      'borderWidth': borderWidth,
       ...super.toMap(),
     };
   }
