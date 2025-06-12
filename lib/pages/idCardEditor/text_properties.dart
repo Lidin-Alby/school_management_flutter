@@ -435,6 +435,15 @@ class TextProperties extends StatelessWidget {
                 onChange(selectedObj);
               },
             ),
+            ChoiceChip(
+              showCheckmark: false,
+              label: Text('W'),
+              selected: selectedObj.stringCase == 'W',
+              onSelected: (value) {
+                selectedObj.stringCase = 'W';
+                onChange(selectedObj);
+              },
+            ),
           ],
         ),
         // DropdownMenu(

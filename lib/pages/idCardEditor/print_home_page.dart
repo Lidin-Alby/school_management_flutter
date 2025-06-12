@@ -214,15 +214,16 @@ class _PrintHomePageState extends State<PrintHomePage> {
                     SizedBox(
                       height: 5,
                     ),
-                    if (selectedType != null)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                              '${selectedStudnts.length} of ${students.length} students selected'),
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: selectedType != null
+                            ? Text(
+                                '${selectedStudnts.length} of ${students.length} students selected')
+                            : Text('unassigned - ${students.length}'),
                       ),
+                    ),
                     if (selectedType != null)
                       Row(
                         children: [

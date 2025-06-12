@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
+
 // import 'package:intl/intl.dart';
 
 import '../../ip_address.dart';
@@ -19,6 +20,20 @@ import 'package:http/http.dart' as http;
 import 'package:pdf/widgets.dart' as pw;
 
 import 'print_settings_class.dart';
+
+extension StringExtension on String {
+  String toTitleCase() {
+    if (isEmpty) {
+      return this;
+    }
+    return split(' ').map((word) {
+      if (word.isEmpty) {
+        return '';
+      }
+      return word[0].toUpperCase() + word.substring(1);
+    }).join(' ');
+  }
+}
 
 class PdfDownloadDialog extends StatefulWidget {
   const PdfDownloadDialog(
@@ -105,6 +120,8 @@ class _PdfDownloadDialogState extends State<PdfDownloadDialog> {
             case 'L':
               ele.value = students[i][ele.name].toLowerCase();
               break;
+            case 'W':
+              students[i][ele.name].toTitleCase();
             default:
               ele.value = students[i][ele.name];
           }

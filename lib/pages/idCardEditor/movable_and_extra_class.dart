@@ -102,7 +102,9 @@ class MyImage extends Movable {
   @override
   initialize(Map json) {
     pngMaskImage = json['pngMaskImage'] ?? '';
-    borderColor = json['borderColor'] ?? borderColor;
+    borderColor = json['borderColor'] == null
+        ? borderColor
+        : colorFromHex(json['borderColor'])!;
     borderWidth = json['borderWidth'] ?? borderWidth;
     super.initialize(json);
   }
@@ -113,7 +115,7 @@ class MyImage extends Movable {
       'width': width,
       'height': height,
       'pngMaskImage': pngMaskImage ?? '',
-      'borderColor': borderColor,
+      'borderColor': colorToHex(borderColor),
       'borderWidth': borderWidth,
       ...super.toMap(),
     };

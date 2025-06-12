@@ -43,7 +43,6 @@ class _ManageProfilesState extends State<ManageProfiles> {
     var url = Uri.parse('$ipv4/getAllMidSchools');
     // var res = await http.get(url);
     var res = await client.get(url);
-    print(res.body);
     List schools = jsonDecode(res.body);
     return schools;
   }
@@ -59,7 +58,6 @@ class _ManageProfilesState extends State<ManageProfiles> {
         'selectedUser': selectedUser,
         'selectedStatus': selectedStatus
       });
-      print(res.body);
       List data = jsonDecode(res.body);
       return data;
     }
@@ -93,7 +91,6 @@ class _ManageProfilesState extends State<ManageProfiles> {
     };
     body.addAll(info);
     var res = await client.post(url, body: body);
-    print(res.body);
     if (res.body == 'true') {
       setState(() {
         _getData = getData();
@@ -117,6 +114,38 @@ class _ManageProfilesState extends State<ManageProfiles> {
           ),
         );
       }
+    }
+  }
+
+  deleteStudents() async {
+    var url = Uri.parse('$ipv4/deleteMultipleMidStudent');
+    var res = await http.post(url, body: {
+      'schoolCode': selectedSchool,
+      'userList': jsonEncode(selectedList),
+    });
+    if (res.body == 'true') {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+      setState(() {
+        _getData = getData();
+      });
+    }
+  }
+
+  deleteStaffs() async {
+    var url = Uri.parse('$ipv4/deleteMultipleMidStaff');
+    var res = await http.post(url, body: {
+      'schoolCode': selectedSchool,
+      'userList': jsonEncode(selectedList),
+    });
+    if (res.body == 'true') {
+      if (mounted) {
+        Navigator.pop(context);
+      }
+      setState(() {
+        _getData = getData();
+      });
     }
   }
 
@@ -537,7 +566,40 @@ class _ManageProfilesState extends State<ManageProfiles> {
                                   ),
                                 ),
                                 child: Text('Download Photos'),
-                              )
+                              ),
+                              Spacer(),
+                              ElevatedButton(
+                                onPressed: selectedList.isEmpty
+                                    ? null
+                                    : () => showDialog(
+                                          barrierDismissible: false,
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: Text('Are you sure?'),
+                                            content: Text(
+                                                'This will delete permanently.'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () =>
+                                                    Navigator.pop(context),
+                                                child: Text('Cancel'),
+                                              ),
+                                              FilledButton(
+                                                onPressed: () {
+                                                  if (selectedUser ==
+                                                      'Students') {
+                                                    deleteStudents();
+                                                  } else {
+                                                    deleteStaffs();
+                                                  }
+                                                },
+                                                child: Text('Confirm'),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                child: Text('Delete'),
+                              ),
                             ],
                           ),
                         ),

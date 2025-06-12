@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:school_management/pages/midCard/ready_to_print_list.dart';
 
 import '../../ip_address.dart';
 
@@ -116,31 +117,38 @@ class _MidDashboardState extends State<MidDashboard> {
                 Wrap(
                   children: [
                     Card(
-                      child: SizedBox(
-                        width: 200,
-                        height: 100,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Ready To Print',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text((stats['staffReadyCount'] +
-                                    stats['studentReadyCount'])
-                                .toString()),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text('Student: ${stats['studentReadyCount']}'),
-                            SizedBox(
-                              height: 2,
-                            ),
-                            Text('Staff: ${stats['staffReadyCount']}')
-                          ],
+                      child: InkWell(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ReadyToPrintList(),
+                            )),
+                        child: SizedBox(
+                          width: 200,
+                          height: 100,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Ready To Print',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text((stats['staffReadyCount'] +
+                                      stats['studentReadyCount'])
+                                  .toString()),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Text('Student: ${stats['studentReadyCount']}'),
+                              SizedBox(
+                                height: 2,
+                              ),
+                              Text('Staff: ${stats['staffReadyCount']}')
+                            ],
+                          ),
                         ),
                       ),
                     ),

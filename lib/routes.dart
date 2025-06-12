@@ -21,6 +21,7 @@ import 'package:school_management/pages/grade_assignment.dart';
 import 'package:school_management/pages/grade_management.dart';
 import 'package:school_management/pages/login_page.dart';
 import 'package:school_management/pages/marks_management.dart';
+import 'package:school_management/pages/midCard/delete_profile_request.dart';
 import 'package:school_management/pages/midCard/mid_agent_home.dart';
 import 'package:school_management/pages/midCard/mid_home.dart';
 import 'package:school_management/pages/online_admission.dart';
@@ -91,6 +92,10 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => LoginPage(),
+    ),
+    GoRoute(
+      path: '/deleteAccoutRequest',
+      builder: (context, state) => DeleteProfileRequest(),
     ),
     GoRoute(
       path: '/shareProfile/:scCode/:admNo',
